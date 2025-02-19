@@ -2,6 +2,7 @@ import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
+import userRoutes from './application/users/user.routes';
 
 dotenv.config();
 
@@ -11,8 +12,6 @@ app.use(cors());
 app.use(helmet());
 app.use(express.json());
 
-app.use('/',(req,res) => {
-    res.send("Welcome to SLOTFLOW home");
-})
+app.use('/user',userRoutes)
 
 export default app;

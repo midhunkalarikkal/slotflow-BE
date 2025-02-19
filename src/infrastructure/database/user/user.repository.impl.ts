@@ -1,0 +1,35 @@
+import { IUser, UserModel } from "./user.model";
+import { User } from "../../../core/entities/user.entity";
+import { UserRepository } from "../../../core/repositories/user.repository";
+
+export class UserRepositoryImpl implements UserRepository {
+    private mapToEntity(user: IUser): User {
+        return new User(
+            user.username,
+            user.email,
+            user.password,
+            user.verified
+        );
+    }
+
+    async createUser(user: User): Promise<User> {
+        try {
+            const createdUser = await UserModel.create(user);
+            return this.mapToEntity(createdUser);
+        } catch (error) {
+            console.error("Error creating user:", error);
+            throw new Error("Database error: Unable to create user.");
+        }
+    }
+
+    async findUserByEmail(email: string): Promise<User | null> {
+        try {
+            console.log("Implements function findUserByEmail", email);
+            const user = await UserModel.findOne({ email });
+            return user ? this.mapToEntity(user) : null;
+        } catch (error) {
+            console.error("Error finding user by email:", error);
+            throw new Error("Database error: Unable to find user.");
+        }
+    }
+}
