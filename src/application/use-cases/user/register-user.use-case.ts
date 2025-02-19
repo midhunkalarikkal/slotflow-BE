@@ -1,4 +1,4 @@
-import { User } from '../../entities/user.entity';
+import { User } from '../../../domain/entities/user.entity';
 import { OTPService } from '../../../infrastructure/services/otp.service';
 import { PasswordHasher } from '../../../infrastructure/security/password-hashing';
 import { UserRepositoryImpl } from '../../../infrastructure/database/user/user.repository.impl';

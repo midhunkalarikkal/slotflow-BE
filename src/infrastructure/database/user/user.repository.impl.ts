@@ -1,6 +1,6 @@
 import { IUser, UserModel } from "./user.model";
-import { User } from "../../../core/entities/user.entity";
-import { UserRepository } from "../../../core/repositories/user.repository";
+import { User } from "../../../domain/entities/user.entity";
+import { UserRepository } from "../../../domain/repositories/user.repository";
 
 export class UserRepositoryImpl implements UserRepository {
     private mapToEntity(user: IUser): User {

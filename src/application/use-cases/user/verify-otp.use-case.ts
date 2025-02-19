@@ -1,7 +1,7 @@
 import { UserRepositoryImpl } from '../../../infrastructure/database/user/user.repository.impl';
 import { JWTService } from '../../../infrastructure/security/jwt';
 import { OTPService } from '../../../infrastructure/services/otp.service';
-import { User } from '../../entities/user.entity';
+import { User } from '../../../domain/entities/user.entity';
 
 export class VerifyOTPUseCase {
   constructor(private userRepository: UserRepositoryImpl) {}
