@@ -18,7 +18,7 @@ export class VerifyOTPUseCase {
     const isValidOTP = OTPService.verifyOTP(decoded.email, otp);
     if (!isValidOTP) return { success: false, message: 'Invalid or expired OTP' };
 
-    const user = new User(decoded.username, decoded.email,decoded.hashedPassword, true)
+    const user = new User(decoded.username, decoded.email,decoded.hashedPassword, null, null, null, false, false)
     await this.userRepository.createUser(user);
 
     return { success: true, message: 'OTP verified, redirecting to home' };

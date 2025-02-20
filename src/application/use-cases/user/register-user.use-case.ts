@@ -1,8 +1,7 @@
-import { User } from '../../../domain/entities/user.entity';
+import { JWTService } from '../../../infrastructure/security/jwt';
 import { OTPService } from '../../../infrastructure/services/otp.service';
 import { PasswordHasher } from '../../../infrastructure/security/password-hashing';
 import { UserRepositoryImpl } from '../../../infrastructure/database/user/user.repository.impl';
-import { JWTService } from '../../../infrastructure/security/jwt';
 
 export class RegisterUserUseCase {
 
@@ -14,15 +13,11 @@ export class RegisterUserUseCase {
     if (existingUser) return { success: false, message: 'Email already registered' };
 
     const hashedPassword = await PasswordHasher.hashPassword(password);
-    const user = new User(username, email, hashedPassword, false);
     
     const otp = OTPService.generateOTP(email);
     await OTPService.sendOTP(email, otp);
 
     const token = JWTService.generateJwtToken({ username, email, hashedPassword });
-
-    console.log("otp : ",otp);
-    console.log("token : ",token);
 
     return { success: true, message: `OTP sent to email`, token };
 

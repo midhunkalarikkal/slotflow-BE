@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { VerifyOTPUseCase } from '../../application/use-cases/user/verify-otp.use-case';
-import { RegisterUserUseCase } from '../../application/use-cases/user/register-user.use-case';
 import { UserRepositoryImpl } from '../../infrastructure/database/user/user.repository.impl';
+import { RegisterUserUseCase } from '../../application/use-cases/user/register-user.use-case';
 
 const userRepositoryImpl = new UserRepositoryImpl();
 const registerUserUseCase = new RegisterUserUseCase(userRepositoryImpl);

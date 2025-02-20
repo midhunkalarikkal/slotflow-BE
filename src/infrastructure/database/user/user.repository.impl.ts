@@ -8,7 +8,11 @@ export class UserRepositoryImpl implements UserRepository {
             user.username,
             user.email,
             user.password,
-            user.verified
+            user.phone,
+            user.profileImage,
+            user.addressId,
+            user.isBlocked,
+            user.isVerified
         );
     }
 
@@ -18,7 +22,7 @@ export class UserRepositoryImpl implements UserRepository {
             return this.mapToEntity(createdUser);
         } catch (error) {
             console.error("Error creating user:", error);
-            throw new Error("Database error: Unable to create user.");
+            throw new Error("Unable to register, please try again after a few minutes.");
         }
     }
 
@@ -29,7 +33,7 @@ export class UserRepositoryImpl implements UserRepository {
             return user ? this.mapToEntity(user) : null;
         } catch (error) {
             console.error("Error finding user by email:", error);
-            throw new Error("Database error: Unable to find user.");
+            throw new Error("Unable to find user by email.");
         }
     }
 }
