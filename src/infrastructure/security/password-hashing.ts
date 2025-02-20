@@ -2,11 +2,19 @@ import bcrypt from 'bcryptjs';
 
 export class PasswordHasher {
   static async hashPassword(password: string): Promise<string> {
-    const salt = await bcrypt.genSalt(10);
-    return await bcrypt.hash(password, salt);
+    try{
+      const salt = await bcrypt.genSalt(10);
+      return await bcrypt.hash(password, salt);
+    }catch(error){
+      throw new Error("Password Hashing failed");
+    }
   }
 
   static async comparePassword(plainPassword: string, hashedPassword: string): Promise<boolean> {
-    return await bcrypt.compare(plainPassword, hashedPassword);
+    try{
+      return await bcrypt.compare(plainPassword, hashedPassword);
+    }catch(error){
+      throw new Error("Password comparison failed.")
+    }
   }
 }

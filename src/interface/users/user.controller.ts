@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { HandleError } from '../../infrastructure/error/error';
 import { VerifyOTPUseCase } from '../../application/use-cases/user/verify-otp.use-case';
 import { UserRepositoryImpl } from '../../infrastructure/database/user/user.repository.impl';
 import { RegisterUserUseCase } from '../../application/use-cases/user/register-user.use-case';
@@ -19,10 +20,9 @@ export class UserController {
     try {
       const { username, email, password } = req.body;
       const result = await this.registerUserUseCase.execute(username, email, password);
-      res.status(result.success ? 200 : 400).json(result);
+      return res.status(201).json(result)
     } catch (error) {
-      console.log("error : ",error);
-      res.status(500).json({ success: false, message: "Internal Server Error", error: error });
+      return HandleError.handle(error, res)
     }
   }
 
@@ -30,9 +30,9 @@ export class UserController {
     try {
       const { token, otp } = req.body;
       const result = await this.verifyOTPUseCase.execute(token, otp);
-      res.status(result.success ? 200 : 400).json(result);
+      return res.status(200).json(result);
     } catch (error) {
-      res.status(500).json({ success: false, message: "Internal Server Error", error: error });
+      return HandleError.handle(error, res);
     }
   }
 }
