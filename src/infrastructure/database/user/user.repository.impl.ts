@@ -28,7 +28,6 @@ export class UserRepositoryImpl implements UserRepository {
 
     async findUserByEmail(email: string): Promise<User | null> {
         try {
-            console.log("Implements function findUserByEmail", email);
             const user = await UserModel.findOne({ email });
             return user ? this.mapToEntity(user) : null;
         } catch (error) {
