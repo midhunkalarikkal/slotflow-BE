@@ -22,19 +22,19 @@ export class UserController {
     try {
       const { username, email, password } = req.body;
       const result = await this.registerUserUseCase.execute(username, email, password);
-      return res.status(201).json(result)
+      res.status(201).json(result);
     } catch (error) {
-      return HandleError.handle(error, res)
-    }
+      HandleError.handle(error, res);
+    }      
   }
 
   async verifyOTP(req: Request, res: Response) {
     try {
       const { token, otp } = req.body;
       const result = await this.verifyOTPUseCase.execute(token, otp);
-      return res.status(200).json(result);
+      res.status(200).json(result);
     } catch (error) {
-      return HandleError.handle(error, res);
+      HandleError.handle(error, res);
     }
   }
 }
