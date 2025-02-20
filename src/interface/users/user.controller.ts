@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { HandleError } from '../../infrastructure/error/error';
 import { VerifyOTPUseCase } from '../../application/use-cases/user/verify-otp.use-case';
 import { UserRepositoryImpl } from '../../infrastructure/database/user/user.repository.impl';
@@ -13,8 +13,10 @@ export class UserController {
   constructor(
     private registerUserUseCase: RegisterUserUseCase,
     private verifyOTPUseCase: VerifyOTPUseCase
-  ) {this.registerUser = this.registerUser.bind(this);
-    this.verifyOTP = this.verifyOTP.bind(this);}
+  ) {
+    this.registerUser = this.registerUser.bind(this); // Bind in constructor
+    this.verifyOTP = this.verifyOTP.bind(this); // Bind in constructor
+    }
 
   async registerUser(req: Request, res: Response) {
     try {
