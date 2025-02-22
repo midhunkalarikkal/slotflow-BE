@@ -1,8 +1,8 @@
-import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
-import userRoutes from './interface/users/user.routes';
+import express from 'express';
+import authRoutes from './interface/auth/auth.routes';
 
 dotenv.config();
 
@@ -12,6 +12,6 @@ app.use(cors());
 app.use(helmet());
 app.use(express.json());
 
-app.use('/user',userRoutes)
+app.use('/api/auth',authRoutes);
 
 export default app;
