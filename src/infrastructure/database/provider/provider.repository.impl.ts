@@ -37,4 +37,12 @@ export class ProviderRepositoryImpl implements IProviderRepository {
             throw new Error("Unable to find the provider.")
         }
     }
+
+    async findAllProviders(): Promise<Provider[]> {
+        try{
+            return await ProviderModel.find({},{_id:1, username:1, profileImage:1, createdAt: 1});
+        }catch(error){
+            throw new Error("Failed to fetch providers from database.");
+        }
+    }
 }
