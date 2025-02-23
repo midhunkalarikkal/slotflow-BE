@@ -14,7 +14,7 @@ const registerUseCase = new RegisterUseCase(userRepositoryImpl, providerReposito
 const verifyOTPUseCase = new VerifyOTPUseCase(userRepositoryImpl, providerRepositoryImpl);
 
 export class AuthController {
-  
+
   constructor(
     private registerUseCase: RegisterUseCase,
     private verifyOTPUseCase: VerifyOTPUseCase,
@@ -55,6 +55,7 @@ export class AuthController {
         sameSite: 'strict',
         secure: appConfig.nodeEnv !== 'development'
       })
+      // result.role is there so that we can show appropriate pages
       res.status(200).json({ success : result.success, message: result.message });
     }catch(error){
       HandleError.handle(error, res);

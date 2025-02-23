@@ -19,3 +19,8 @@ export const jwtConfig = {
 export const appConfig = {
     nodeEnv : process.env.NODE_ENV
 }
+
+export const adminConfig = {
+    adminEmail : process.env.ADMIN_EMAIL,
+    adminPassword : process.env.ADMIN_PASSWORD
+}

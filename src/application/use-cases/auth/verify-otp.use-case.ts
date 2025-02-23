@@ -25,10 +25,10 @@ export class VerifyOTPUseCase {
     } else if (decoded.role === "PROVIDER") {
       const provider = new Provider("",decoded.username, decoded.email, decoded.hashedPassword, null, null, null, null, null, false, true)
       await this.providerRepository.createProvider(provider);
-    } else {
+    }else{
       throw new Error("Unexpected error, please try again.")
     }
-
-    return { success: true, message: 'OTP verified, Welcome.' };
+    
+    return { success: true, message: 'OTP verified successfully.' };
   }
 }
