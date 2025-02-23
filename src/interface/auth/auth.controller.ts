@@ -61,6 +61,21 @@ export class AuthController {
       HandleError.handle(error, res);
     }
   }
+
+  async logout(req: Request, res: Response) {
+    try{
+      const { role } = req.body;
+      res.cookie("jwt", {
+        httpOnly: true,
+        sameSite: 'strict',
+        secure: appConfig.nodeEnv !== 'development'
+    });
+    // role based logout we can implement
+    res.status(200).json({ success: true, message: "Logged out successfully." });
+    }catch(error){
+      HandleError.handle(error,res);
+    }
+  }
 }
 
 const authController = new AuthController(registerUseCase, verifyOTPUseCase, loginUseCase);
