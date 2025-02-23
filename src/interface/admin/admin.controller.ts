@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { HandleError } from "../../infrastructure/error/error";
-import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/provider.repository.impl";
 import { AdminUseCase } from "../../application/use-cases/admin/admin.Use-Case";
+import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/provider.repository.impl";
 
 const providerRepositoryImpl = new ProviderRepositoryImpl();
 const adminUseCase = new AdminUseCase(providerRepositoryImpl);

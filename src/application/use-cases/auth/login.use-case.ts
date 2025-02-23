@@ -36,7 +36,7 @@ export class LoginUseCase {
         const valid = await PasswordHasher.comparePassword(password, userOrProvider.password);
         if(!valid) throw new Error("Invalid credentials.");
         
-        const token = JWTService.generateJwtToken({userOrProviderId : userOrProvider._id, role})
+        const token = JWTService.generateJwtToken({userOrProviderId : userOrProvider._id})
         return { success: true, message: 'Logged In Successfully.', token };
     }
 }

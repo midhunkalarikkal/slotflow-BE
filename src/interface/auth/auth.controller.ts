@@ -55,8 +55,7 @@ export class AuthController {
         sameSite: 'strict',
         secure: appConfig.nodeEnv !== 'development'
       })
-      // result.role is there so that we can show appropriate pages
-      res.status(200).json({ success, message });
+      res.status(200).json({ success, message, token });
     }catch(error){
       HandleError.handle(error, res);
     }
