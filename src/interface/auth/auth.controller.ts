@@ -48,15 +48,15 @@ export class AuthController {
   async login(req: Request, res: Response) {
     try{
       const { email, password, role } = req.body;
-      const result = await this.loginUseCase.execute(email, password, role);
-      res.cookie("jwt",result.token, {
+      const { success, message, token } = await this.loginUseCase.execute(email, password, role);
+      res.cookie("jwt",token, {
         maxAge: 7 * 24 * 60 * 60 * 1000,
         httpOnly: true,
         sameSite: 'strict',
         secure: appConfig.nodeEnv !== 'development'
       })
       // result.role is there so that we can show appropriate pages
-      res.status(200).json({ success : result.success, message: result.message });
+      res.status(200).json({ success, message });
     }catch(error){
       HandleError.handle(error, res);
     }
