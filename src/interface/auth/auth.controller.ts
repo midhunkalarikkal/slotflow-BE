@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
+import { appConfig } from '../../config/env';
 import { HandleError } from '../../infrastructure/error/error';
+import { LoginUseCase } from '../../application/use-cases/auth/login.use-case';
 import { RegisterUseCase } from '../../application/use-cases/auth/register.use-case';
 import { VerifyOTPUseCase } from '../../application/use-cases/auth/verify-otp.use-case';
 import { UserRepositoryImpl } from '../../infrastructure/database/user/user.repository.impl';
@@ -7,16 +9,20 @@ import { ProviderRepositoryImpl } from '../../infrastructure/database/provider/p
 
 const userRepositoryImpl = new UserRepositoryImpl();
 const providerRepositoryImpl = new ProviderRepositoryImpl();
+const loginUseCase = new LoginUseCase(userRepositoryImpl, providerRepositoryImpl);
 const registerUseCase = new RegisterUseCase(userRepositoryImpl, providerRepositoryImpl);
 const verifyOTPUseCase = new VerifyOTPUseCase(userRepositoryImpl, providerRepositoryImpl);
 
 export class AuthController {
+  
   constructor(
     private registerUseCase: RegisterUseCase,
-    private verifyOTPUseCase: VerifyOTPUseCase
+    private verifyOTPUseCase: VerifyOTPUseCase,
+    private loginUseCase: LoginUseCase
   ) {
     this.register = this.register.bind(this);
     this.verifyOTP = this.verifyOTP.bind(this);
+    this.login = this.login.bind(this);
     }
 
   async register(req: Request, res: Response) {
@@ -38,7 +44,23 @@ export class AuthController {
       HandleError.handle(error, res);
     }
   }
+
+  async login(req: Request, res: Response) {
+    try{
+      const { email, password, role } = req.body;
+      const result = await this.loginUseCase.execute(email, password, role);
+      res.cookie("jwt",result.token, {
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+        httpOnly: true,
+        sameSite: 'strict',
+        secure: appConfig.nodeEnv !== 'development'
+      })
+      res.status(200).json({ success : result.success, message: result.message });
+    }catch(error){
+      HandleError.handle(error, res);
+    }
+  }
 }
 
-const authController = new AuthController(registerUseCase, verifyOTPUseCase);
+const authController = new AuthController(registerUseCase, verifyOTPUseCase, loginUseCase);
 export { authController };

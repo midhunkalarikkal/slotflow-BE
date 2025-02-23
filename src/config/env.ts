@@ -15,3 +15,7 @@ export const mailConfig = {
 export const jwtConfig = {
     jwtSecret : process.env.JWT_SECRET
 }
+
+export const appConfig = {
+    nodeEnv : process.env.NODE_ENV
+}

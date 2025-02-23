@@ -2,6 +2,7 @@ import { Types } from "mongoose";
 
 export class Provider {
     constructor(
+        public _id: Types.ObjectId | string,
         public username : string,
         public email : string,
         public password : string,

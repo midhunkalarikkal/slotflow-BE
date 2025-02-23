@@ -1,11 +1,12 @@
 import { IProvider, ProviderModel } from "./provider.model";
 import { Provider } from "../../../domain/entities/provider.entity";
-import { ProviderRepository } from '../../../domain/repositories/provider.repository';
+import { IProviderRepository } from '../../../domain/repositories/IProvider.repository';
 
 
-export class ProviderRepositoryImpl implements ProviderRepository {
+export class ProviderRepositoryImpl implements IProviderRepository {
     private mapToEntity(provider : IProvider) : Provider {
         return new Provider(
+            provider._id,
             provider.username,
             provider.email,
             provider.password,
