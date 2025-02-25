@@ -5,7 +5,6 @@ import { IUserRepository } from "../../../domain/repositories/IUser.repository";
 export class UserRepositoryImpl implements IUserRepository {
     private mapToEntity(user: IUser): User {
         return new User(
-            user._id,
             user.username,
             user.email,
             user.password,

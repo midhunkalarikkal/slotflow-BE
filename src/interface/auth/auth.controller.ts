@@ -28,8 +28,14 @@ export class AuthController {
   async register(req: Request, res: Response) {
     try {
       const { username, email, password, role } = req.body;
-      const result = await this.registerUseCase.execute(username, email, password, role);
-      res.status(201).json(result);
+      const { success, message, token } = await this.registerUseCase.execute(username, email, password, role);
+      res.cookie("jwt",token, {
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+        httpOnly: true,
+        sameSite: 'strict',
+        secure: appConfig.nodeEnv !== 'development'
+      })
+      res.status(201).json({ success, message, token });
     } catch (error) {
       HandleError.handle(error, res);
     }      
@@ -37,7 +43,8 @@ export class AuthController {
 
   async verifyOTP(req: Request, res: Response) {
     try {
-      const { token, otp } = req.body;
+      const token = req.cookies.jwt;
+      const { otp } = req.body;
       const result = await this.verifyOTPUseCase.execute(token, otp);
       res.status(200).json(result);
     } catch (error) {
@@ -54,8 +61,8 @@ export class AuthController {
         httpOnly: true,
         sameSite: 'strict',
         secure: appConfig.nodeEnv !== 'development'
-      })
-      res.status(200).json({ success, message, token });
+      });
+      res.status(200).json({ success, message });
     }catch(error){
       HandleError.handle(error, res);
     }

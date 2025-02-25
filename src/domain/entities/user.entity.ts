@@ -2,7 +2,6 @@ import { Types } from "mongoose";
 
 export class User {
     constructor(
-        public _id: Types.ObjectId | string,
         public username: string,
         public email: string,
         public password: string,
@@ -11,5 +10,6 @@ export class User {
         public addressId: Types.ObjectId | null,
         public isBlocked: boolean,
         public isVerified: boolean,
+        public _id?: Types.ObjectId | string,
     ) {}
 }

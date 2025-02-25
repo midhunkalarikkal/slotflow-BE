@@ -2,7 +2,6 @@ import { Types } from "mongoose";
 
 export class Provider {
     constructor(
-        public _id: Types.ObjectId | string,
         public username : string,
         public email : string,
         public password : string,
@@ -13,5 +12,6 @@ export class Provider {
         public subscription: [Types.ObjectId] | null,
         public isBlocked: boolean,
         public isVerified: boolean,
+        public _id?: Types.ObjectId | string,
     ){}
 }

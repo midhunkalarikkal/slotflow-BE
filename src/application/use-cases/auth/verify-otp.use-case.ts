@@ -20,15 +20,15 @@ export class VerifyOTPUseCase {
     if (!isValidOTP) throw new Error("Invalid or expired OTP.")
       
     if (decoded.role === "USER") {
-      const user = new User("",decoded.username, decoded.email, decoded.hashedPassword, null, null, null, false, true)
+      const user = new User(decoded.username, decoded.email, decoded.hashedPassword, null, null, null, false, true)
       await this.userRepository.createUser(user);
     } else if (decoded.role === "PROVIDER") {
-      const provider = new Provider("",decoded.username, decoded.email, decoded.hashedPassword, null, null, null, null, null, false, true)
+      const provider = new Provider(decoded.username, decoded.email, decoded.hashedPassword, null, null, null, null, null, false, true)
       await this.providerRepository.createProvider(provider);
     }else{
       throw new Error("Unexpected error, please try again.")
     }
     
-    return { success: true, message: 'OTP verified successfully.' };
+    return { success: true, message: 'OTP verified successfully.' };  
   }
 }
