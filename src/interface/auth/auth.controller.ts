@@ -28,16 +28,16 @@ export class AuthController {
   async register(req: Request, res: Response) {
     try {
       const { username, email, password, role } = req.body;
-      const { success, message, token } = await this.registerUseCase.execute(username, email, password, role);
+      const {success, message, token} = await this.registerUseCase.execute(username, email, password, role);
       res.cookie("jwt",token, {
         maxAge: 7 * 24 * 60 * 60 * 1000,
         httpOnly: true,
         sameSite: 'strict',
         secure: appConfig.nodeEnv !== 'development'
       })
-      res.status(201).json({ success, message, token });
+      res.status(success ? 200 : 400).json({ success, message });
     } catch (error) {
-      HandleError.handle(error, res);
+      res.status(500).json({ success: false, message: "Internal Server Error" });
     }      
   }
 
@@ -46,25 +46,26 @@ export class AuthController {
       const token = req.cookies.jwt;
       const { otp } = req.body;
       const result = await this.verifyOTPUseCase.execute(token, otp);
-      res.status(200).json(result);
+      res.status(result.success ? 200 : 400).json(result);
     } catch (error) {
-      HandleError.handle(error, res);
+      res.status(500).json({ success: false, message: "Internal Server Error" });
     }
   }
 
   async login(req: Request, res: Response) {
     try{
       const { email, password, role } = req.body;
-      const { success, message, token } = await this.loginUseCase.execute(email, password, role);
+      const {success, message, token, userData} = await this.loginUseCase.execute(email, password, role);
       res.cookie("jwt",token, {
         maxAge: 7 * 24 * 60 * 60 * 1000,
         httpOnly: true,
         sameSite: 'strict',
         secure: appConfig.nodeEnv !== 'development'
       });
-      res.status(200).json({ success, message });
+      console.log(success, message, token)
+      res.status(success ? 200 : 400).json({success, message, userData, role});
     }catch(error){
-      HandleError.handle(error, res);
+      res.status(500).json({ success: false, message: "Internal Server Error" });
     }
   }
 
@@ -76,10 +77,9 @@ export class AuthController {
         sameSite: 'strict',
         secure: appConfig.nodeEnv !== 'development'
     });
-    // role based logout we can implement
-    res.status(200).json({ success: true, message: "Logged out successfully." });
+      res.status(200).json({ success: true, message: "Logged out successfully." });
     }catch(error){
-      HandleError.handle(error,res);
+      res.status(500).json({ success: false, message: "Internal Server Error" });
     }
   }
 }

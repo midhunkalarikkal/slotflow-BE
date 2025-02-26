@@ -14,10 +14,10 @@ export class VerifyOTPUseCase {
     Validator.validateOtp(otp);
 
     const decoded = JWTService.verifyJwtToken(token) as { username: string, email: string, hashedPassword: string, role: string };
-    if (!decoded) throw new Error("Invalid or required token.")
+    if (!decoded) return { success: false, message: 'Unexpected error, please try again.' };  
 
     const isValidOTP = OTPService.verifyOTP(decoded.email, otp);
-    if (!isValidOTP) throw new Error("Invalid or expired OTP.")
+    if (!isValidOTP) return { success: false, message: 'Invalid or expired OTP.' };  
       
     if (decoded.role === "USER") {
       const user = new User(decoded.username, decoded.email, decoded.hashedPassword, null, null, null, false, true)
@@ -26,7 +26,7 @@ export class VerifyOTPUseCase {
       const provider = new Provider(decoded.username, decoded.email, decoded.hashedPassword, null, null, null, null, null, false, true)
       await this.providerRepository.createProvider(provider);
     }else{
-      throw new Error("Unexpected error, please try again.")
+      return { success: false, message: 'Unexpected error, please try again.' };  
     }
     
     return { success: true, message: 'OTP verified successfully.' };  

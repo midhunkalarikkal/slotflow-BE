@@ -10,7 +10,7 @@ import { adminConfig } from "../../../config/env";
 export class LoginUseCase {
     constructor(private userRepository: UserRepositoryImpl, private providerRepository: ProviderRepositoryImpl){ }
 
-    async execute(email: string, password: string, role: string): Promise<{ success: boolean; message: string, token : string }> {
+    async execute(email: string, password: string, role: string): Promise<{ success: boolean; message: string, token?: string,role?: string,  userData?: {username: string, profileImage: string | null} }> {
         
         Validator.validateEmail(email);
         Validator.validatePassword(password);
@@ -23,20 +23,20 @@ export class LoginUseCase {
             userOrProvider = await this.providerRepository.findProviderByEmail(email);
         }else if(role === "ADMIN"){
             if (email !== adminConfig.adminEmail || password !== adminConfig.adminPassword) {
-                throw new Error("Invalid credentials.")
+                return { success: false, message: "Invalid credentials." };
             }
             const token = JWTService.generateJwtToken({email, role})
-            return { success: true, message: 'Logged In Successfully.', token };
+            return { success: true, message: "Logged In Successfully.", token, role };
         }else{
-            throw new Error("Invalid request.");
+            return { success: false, message: "Invalid request." };
         }
 
-        if(!userOrProvider) throw new Error('Invalid credentials.');
+        if(!userOrProvider) return { success: false, message: "Invalid credentials." };
         
         const valid = await PasswordHasher.comparePassword(password, userOrProvider.password);
-        if(!valid) throw new Error("Invalid credentials.");
+        if(!valid) return { success: false, message: "Invalid credentials." };
         
         const token = JWTService.generateJwtToken({userOrProviderId : userOrProvider._id})
-        return { success: true, message: 'Logged In Successfully.', token };
+        return { success: true, message: 'Logged In Successfully.', token, role, userData : {username : userOrProvider.username, profileImage: userOrProvider.profileImage }};
     }
 }

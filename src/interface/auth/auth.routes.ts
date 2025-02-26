@@ -3,9 +3,9 @@ import { authController } from './auth.controller';
 
 const router = Router();
 
-router.post('/register', authController.register);
+router.post('/signup', authController.register);
 router.post('/verify-otp', authController.verifyOTP);
-router.post("/login",authController.login);
-router.post('/logout',authController.logout);
+router.post("/signin",authController.login);
+router.post('/signout',authController.logout);
 
 export default router;

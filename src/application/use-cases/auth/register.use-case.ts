@@ -17,23 +17,23 @@ export class RegisterUseCase {
 
     if (role === "USER") {
       const existingUser = await this.userRepository.findUserByEmail(email);
-      if (existingUser) throw new Error("Email already exist.")
+      if (existingUser) return { success: false, message: `Email already exist.` };
     } else if (role === "PROVIDER") {
       const existingProvider = await this.providerRepository.findProviderByEmail(email);
-      if (existingProvider) throw new Error("Email already exist.")
+      if (existingProvider) return { success: false, message: `Email already exist.` };
     } else {
-      throw new Error("Invalid request.");
+      return { success: false, message: `Invalid request.` };
     }
 
     const hashedPassword = await PasswordHasher.hashPassword(password);
 
     const otp = OTPService.generateOTP(email);
-    if (!otp) throw new Error("OTP generation failed");
+    if (!otp) return { success: false, message: `Unexpected error, please try again.` };
 
     await OTPService.sendOTP(email, otp);
 
     const token = JWTService.generateJwtToken({ username, email, hashedPassword, role });
-    if (!token) throw new Error("Token creation failed.");
+    if (!token) return { success: false, message: `Unexpected error, please try again.` };
 
     return { success: true, message: `OTP sent to email`, token };
 
