@@ -6,7 +6,6 @@ import { IProviderRepository } from '../../../domain/repositories/IProvider.repo
 export class ProviderRepositoryImpl implements IProviderRepository {
     private mapToEntity(provider : IProvider) : Provider {
         return new Provider(
-            provider._id,
             provider.username,
             provider.email,
             provider.password,
@@ -17,6 +16,7 @@ export class ProviderRepositoryImpl implements IProviderRepository {
             provider.subscription,
             provider.isBlocked,
             provider.isVerified,
+            provider._id,
         )
     }
 

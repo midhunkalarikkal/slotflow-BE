@@ -12,7 +12,8 @@ export class UserRepositoryImpl implements IUserRepository {
             user.profileImage,
             user.addressId,
             user.isBlocked,
-            user.isVerified
+            user.isVerified,
+            user._id
         );
     }
 
@@ -33,6 +34,14 @@ export class UserRepositoryImpl implements IUserRepository {
         } catch (error) {
             console.error("Error finding user by email:", error);
             throw new Error("Unable to find user by email.");
+        }
+    }
+
+    async findAllUsers(): Promise<User[]> {
+        try{
+            return await UserModel.find({},{ _id:1, username:1, profileImage:1, createdAt:1 });
+        }catch(error){
+            throw new Error("Failed to fetch users from database.")
         }
     }
 }
