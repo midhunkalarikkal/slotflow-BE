@@ -15,25 +15,26 @@ export class RegisterUseCase {
     Validator.validateEmail(email);
     Validator.validatePassword(password);
 
+    
     if (role === "USER") {
       const existingUser = await this.userRepository.findUserByEmail(email);
-      if (existingUser) return { success: false, message: `Email already exist.` };
+      if (existingUser) throw new Error("Email already exist.");
     } else if (role === "PROVIDER") {
       const existingProvider = await this.providerRepository.findProviderByEmail(email);
-      if (existingProvider) return { success: false, message: `Email already exist.` };
+      if (existingProvider) throw new Error("Email already exist.");
     } else {
-      return { success: false, message: `Invalid request.` };
+      throw new Error("Invalid request from test.");
     }
 
     const hashedPassword = await PasswordHasher.hashPassword(password);
 
     const otp = OTPService.generateOTP(email);
-    if (!otp) return { success: false, message: `Unexpected error, please try again.` };
+    if (!otp) throw new Error("Unexpected error, please try again.");
 
     await OTPService.sendOTP(email, otp);
 
     const token = JWTService.generateJwtToken({ username, email, hashedPassword, role });
-    if (!token) return { success: false, message: `Unexpected error, please try again.` };
+    if (!token) throw new Error("Unexpected error, please try again.");
 
     return { success: true, message: `OTP sent to email`, token };
 

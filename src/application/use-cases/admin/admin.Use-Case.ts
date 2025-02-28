@@ -8,21 +8,13 @@ export class AdminUseCase {
 
     async providersList(): Promise<{success : boolean, message: string, providers?: Provider[]}>{
         const providers = await this.providerRepository.findAllProviders();
-        
-        if (providers.length === 0) {
-            return { success: true, message: "No service providers found in database." };
-        }
-
+        if(!providers) throw new Error("Fetching error, please try again.");
         return { success: true, message: "Fetched providers.", providers };
     }
-
+    
     async usersList(): Promise<{success: boolean, message: string, users?: User[]}>{
         const users = await this.userRepository.findAllUsers();
-
-        if (users.length === 0) {
-            return { success: true, message: "No users found in database." };
-        }
-
+        if(!users) throw new Error("Fetching error, please try again.");
         return { success: true, message: "Fetched users.", users };
     }
 }

@@ -4,8 +4,8 @@ import { AdminUseCase } from "../../application/use-cases/admin/admin.Use-Case";
 import { UserRepositoryImpl } from "../../infrastructure/database/user/user.repository.impl";
 import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/provider.repository.impl";
 
-const providerRepositoryImpl = new ProviderRepositoryImpl();
 const userRepositoryImpl = new UserRepositoryImpl();
+const providerRepositoryImpl = new ProviderRepositoryImpl();
 const adminUseCase = new AdminUseCase(providerRepositoryImpl, userRepositoryImpl);
 
 export class AdminController {
@@ -18,7 +18,6 @@ export class AdminController {
 
     async getAllProviders(req: Request, res: Response) {
         try{
-            console.log("provider function")
             const result = await this.adminUseCase.providersList();
             res.status(200).json(result);
         }catch(error){
@@ -28,7 +27,6 @@ export class AdminController {
 
     async getAllUsers(req: Request, res: Response) {
         try{
-            console.log("user function")
             const result = await this.adminUseCase.usersList();
             res.status(200).json(result);
         }catch(error){

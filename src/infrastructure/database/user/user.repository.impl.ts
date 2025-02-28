@@ -22,7 +22,6 @@ export class UserRepositoryImpl implements IUserRepository {
             const createdUser = await UserModel.create(user);
             return this.mapToEntity(createdUser);
         } catch (error) {
-            console.error("Error creating user:", error);
             throw new Error("Unable to register, please try again after a few minutes.");
         }
     }
@@ -32,7 +31,6 @@ export class UserRepositoryImpl implements IUserRepository {
             const user = await UserModel.findOne({ email });
             return user ? this.mapToEntity(user) : null;
         } catch (error) {
-            console.error("Error finding user by email:", error);
             throw new Error("Unable to find user by email.");
         }
     }

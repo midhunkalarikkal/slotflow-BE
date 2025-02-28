@@ -35,9 +35,9 @@ export class AuthController {
         sameSite: 'strict',
         secure: appConfig.nodeEnv !== 'development'
       })
-      res.status(success ? 200 : 400).json({ success, message });
+      res.status(200).json({ success, message });
     } catch (error) {
-      res.status(500).json({ success: false, message: "Internal Server Error" });
+      HandleError.handle(error, res);
     }      
   }
 
@@ -46,9 +46,9 @@ export class AuthController {
       const token = req.cookies.jwt;
       const { otp } = req.body;
       const result = await this.verifyOTPUseCase.execute(token, otp);
-      res.status(result.success ? 200 : 400).json(result);
+      res.status(200).json(result);
     } catch (error) {
-      res.status(500).json({ success: false, message: "Internal Server Error" });
+      HandleError.handle(error, res);
     }
   }
 
@@ -62,16 +62,14 @@ export class AuthController {
         sameSite: 'strict',
         secure: appConfig.nodeEnv !== 'development'
       });
-      console.log(success, message, token)
-      res.status(success ? 200 : 400).json({success, message, userData, role});
+      res.status(200).json({success, message, userData, role});
     }catch(error){
-      res.status(500).json({ success: false, message: "Internal Server Error" });
+      HandleError.handle(error, res);
     }
   }
 
   async logout(req: Request, res: Response) {
     try{
-      const { role } = req.body;
       res.cookie("jwt", {
         httpOnly: true,
         sameSite: 'strict',
@@ -79,7 +77,7 @@ export class AuthController {
     });
       res.status(200).json({ success: true, message: "Logged out successfully." });
     }catch(error){
-      res.status(500).json({ success: false, message: "Internal Server Error" });
+      HandleError.handle(error, res);
     }
   }
 }

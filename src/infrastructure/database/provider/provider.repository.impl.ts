@@ -25,7 +25,7 @@ export class ProviderRepositoryImpl implements IProviderRepository {
             const createdProvider = await ProviderModel.create(provider);
             return this.mapToEntity(createdProvider);
         }catch(error){
-            throw new Error("Unable to register, Please try again after a few minutes.")
+            throw new Error("Unable to register, Please try again after a few minutes.");
         }
     }
 
@@ -34,7 +34,7 @@ export class ProviderRepositoryImpl implements IProviderRepository {
             const provider = await ProviderModel.findOne({ email });
             return provider ? this.mapToEntity(provider) : null;
         }catch(error){
-            throw new Error("Unable to find the provider.")
+            throw new Error("Unexpected error, please try again.");
         }
     }
 

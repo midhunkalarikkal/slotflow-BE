@@ -23,18 +23,18 @@ export class LoginUseCase {
             userOrProvider = await this.providerRepository.findProviderByEmail(email);
         }else if(role === "ADMIN"){
             if (email !== adminConfig.adminEmail || password !== adminConfig.adminPassword) {
-                return { success: false, message: "Invalid credentials." };
+                throw new Error("Invalid credentials.");
             }
             const token = JWTService.generateJwtToken({email, role})
             return { success: true, message: "Logged In Successfully.", token, role };
         }else{
-            return { success: false, message: "Invalid request." };
+            throw new Error("Invalid request.");
         }
 
-        if(!userOrProvider) return { success: false, message: "Invalid credentials." };
+        if(!userOrProvider) throw new Error("Invalid credentials.");
         
         const valid = await PasswordHasher.comparePassword(password, userOrProvider.password);
-        if(!valid) return { success: false, message: "Invalid credentials." };
+        if(!valid) throw new Error("Invalid credentials.");
         
         const token = JWTService.generateJwtToken({userOrProviderId : userOrProvider._id})
         return { success: true, message: 'Logged In Successfully.', token, role, userData : {username : userOrProvider.username, profileImage: userOrProvider.profileImage }};

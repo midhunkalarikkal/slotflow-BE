@@ -6,7 +6,7 @@ export class PasswordHasher {
       const salt = await bcrypt.genSalt(10);
       return await bcrypt.hash(password, salt);
     }catch(error){
-      throw new Error("Password Hashing failed");
+      throw new Error("Unexpected error, please try again");
     }
   }
 
@@ -14,7 +14,7 @@ export class PasswordHasher {
     try{
       return await bcrypt.compare(plainPassword, hashedPassword);
     }catch(error){
-      throw new Error("Password comparison failed.")
+      throw new Error("Unexpected error, please try again.");
     }
   }
 }
