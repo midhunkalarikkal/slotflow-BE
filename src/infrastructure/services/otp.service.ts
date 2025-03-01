@@ -64,6 +64,7 @@ export class OTPService {
               </html>`,
       });
     } catch (error) {
+      console.log("error : ",error);
       throw new Error("Failed to send OTP.");
     }
   }

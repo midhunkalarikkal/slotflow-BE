@@ -40,7 +40,7 @@ export class ProviderRepositoryImpl implements IProviderRepository {
 
     async findAllProviders(): Promise<Provider[]> {
         try{
-            return await ProviderModel.find({},{_id:1, username:1, profileImage:1, createdAt: 1});
+            return await ProviderModel.find({},{_id:1, username:1, email: 1, isBlocked: 1, isVerified: 1});
         }catch(error){
             throw new Error("Failed to fetch providers from database.");
         }

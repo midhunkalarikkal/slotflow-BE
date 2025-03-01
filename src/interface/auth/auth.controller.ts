@@ -6,21 +6,25 @@ import { RegisterUseCase } from '../../application/use-cases/auth/register.use-c
 import { VerifyOTPUseCase } from '../../application/use-cases/auth/verify-otp.use-case';
 import { UserRepositoryImpl } from '../../infrastructure/database/user/user.repository.impl';
 import { ProviderRepositoryImpl } from '../../infrastructure/database/provider/provider.repository.impl';
+import { ResendOtpUseCase } from '../../application/use-cases/auth/resend-otp.use-case';
 
 const userRepositoryImpl = new UserRepositoryImpl();
 const providerRepositoryImpl = new ProviderRepositoryImpl();
 const loginUseCase = new LoginUseCase(userRepositoryImpl, providerRepositoryImpl);
 const registerUseCase = new RegisterUseCase(userRepositoryImpl, providerRepositoryImpl);
 const verifyOTPUseCase = new VerifyOTPUseCase(userRepositoryImpl, providerRepositoryImpl);
+const resendOtpUseCase = new ResendOtpUseCase();
 
 export class AuthController {
 
   constructor(
     private registerUseCase: RegisterUseCase,
     private verifyOTPUseCase: VerifyOTPUseCase,
-    private loginUseCase: LoginUseCase
+    private loginUseCase: LoginUseCase,
+    private resendOtpUseCase: ResendOtpUseCase,
   ) {
     this.register = this.register.bind(this);
+    this.resendOtp = this.resendOtp.bind(this);
     this.verifyOTP = this.verifyOTP.bind(this);
     this.login = this.login.bind(this);
     }
@@ -34,7 +38,23 @@ export class AuthController {
         httpOnly: true,
         sameSite: 'strict',
         secure: appConfig.nodeEnv !== 'development'
-      })
+      });
+      res.status(200).json({ success, message, email });
+    } catch (error) {
+      HandleError.handle(error, res);
+    }      
+  }
+
+  async resendOtp(req: Request, res: Response) {
+    try {
+      const { email } = req.body;
+      const {success, message, token} = await this.resendOtpUseCase.execute(email);
+      res.cookie("jwt",token, {
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+        httpOnly: true,
+        sameSite: 'strict',
+        secure: appConfig.nodeEnv !== 'development'
+      });
       res.status(200).json({ success, message });
     } catch (error) {
       HandleError.handle(error, res);
@@ -82,5 +102,5 @@ export class AuthController {
   }
 }
 
-const authController = new AuthController(registerUseCase, verifyOTPUseCase, loginUseCase);
+const authController = new AuthController(registerUseCase, verifyOTPUseCase, loginUseCase, resendOtpUseCase);
 export { authController };

@@ -9,12 +9,11 @@ export class RegisterUseCase {
 
   constructor(private userRepository: UserRepositoryImpl, private providerRepository: ProviderRepositoryImpl) { }
 
-  async execute(username: string, email: string, password: string, role: string): Promise<{ success: boolean; message: string, token?: string }> {
+  async execute(username: string, email: string, password: string, role: string): Promise<{ success: boolean; message: string, token?: string, email: string }> {
 
     Validator.validateUsername(username);
     Validator.validateEmail(email);
     Validator.validatePassword(password);
-
     
     if (role === "USER") {
       const existingUser = await this.userRepository.findUserByEmail(email);
@@ -36,7 +35,7 @@ export class RegisterUseCase {
     const token = JWTService.generateJwtToken({ username, email, hashedPassword, role });
     if (!token) throw new Error("Unexpected error, please try again.");
 
-    return { success: true, message: `OTP sent to email`, token };
+    return { success: true, message: `OTP sent to email`, token, email };
 
   }
 }
