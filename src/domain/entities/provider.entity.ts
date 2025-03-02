@@ -11,7 +11,9 @@ export class Provider {
         public serviceId: Types.ObjectId | null,
         public subscription: [Types.ObjectId] | null,
         public isBlocked: boolean,
-        public isVerified: boolean,
+        public isEmailVerified: boolean,
+        public isAdminVerified: boolean,
         public _id?: Types.ObjectId | string,
+        public verificationToken?: string,
     ){}
 }

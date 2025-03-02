@@ -15,7 +15,8 @@ export class ProviderRepositoryImpl implements IProviderRepository {
             provider.serviceId,
             provider.subscription,
             provider.isBlocked,
-            provider.isVerified,
+            provider.isEmailVerified,
+            provider.isAdminVerified,
             provider._id,
         )
     }
@@ -59,4 +60,22 @@ export class ProviderRepositoryImpl implements IProviderRepository {
             throw new Error("Unexpected error, please try again.");
         }
     }
+
+    async getVerificationData(verificationToken: string): Promise<Provider | null> {
+            try {
+                const User = await ProviderModel.findOne({ verificationToken });
+                return User;
+            } catch (error) {
+                throw new Error("Unable to retrieve verification data.");
+            }
+        }
+        
+        async updateProvider(user: Provider): Promise<Provider | null> {
+            try {
+                const updatedUser = await ProviderModel.findByIdAndUpdate(user._id, user, { new: true });
+                return updatedUser ? this.mapToEntity(updatedUser) : null;
+            } catch (error) {
+                throw new Error("Unable to update user.");
+            }
+        }
 }

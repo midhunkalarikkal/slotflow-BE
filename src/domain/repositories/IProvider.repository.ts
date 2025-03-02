@@ -5,4 +5,6 @@ export interface IProviderRepository {
     findProviderByEmail(email : string) : Promise<Provider | null>;
     findAllProviders(): Promise<Provider[]>;
     updateProviderVerificationStatus(providerId: string, isVerified: boolean): Promise<Provider | null>;
+    getVerificationData(verificationToken: string): Promise<Provider | null>;
+    updateProvider(user: Provider): Promise<Provider | null>;
 }

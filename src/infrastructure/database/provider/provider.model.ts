@@ -11,7 +11,9 @@ export interface IProvider extends Document {
   serviceId: Types.ObjectId;
   subscription: [Types.ObjectId];
   isBlocked: boolean;
-  isVerified: boolean
+  isEmailVerified: boolean;
+  isAdminVerified: boolean;
+  verificationToken?: string;
 }
 
 const ProviderSchema = new Schema<IProvider>({
@@ -24,7 +26,9 @@ const ProviderSchema = new Schema<IProvider>({
   serviceId: { type: Schema.Types.ObjectId, ref: "Service", default: null},
   subscription: { type: [Schema.Types.ObjectId], ref: "Subscription", default: null},
   isBlocked: { type: Boolean, default: false },
-  isVerified: { type: Boolean, default: false },
+  isEmailVerified: { type: Boolean, default: false },
+  isAdminVerified: { type: Boolean, default: false },
+  verificationToken: { type: String, default: null },
 }, {
   timestamps: true
 });

@@ -1,6 +1,3 @@
-import { User } from '../../../domain/entities/user.entity';
-import { JWTService } from '../../../infrastructure/security/jwt';
-import { Provider } from '../../../domain/entities/provider.entity';
 import { Validator } from '../../../infrastructure/validator/validator';
 import { OTPService } from '../../../infrastructure/services/otp.service';
 import { UserRepositoryImpl } from '../../../infrastructure/database/user/user.repository.impl';
@@ -24,9 +21,11 @@ export class VerifyOTPUseCase {
       await this.userRepository.updateUser(user);
       
     } else if (role === "PROVIDER") {
-      
-    }else if(role === ""){
-      return { success: true, message: 'OTP verified successfully.' };  
+      const provider = await this.providerRepository.getVerificationData(verificationToken);
+      if(!provider) throw new Error("Verification failed");
+
+      provider.isEmailVerified = true;
+      await this.providerRepository.updateProvider(provider);
     }else{
       throw new Error("Unexpected error, please try again."); 
     }

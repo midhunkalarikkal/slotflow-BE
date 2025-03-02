@@ -14,7 +14,7 @@ export class RegisterUseCase {
     Validator.validateUsername(username);
     Validator.validateEmail(email);
     Validator.validatePassword(password);
-    
+
     if (role === "USER") {
       const existingUser = await this.userRepository.findUserByEmail(email);
       if (existingUser) throw new Error("Email already exist.");
@@ -37,19 +37,30 @@ export class RegisterUseCase {
 
     if (role === "USER") {
       await this.userRepository.createUser({
-        username : username,
-        email : email,
+        username: username,
+        email: email,
         password: hashedPassword,
         phone: null,
         profileImage: null,
         addressId: null,
         isBlocked: false,
         isVerified: false,
-        verificationToken: verificationToken,   
+        verificationToken: verificationToken,
       });
-    }else if(role === "PROVIDER"){
+    } else if (role === "PROVIDER") {
       await this.providerRepository.createProvider({
-
+        username: username,
+        email: email,
+        password: hashedPassword,
+        phone: null,
+        profileImage: null,
+        addressId: null,
+        serviceId: null,
+        subscription: null,
+        isBlocked: false,
+        isEmailVerified: false,
+        isAdminVerified: false,
+        verificationToken: verificationToken
       })
     }
 

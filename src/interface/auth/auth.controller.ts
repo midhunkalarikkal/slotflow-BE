@@ -22,13 +22,13 @@ export class AuthController {
   constructor(
     private registerUseCase: RegisterUseCase,
     private verifyOTPUseCase: VerifyOTPUseCase,
-    private loginUseCase: LoginUseCase,
     private resendOtpUseCase: ResendOtpUseCase,
+    private loginUseCase: LoginUseCase,
     private refreshAccessToeknUseCase: RefreshAccessTokenUseCase,
   ) {
     this.register = this.register.bind(this);
-    this.resendOtp = this.resendOtp.bind(this);
     this.verifyOTP = this.verifyOTP.bind(this);
+    this.resendOtp = this.resendOtp.bind(this);
     this.login = this.login.bind(this);
     this.refreshAccessToken = this.refreshAccessToken.bind(this);
   }
@@ -37,6 +37,17 @@ export class AuthController {
     try {
       const { username, email, password, role } = req.body;
       const result = await this.registerUseCase.execute(username, email, password, role);
+      res.status(200).json(result);
+    } catch (error) {
+      HandleError.handle(error, res);
+    }
+  }
+
+  async verifyOTP(req: Request, res: Response) {
+    try {
+      console.log("req.body : ",req.body);
+      const { otp, verificationToken, role } = req.body;
+      const result = await this.verifyOTPUseCase.execute(otp,verificationToken, role);
       res.status(200).json(result);
     } catch (error) {
       HandleError.handle(error, res);
@@ -54,17 +65,6 @@ export class AuthController {
         secure: appConfig.nodeEnv !== 'development'
       });
       res.status(200).json({ success, message });
-    } catch (error) {
-      HandleError.handle(error, res);
-    }
-  }
-
-  async verifyOTP(req: Request, res: Response) {
-    try {
-      console.log("req.body : ",req.body);
-      const { otp, verificationToken, role } = req.body;
-      const result = await this.verifyOTPUseCase.execute(otp,verificationToken, role);
-      res.status(200).json(result);
     } catch (error) {
       HandleError.handle(error, res);
     }
@@ -107,5 +107,5 @@ export class AuthController {
   }
 }
 
-const authController = new AuthController(registerUseCase, verifyOTPUseCase, loginUseCase, resendOtpUseCase, refreshAccessToeknUseCase);
+const authController = new AuthController(registerUseCase, verifyOTPUseCase, resendOtpUseCase, loginUseCase, refreshAccessToeknUseCase);
 export { authController };
