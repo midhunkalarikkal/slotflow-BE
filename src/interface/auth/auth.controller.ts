@@ -14,7 +14,7 @@ const providerRepositoryImpl = new ProviderRepositoryImpl();
 const loginUseCase = new LoginUseCase(userRepositoryImpl, providerRepositoryImpl);
 const registerUseCase = new RegisterUseCase(userRepositoryImpl, providerRepositoryImpl);
 const verifyOTPUseCase = new VerifyOTPUseCase(userRepositoryImpl, providerRepositoryImpl);
-const resendOtpUseCase = new ResendOtpUseCase();
+const resendOtpUseCase = new ResendOtpUseCase(userRepositoryImpl, providerRepositoryImpl);
 const refreshAccessToeknUseCase = new RefreshAccessTokenUseCase();
 
 export class AuthController {
@@ -56,14 +56,8 @@ export class AuthController {
 
   async resendOtp(req: Request, res: Response) {
     try {
-      const { email } = req.body;
-      const { success, message, token } = await this.resendOtpUseCase.execute(email);
-      res.cookie("jwt", token, {
-        maxAge: 7 * 24 * 60 * 60 * 1000,
-        httpOnly: true,
-        sameSite: 'strict',
-        secure: appConfig.nodeEnv !== 'development'
-      });
+      const { verificationToken, role } = req.body;
+      const { success, message } = await this.resendOtpUseCase.execute(verificationToken, role);
       res.status(200).json({ success, message });
     } catch (error) {
       HandleError.handle(error, res);

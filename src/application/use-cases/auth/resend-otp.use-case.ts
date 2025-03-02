@@ -1,21 +1,32 @@
 
-import { JWTService } from '../../../infrastructure/security/jwt';
+import { User } from '../../../domain/entities/user.entity';
+import { Provider } from '../../../domain/entities/provider.entity';
 import { OTPService } from '../../../infrastructure/services/otp.service';
+import { UserRepositoryImpl } from '../../../infrastructure/database/user/user.repository.impl';
+import { ProviderRepositoryImpl } from '../../../infrastructure/database/provider/provider.repository.impl';
 
 export class ResendOtpUseCase {
 
-  constructor() {}
+  constructor(private userRepository: UserRepositoryImpl, private providerRepository: ProviderRepositoryImpl) {}
 
-  async execute(email: string): Promise<{ success: boolean; message: string, token: string}> {
+  async execute(verificationToken: string, role: string): Promise<{ success: boolean; message: string}> {
+    
+    let userOrProvider : Provider | User | null;
 
-    const otp = OTPService.generateOTP(email);
+    if(role === "USER"){
+      userOrProvider = await this.userRepository.getVerificationData(verificationToken);
+    }else if(role === "PROVIDER"){
+      userOrProvider = await this.providerRepository.getVerificationData(verificationToken);
+    }else{
+      throw new Error("Please register again.");
+    }
+
+    const otp = OTPService.generateOTP(verificationToken);
     if (!otp) throw new Error("Unexpected error, please try again.");
 
-    await OTPService.sendOTP(email, otp);
+    await OTPService.sendOTP(userOrProvider?.email!, otp);
 
-    const token = JWTService.generateJwtToken({email, role: ""})
-
-    return { success: true, message: `OTP sent to email.`, token };
+    return { success: true, message: `OTP sent to email.` };
 
   }
 }
