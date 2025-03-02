@@ -45,4 +45,18 @@ export class ProviderRepositoryImpl implements IProviderRepository {
             throw new Error("Failed to fetch providers from database.");
         }
     }
+
+
+    async updateProviderVerificationStatus(providerId: string, isVerified: boolean): Promise<Provider | null> {
+        try {
+            const updatedProvider = await ProviderModel.findByIdAndUpdate(
+                providerId,
+                { isVerified: isVerified },
+                { new: true, select: '_id isVerified' }
+            );
+            return updatedProvider ? this.mapToEntity(updatedProvider) : null;
+        } catch (error) {
+            throw new Error("Unexpected error, please try again.");
+        }
+    }
 }

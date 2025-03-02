@@ -3,10 +3,11 @@ import { appConfig } from '../../config/env';
 import { HandleError } from '../../infrastructure/error/error';
 import { LoginUseCase } from '../../application/use-cases/auth/login.use-case';
 import { RegisterUseCase } from '../../application/use-cases/auth/register.use-case';
+import { ResendOtpUseCase } from '../../application/use-cases/auth/resend-otp.use-case';
 import { VerifyOTPUseCase } from '../../application/use-cases/auth/verify-otp.use-case';
 import { UserRepositoryImpl } from '../../infrastructure/database/user/user.repository.impl';
 import { ProviderRepositoryImpl } from '../../infrastructure/database/provider/provider.repository.impl';
-import { ResendOtpUseCase } from '../../application/use-cases/auth/resend-otp.use-case';
+import { RefreshAccessTokenUseCase } from '../../application/use-cases/auth/refreshAccessToekn.use-case';
 
 const userRepositoryImpl = new UserRepositoryImpl();
 const providerRepositoryImpl = new ProviderRepositoryImpl();
@@ -14,6 +15,7 @@ const loginUseCase = new LoginUseCase(userRepositoryImpl, providerRepositoryImpl
 const registerUseCase = new RegisterUseCase(userRepositoryImpl, providerRepositoryImpl);
 const verifyOTPUseCase = new VerifyOTPUseCase(userRepositoryImpl, providerRepositoryImpl);
 const resendOtpUseCase = new ResendOtpUseCase();
+const refreshAccessToeknUseCase = new RefreshAccessTokenUseCase();
 
 export class AuthController {
 
@@ -22,34 +24,30 @@ export class AuthController {
     private verifyOTPUseCase: VerifyOTPUseCase,
     private loginUseCase: LoginUseCase,
     private resendOtpUseCase: ResendOtpUseCase,
+    private refreshAccessToeknUseCase: RefreshAccessTokenUseCase,
   ) {
     this.register = this.register.bind(this);
     this.resendOtp = this.resendOtp.bind(this);
     this.verifyOTP = this.verifyOTP.bind(this);
     this.login = this.login.bind(this);
-    }
+    this.refreshAccessToken = this.refreshAccessToken.bind(this);
+  }
 
   async register(req: Request, res: Response) {
     try {
       const { username, email, password, role } = req.body;
-      const {success, message, token} = await this.registerUseCase.execute(username, email, password, role);
-      res.cookie("jwt",token, {
-        maxAge: 7 * 24 * 60 * 60 * 1000,
-        httpOnly: true,
-        sameSite: 'strict',
-        secure: appConfig.nodeEnv !== 'development'
-      });
-      res.status(200).json({ success, message, email });
+      const result = await this.registerUseCase.execute(username, email, password, role);
+      res.status(200).json(result);
     } catch (error) {
       HandleError.handle(error, res);
-    }      
+    }
   }
 
   async resendOtp(req: Request, res: Response) {
     try {
       const { email } = req.body;
-      const {success, message, token} = await this.resendOtpUseCase.execute(email);
-      res.cookie("jwt",token, {
+      const { success, message, token } = await this.resendOtpUseCase.execute(email);
+      res.cookie("jwt", token, {
         maxAge: 7 * 24 * 60 * 60 * 1000,
         httpOnly: true,
         sameSite: 'strict',
@@ -58,14 +56,14 @@ export class AuthController {
       res.status(200).json({ success, message });
     } catch (error) {
       HandleError.handle(error, res);
-    }      
+    }
   }
 
   async verifyOTP(req: Request, res: Response) {
     try {
-      const token = req.cookies.jwt;
-      const { otp } = req.body;
-      const result = await this.verifyOTPUseCase.execute(token, otp);
+      console.log("req.body : ",req.body);
+      const { otp, verificationToken, role } = req.body;
+      const result = await this.verifyOTPUseCase.execute(otp,verificationToken, role);
       res.status(200).json(result);
     } catch (error) {
       HandleError.handle(error, res);
@@ -73,34 +71,41 @@ export class AuthController {
   }
 
   async login(req: Request, res: Response) {
-    try{
+    try {
       const { email, password, role } = req.body;
-      const {success, message, token, userData} = await this.loginUseCase.execute(email, password, role);
-      res.cookie("jwt",token, {
+      const { success, message, accessToken, refreshToken, userData } = await this.loginUseCase.execute(email, password, role);
+      res.cookie("refreshToken", refreshToken, {
         maxAge: 7 * 24 * 60 * 60 * 1000,
         httpOnly: true,
         sameSite: 'strict',
-        secure: appConfig.nodeEnv !== 'development'
+        secure: appConfig.nodeEnv !== 'development',
       });
-      res.status(200).json({success, message, userData, role});
-    }catch(error){
+      res.status(200).json({ success, message, userData, role, accessToken });
+    } catch (error) {
       HandleError.handle(error, res);
     }
   }
 
   async logout(req: Request, res: Response) {
-    try{
-      res.cookie("jwt", {
-        httpOnly: true,
-        sameSite: 'strict',
-        secure: appConfig.nodeEnv !== 'development'
-    });
+    try {
+      res.clearCookie("refreshToken");
       res.status(200).json({ success: true, message: "Logged out successfully." });
-    }catch(error){
+    } catch (error) {
+      HandleError.handle(error, res);
+    }
+  }
+
+  async refreshAccessToken(req: Request, res: Response) {
+    try {
+      const refreshToken = req.cookies.refreshToken;
+      if (!refreshToken) throw new Error("Toekn not found");
+      const result = await this.refreshAccessToeknUseCase.execute(refreshToken);
+      res.status(200).json(result);
+    } catch (error) {
       HandleError.handle(error, res);
     }
   }
 }
 
-const authController = new AuthController(registerUseCase, verifyOTPUseCase, loginUseCase, resendOtpUseCase);
+const authController = new AuthController(registerUseCase, verifyOTPUseCase, loginUseCase, resendOtpUseCase, refreshAccessToeknUseCase);
 export { authController };

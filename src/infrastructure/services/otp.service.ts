@@ -5,20 +5,20 @@ import { mailConfig } from '../../config/env';
 export class OTPService {
   private static otpStore: Map<string, string> = new Map();
 
-  static generateOTP(email: string): string {
+  static generateOTP(verificationToken: string): string {
     try {
       const otp = crypto.randomInt(100000, 999999).toString();
-      this.otpStore.set(email, otp);
-      setTimeout(() => this.otpStore.delete(email), 300000);
+      this.otpStore.set(verificationToken, otp);
+      setTimeout(() => this.otpStore.delete(verificationToken), 300000);
       return otp;
     } catch (error) {
       throw new Error("Failed to generate OTP.");
     }
   }
 
-  static verifyOTP(email: string, otp: string): boolean {
+  static verifyOTP(verificationToken: string, otp: string): boolean {
     try {
-      return this.otpStore.get(email) === otp;
+      return this.otpStore.get(verificationToken) === otp;
     } catch (error) {
       throw new Error("Failed to verify OTP.")
     }

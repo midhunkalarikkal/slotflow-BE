@@ -7,4 +7,6 @@ const router = Router();
 router.get('/providers',authMiddleware, adminController.getAllProviders);
 router.get('/users',authMiddleware, adminController.getAllUsers);
 
+router.put('/provider/approve/:providerId',adminController.approveProvider)
+
 export default router;

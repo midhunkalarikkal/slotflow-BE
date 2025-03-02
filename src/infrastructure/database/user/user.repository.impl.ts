@@ -13,7 +13,8 @@ export class UserRepositoryImpl implements IUserRepository {
             user.addressId,
             user.isBlocked,
             user.isVerified,
-            user._id
+            user._id,
+            user.verificationToken
         );
     }
 
@@ -42,4 +43,24 @@ export class UserRepositoryImpl implements IUserRepository {
             throw new Error("Failed to fetch users from database.")
         }
     }
+
+    
+    async getVerificationData(verificationToken: string): Promise<User | null> {
+        try {
+            const User = await UserModel.findOne({ verificationToken });
+            return User;
+        } catch (error) {
+            throw new Error("Unable to retrieve verification data.");
+        }
+    }
+    
+    async updateUser(user: User): Promise<User | null> {
+        try {
+            const updatedUser = await UserModel.findByIdAndUpdate(user._id, user, { new: true });
+            return updatedUser ? this.mapToEntity(updatedUser) : null;
+        } catch (error) {
+            throw new Error("Unable to update user.");
+        }
+    }
+    
 }

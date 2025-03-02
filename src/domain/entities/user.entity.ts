@@ -11,5 +11,6 @@ export class User {
         public isBlocked: boolean,
         public isVerified: boolean,
         public _id?: Types.ObjectId | string,
+        public verificationToken?: string | null,
     ) {}
 }

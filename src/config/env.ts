@@ -13,7 +13,8 @@ export const mailConfig = {
 }
 
 export const jwtConfig = {
-    jwtSecret : process.env.JWT_SECRET
+    jwtSecret : process.env.JWT_SECRET,
+    refreshJwtSecret : process.env.REFRES_JWT_SECRET
 }
 
 export const appConfig = {

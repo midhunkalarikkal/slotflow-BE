@@ -9,7 +9,8 @@ export interface IUser extends Document {
   profileImage: string;
   addressId: Types.ObjectId;
   isBlocked: boolean;
-  isVerified: boolean
+  isVerified: boolean;
+  verificationToken?: string;
 }
 
 const UserSchema = new Schema<IUser>({
@@ -21,6 +22,7 @@ const UserSchema = new Schema<IUser>({
   addressId: { type: Schema.Types.ObjectId, ref: "Address", default: null },
   isBlocked: { type: Boolean, default: false },
   isVerified: { type: Boolean, default: false },
+  verificationToken: { type: String, default: null },
 }, {
   timestamps: true
 });

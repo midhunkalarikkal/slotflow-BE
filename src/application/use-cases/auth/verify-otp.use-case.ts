@@ -9,23 +9,23 @@ import { ProviderRepositoryImpl } from '../../../infrastructure/database/provide
 export class VerifyOTPUseCase {
   constructor(private userRepository: UserRepositoryImpl, private providerRepository: ProviderRepositoryImpl) { }
 
-  async execute(token: string, otp: string): Promise<{ success: boolean; message: string }> {
+  async execute(otp: string, verificationToken: string, role: string): Promise<{ success: boolean; message: string }> {
 
     Validator.validateOtp(otp);
 
-    const decoded = JWTService.verifyJwtToken(token) as { username: string, email: string, hashedPassword: string, role: string };
-    if (!decoded) throw new Error("Unexpected error, please try again.");
-
-    const isValidOTP = OTPService.verifyOTP(decoded.email, otp);
+    const isValidOTP = OTPService.verifyOTP(verificationToken, otp);
     if (!isValidOTP) throw new Error("Invalid or expired OTP.");  
       
-    if (decoded.role === "USER") {
-      const user = new User(decoded.username, decoded.email, decoded.hashedPassword, null, null, null, false, true);
-      await this.userRepository.createUser(user);
-    } else if (decoded.role === "PROVIDER") {
-      const provider = new Provider(decoded.username, decoded.email, decoded.hashedPassword, null, null, null, null, null, false, false);
-      await this.providerRepository.createProvider(provider);
-    }else if(decoded.role === ""){
+    if (role === "USER") {
+      const user = await this.userRepository.getVerificationData(verificationToken);
+      if(!user) throw new Error("Verification failed");
+
+      user.isVerified = true;
+      await this.userRepository.updateUser(user);
+      
+    } else if (role === "PROVIDER") {
+      
+    }else if(role === ""){
       return { success: true, message: 'OTP verified successfully.' };  
     }else{
       throw new Error("Unexpected error, please try again."); 

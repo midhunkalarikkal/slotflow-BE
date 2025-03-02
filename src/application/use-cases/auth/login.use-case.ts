@@ -1,3 +1,4 @@
+import { adminConfig } from "../../../config/env";
 import { User } from "../../../domain/entities/user.entity";
 import { JWTService } from "../../../infrastructure/security/jwt";
 import { Provider } from "../../../domain/entities/provider.entity";
@@ -5,12 +6,11 @@ import { Validator } from "../../../infrastructure/validator/validator";
 import { PasswordHasher } from "../../../infrastructure/security/password-hashing";
 import { UserRepositoryImpl } from "../../../infrastructure/database/user/user.repository.impl";
 import { ProviderRepositoryImpl } from "../../../infrastructure/database/provider/provider.repository.impl";
-import { adminConfig } from "../../../config/env";
 
 export class LoginUseCase {
     constructor(private userRepository: UserRepositoryImpl, private providerRepository: ProviderRepositoryImpl){ }
 
-    async execute(email: string, password: string, role: string): Promise<{ success: boolean; message: string, token?: string,role?: string,  userData?: {username: string, profileImage: string | null} }> {
+    async execute(email: string, password: string, role: string): Promise<{ success: boolean; message: string, accessToken?: string, refreshToken?: string, role?: string,  userData?: {username: string, profileImage: string | null} }> {
         
         Validator.validateEmail(email);
         Validator.validatePassword(password);
@@ -26,8 +26,9 @@ export class LoginUseCase {
             if (email !== adminConfig.adminEmail || password !== adminConfig.adminPassword) {
                 throw new Error("Invalid credentials.");
             }
-            const token = JWTService.generateJwtToken({email, role})
-            return { success: true, message: "Logged In Successfully.", token, role };
+            const accessToken = JWTService.generateAccessToken({email: email, role : role});
+            const refreshToken = JWTService.generateRefreshToken({email: email, role : role});
+            return { success: true, message: "Logged In Successfully.", accessToken, refreshToken, role };
         }else{
             throw new Error("Invalid request.");
         }
@@ -37,7 +38,9 @@ export class LoginUseCase {
         const valid = await PasswordHasher.comparePassword(password, userOrProvider.password);
         if(!valid) throw new Error("Invalid credentials.");
         
-        const token = JWTService.generateJwtToken({userOrProviderId : userOrProvider._id})
-        return { success: true, message: 'Logged In Successfully.', token, role, userData : {username : userOrProvider.username, profileImage: userOrProvider.profileImage }};
+        const accessToken = JWTService.generateAccessToken({userOrProviderId: userOrProvider._id, role : role});
+        const refreshToken = JWTService.generateRefreshToken({userOrProviderId: userOrProvider._id, role : role});
+
+        return { success: true, message: 'Logged In Successfully.', accessToken, refreshToken, role, userData : {username : userOrProvider.username, profileImage: userOrProvider.profileImage }};
     }
 }
