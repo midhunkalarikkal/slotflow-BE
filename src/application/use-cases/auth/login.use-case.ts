@@ -21,7 +21,9 @@ export class LoginUseCase {
             userOrProvider = await this.userRepository.findUserByEmail(email);
         }else if(role === "PROVIDER"){
             userOrProvider = await this.providerRepository.findProviderByEmail(email);
-            if(!userOrProvider?.isVerified) throw new Error("Your admin verication is pending.");
+            if (userOrProvider && !(userOrProvider as Provider).isAdminVerified) {
+                throw new Error("Your admin verification is pending.");
+            }
         }else if(role === "ADMIN"){
             if (email !== adminConfig.adminEmail || password !== adminConfig.adminPassword) {
                 throw new Error("Invalid credentials.");
@@ -33,7 +35,7 @@ export class LoginUseCase {
             throw new Error("Invalid request.");
         }
 
-        if(!userOrProvider) throw new Error("Invalid credentials.");
+        if(!userOrProvider) throw new Error("Invalid credentials")
         
         const valid = await PasswordHasher.comparePassword(password, userOrProvider.password);
         if(!valid) throw new Error("Invalid credentials.");

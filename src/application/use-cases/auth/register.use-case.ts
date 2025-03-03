@@ -1,4 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
+import { User } from '../../../domain/entities/user.entity';
+import { Provider } from '../../../domain/entities/provider.entity';
 import { Validator } from '../../../infrastructure/validator/validator';
 import { OTPService } from '../../../infrastructure/services/otp.service';
 import { PasswordHasher } from '../../../infrastructure/security/password-hashing';
@@ -15,12 +17,14 @@ export class RegisterUseCase {
     Validator.validateEmail(email);
     Validator.validatePassword(password);
 
+    let userOrProvider: Provider | User | null;
+
     if (role === "USER") {
-      const existingUser = await this.userRepository.findUserByEmail(email);
-      if (existingUser) throw new Error("Email already exist.");
+      userOrProvider = await this.userRepository.findUserByEmail(email);
+      if (userOrProvider?.isEmailVerified) throw new Error("Email already exist.");
     } else if (role === "PROVIDER") {
-      const existingProvider = await this.providerRepository.findProviderByEmail(email);
-      if (existingProvider) throw new Error("Email already exist.");
+      userOrProvider = await this.providerRepository.findProviderByEmail(email);
+      if (userOrProvider?.isEmailVerified) throw new Error("Email already exist.");
     } else {
       throw new Error("Invalid request from test.");
     }
@@ -30,38 +34,50 @@ export class RegisterUseCase {
     const verificationToken = uuidv4();
     if (!verificationToken) throw new Error("Unexpected error, please try again.");
 
-    const otp = OTPService.generateOTP(verificationToken);
+    const otp = OTPService.generateOTP(verificationToken!);
     if (!otp) throw new Error("Unexpected error, please try again.");
 
     await OTPService.sendOTP(email, otp);
 
-    if (role === "USER") {
-      await this.userRepository.createUser({
-        username: username,
-        email: email,
-        password: hashedPassword,
-        phone: null,
-        profileImage: null,
-        addressId: null,
-        isBlocked: false,
-        isVerified: false,
-        verificationToken: verificationToken,
-      });
-    } else if (role === "PROVIDER") {
-      await this.providerRepository.createProvider({
-        username: username,
-        email: email,
-        password: hashedPassword,
-        phone: null,
-        profileImage: null,
-        addressId: null,
-        serviceId: null,
-        subscription: null,
-        isBlocked: false,
-        isEmailVerified: false,
-        isAdminVerified: false,
-        verificationToken: verificationToken
-      })
+    if (userOrProvider) {
+      if (role === "USER") {
+        userOrProvider.verificationToken = verificationToken;
+        userOrProvider.password = hashedPassword;
+        await this.userRepository.updateUser(userOrProvider as User);
+      } else if (role === "PROVIDER") {
+        userOrProvider.verificationToken = verificationToken;
+        userOrProvider.password = hashedPassword;
+        await this.providerRepository.updateProvider(userOrProvider as Provider);
+      }
+    } else {
+      if (role === "USER") {
+        await this.userRepository.createUser({
+          username: username,
+          email: email,
+          password: hashedPassword,
+          phone: null,
+          profileImage: null,
+          addressId: null,
+          isBlocked: false,
+          isEmailVerified: false,
+          verificationToken: verificationToken,
+        });
+      } else if (role === "PROVIDER") {
+        await this.providerRepository.createProvider({
+          username: username,
+          email: email,
+          password: hashedPassword,
+          phone: null,
+          profileImage: null,
+          addressId: null,
+          serviceId: null,
+          subscription: null,
+          isBlocked: false,
+          isEmailVerified: false,
+          isAdminVerified: false,
+          verificationToken: verificationToken
+        });
+      }
     }
 
     return { success: true, message: `OTP sent to email`, verificationToken, role };

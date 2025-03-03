@@ -9,7 +9,7 @@ export class User {
         public profileImage: string | null,
         public addressId: Types.ObjectId | null,
         public isBlocked: boolean,
-        public isVerified: boolean,
+        public isEmailVerified: boolean,
         public _id?: Types.ObjectId | string,
         public verificationToken?: string | null,
     ) {}

@@ -17,7 +17,7 @@ export class VerifyOTPUseCase {
       const user = await this.userRepository.getVerificationData(verificationToken);
       if(!user) throw new Error("Verification failed");
 
-      user.isVerified = true;
+      user.isEmailVerified = true;
       await this.userRepository.updateUser(user);
       
     } else if (role === "PROVIDER") {

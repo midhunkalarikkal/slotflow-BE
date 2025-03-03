@@ -18,6 +18,7 @@ export class ProviderRepositoryImpl implements IProviderRepository {
             provider.isEmailVerified,
             provider.isAdminVerified,
             provider._id,
+            provider.verificationToken
         )
     }
 
@@ -64,8 +65,10 @@ export class ProviderRepositoryImpl implements IProviderRepository {
     async getVerificationData(verificationToken: string): Promise<Provider | null> {
             try {
                 const User = await ProviderModel.findOne({ verificationToken });
+                console.log("User : ",User);
                 return User;
             } catch (error) {
+                console.log("Error : ",error);
                 throw new Error("Unable to retrieve verification data.");
             }
         }

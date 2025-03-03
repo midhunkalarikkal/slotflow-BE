@@ -18,7 +18,8 @@ export class OTPService {
 
   static verifyOTP(verificationToken: string, otp: string): boolean {
     try {
-      return this.otpStore.get(verificationToken) === otp;
+      const result = this.otpStore.get(verificationToken) === otp;
+      return result;
     } catch (error) {
       throw new Error("Failed to verify OTP.")
     }

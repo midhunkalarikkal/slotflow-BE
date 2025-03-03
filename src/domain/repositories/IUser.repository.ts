@@ -5,4 +5,5 @@ export interface IUserRepository {
   findUserByEmail(email: string): Promise<User | null>;
   getVerificationData(verificationToken: string): Promise<User | null>;
   updateUser(user: User): Promise<User | null>;
+  findAllUsers(): Promise<User[]>;
 }

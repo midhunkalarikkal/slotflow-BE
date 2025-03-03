@@ -12,7 +12,7 @@ export class UserRepositoryImpl implements IUserRepository {
             user.profileImage,
             user.addressId,
             user.isBlocked,
-            user.isVerified,
+            user.isEmailVerified,
             user._id,
             user.verificationToken
         );
@@ -23,6 +23,7 @@ export class UserRepositoryImpl implements IUserRepository {
             const createdUser = await UserModel.create(user);
             return this.mapToEntity(createdUser);
         } catch (error) {
+            console.log("error : ",error);
             throw new Error("Unable to register, please try again after a few minutes.");
         }
     }
@@ -43,7 +44,6 @@ export class UserRepositoryImpl implements IUserRepository {
             throw new Error("Failed to fetch users from database.")
         }
     }
-
     
     async getVerificationData(verificationToken: string): Promise<User | null> {
         try {
