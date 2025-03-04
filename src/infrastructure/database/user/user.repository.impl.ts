@@ -39,7 +39,7 @@ export class UserRepositoryImpl implements IUserRepository {
 
     async findAllUsers(): Promise<User[]> {
         try{
-            return await UserModel.find({},{_id:1, username:1, email: 1, isBlocked: 1, isVerified: 1});
+            return await UserModel.find({},{_id:1, username:1, email: 1, isBlocked: 1, isEmailVerified: 1});
         }catch(error){
             throw new Error("Failed to fetch users from database.")
         }

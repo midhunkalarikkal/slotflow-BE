@@ -12,8 +12,10 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction):
     try {
       const decoded = JWTService.verifyAccessToken(token);
       (req as any).user = decoded;
+      console.log("authorised");
       next();
     } catch (error) {
+      console.log("unauthorized");
       res.status(401).json({ success: false, message: "Unauthorized: Invalid token." });
     }
   };

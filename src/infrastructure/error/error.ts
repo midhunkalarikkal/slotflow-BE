@@ -2,7 +2,7 @@ import { Response } from "express";
 
 export class HandleError {
     static handle(error : any, res : Response) : void {
-
+        console.log("Error")
         if (error instanceof Error) {
             res.status(400).json({ success: false, message: error.message });
             return ;
