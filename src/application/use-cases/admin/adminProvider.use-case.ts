@@ -24,4 +24,15 @@ export class AdminProviderUseCase {
             throw new Error("Unexpected error occurred, please try again.");
         }
     }
+
+    async changeStatus(providerId: string, status: boolean): Promise<{success: boolean, message: string, updatedProvider: Partial<Provider>}>{
+        try {
+            if(!providerId) throw new Error("Invalid request");
+            const updatedProvider = await this.providerRepository.updateProviderStatus(providerId, status);
+            if (!updatedProvider) throw new Error("Provider not found");
+            return { success: true, message: "Provider approved successfully.", updatedProvider};
+        } catch (error) {
+            throw new Error("Unexpected error occurred, please try again.");
+        }
+    }
 }

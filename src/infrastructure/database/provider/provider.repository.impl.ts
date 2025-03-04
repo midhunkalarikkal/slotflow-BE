@@ -4,7 +4,7 @@ import { IProviderRepository } from '../../../domain/repositories/IProvider.repo
 
 
 export class ProviderRepositoryImpl implements IProviderRepository {
-    private mapToEntity(provider : IProvider) : Provider {
+    private mapToEntity(provider: IProvider): Provider {
         return new Provider(
             provider.username,
             provider.email,
@@ -23,27 +23,27 @@ export class ProviderRepositoryImpl implements IProviderRepository {
     }
 
     async createProvider(provider: Provider): Promise<Provider> {
-        try{
+        try {
             const createdProvider = await ProviderModel.create(provider);
             return this.mapToEntity(createdProvider);
-        }catch(error){
+        } catch (error) {
             throw new Error("Unable to register, Please try again after a few minutes.");
         }
     }
 
     async findProviderByEmail(email: string): Promise<Provider | null> {
-        try{
+        try {
             const provider = await ProviderModel.findOne({ email });
             return provider ? this.mapToEntity(provider) : null;
-        }catch(error){
+        } catch (error) {
             throw new Error("Unexpected error, please try again.");
         }
     }
 
     async findAllProviders(): Promise<Provider[]> {
-        try{
-            return await ProviderModel.find({},{_id:1, username:1, email: 1, isBlocked: 1, isAdminVerified: 1});
-        }catch(error){
+        try {
+            return await ProviderModel.find({}, { _id: 1, username: 1, email: 1, isBlocked: 1, isAdminVerified: 1 });
+        } catch (error) {
             throw new Error("Failed to fetch providers from database.");
         }
     }
@@ -63,20 +63,34 @@ export class ProviderRepositoryImpl implements IProviderRepository {
     }
 
     async getVerificationData(verificationToken: string): Promise<Provider | null> {
-            try {
-                const User = await ProviderModel.findOne({ verificationToken });
-                return User;
-            } catch (error) {
-                throw new Error("Unable to retrieve verification data.");
-            }
+        try {
+            const User = await ProviderModel.findOne({ verificationToken });
+            return User;
+        } catch (error) {
+            throw new Error("Unable to retrieve verification data.");
         }
-        
-        async updateProvider(provider: Provider): Promise<Provider | null> {
-            try {
-                const updatedProvider = await ProviderModel.findByIdAndUpdate(provider._id, provider, { new: true });
-                return updatedProvider ? this.mapToEntity(updatedProvider) : null;
-            } catch (error) {
-                throw new Error("Unable to update user.");
-            }
+    }
+
+    async updateProvider(provider: Provider): Promise<Provider | null> {
+        try {
+            const updatedProvider = await ProviderModel.findByIdAndUpdate(provider._id, provider, { new: true });
+            return updatedProvider ? this.mapToEntity(updatedProvider) : null;
+        } catch (error) {
+            throw new Error("Unable to update user.");
         }
+    }
+
+    async updateProviderStatus(providerId: string, status: boolean): Promise<Partial<Provider> | null> {
+        try {
+            const updatedProvider = await ProviderModel.findByIdAndUpdate(
+                providerId,
+                { isBlocked: status },
+                { new: true, select: '_id isBlocked' }
+            );
+            console.log("updatedProvider : ",updatedProvider);
+            return updatedProvider;
+        } catch (error) {
+            throw new Error("Unexpected error, please try again.");
+        }
+    }
 }

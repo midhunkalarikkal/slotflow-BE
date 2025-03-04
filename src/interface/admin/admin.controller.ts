@@ -18,6 +18,7 @@ export class AdminController {
         this.getAllProviders = this.getAllProviders.bind(this);
         this.getAllUsers = this.getAllUsers.bind(this);
         this.approveProvider = this.approveProvider.bind(this);
+        this.changeProviderStatus = this.changeProviderStatus.bind(this);
     }
 
     async getAllProviders(req: Request, res: Response) {
@@ -45,6 +46,18 @@ export class AdminController {
             console.log("ProviderId : ",providerId);
             const result = await this.adminProviderUseCase.approveProvider(providerId);
             console.log("result : ",result);
+            res.status(200).json(result);
+        }catch(error){
+            HandleError.handle(error, res);
+        }
+    }
+
+    async changeProviderStatus(req: Request, res: Response) {
+        try{
+            const { providerId } = req.params;
+            const { status } = req.query;
+            const statusValue = status === 'true';
+            const result = await this.adminProviderUseCase.changeStatus(providerId, statusValue);
             res.status(200).json(result);
         }catch(error){
             HandleError.handle(error, res);

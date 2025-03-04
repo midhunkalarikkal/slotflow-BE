@@ -8,5 +8,6 @@ router.get('/providers',authMiddleware, adminController.getAllProviders);
 router.get('/users',authMiddleware, adminController.getAllUsers);
 
 router.put('/provider/approve/:providerId',authMiddleware,adminController.approveProvider)
+router.put('/provider/changeStatus/:providerId',authMiddleware,adminController.changeProviderStatus)
 
 export default router;
