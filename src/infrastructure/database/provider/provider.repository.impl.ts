@@ -40,7 +40,7 @@ export class ProviderRepositoryImpl implements IProviderRepository {
         }
     }
 
-    async findAllProviders(): Promise<Provider[]> {
+    async findAllProviders(): Promise<Partial<Provider>[]> {
         try {
             return await ProviderModel.find({}, { _id: 1, username: 1, email: 1, isBlocked: 1, isAdminVerified: 1 });
         } catch (error) {
@@ -49,7 +49,7 @@ export class ProviderRepositoryImpl implements IProviderRepository {
     }
 
 
-    async updateProviderVerificationStatus(providerId: string, isAdminVerified: boolean): Promise<Provider | null> {
+    async updateProviderVerificationStatus(providerId: string, isAdminVerified: boolean): Promise<Partial<Provider> | null> {
         try {
             const updatedProvider = await ProviderModel.findByIdAndUpdate(
                 providerId,

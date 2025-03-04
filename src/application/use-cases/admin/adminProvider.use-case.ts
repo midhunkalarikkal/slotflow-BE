@@ -4,7 +4,7 @@ import { ProviderRepositoryImpl } from "../../../infrastructure/database/provide
 export class AdminProviderUseCase {
     constructor(private providerRepository: ProviderRepositoryImpl) {}
 
-    async providersList(): Promise<{success : boolean, message: string, providers?: Provider[]}>{
+    async providersList(): Promise<{success : boolean, message: string, providers?: Partial<Provider>[]}>{
         try{
             const providers = await this.providerRepository.findAllProviders();
             if(!providers) throw new Error("Fetching error, please try again.");
@@ -14,7 +14,7 @@ export class AdminProviderUseCase {
         }
     }
     
-    async approveProvider(providerId: string): Promise<{success: boolean, message: string, updatedProvider: Provider}>{
+    async approveProvider(providerId: string): Promise<{success: boolean, message: string, updatedProvider: Partial<Provider>}>{
         try {
             if(!providerId) throw new Error("Invalid request");
             const updatedProvider = await this.providerRepository.updateProviderVerificationStatus(providerId, true);
@@ -30,7 +30,7 @@ export class AdminProviderUseCase {
             if(!providerId) throw new Error("Invalid request");
             const updatedProvider = await this.providerRepository.updateProviderStatus(providerId, status);
             if (!updatedProvider) throw new Error("Provider not found");
-            return { success: true, message: "Provider approved successfully.", updatedProvider};
+            return { success: true, message: `Provider ${status ? "blocked" : "Unblocked"} successfully.`, updatedProvider};
         } catch (error) {
             throw new Error("Unexpected error occurred, please try again.");
         }

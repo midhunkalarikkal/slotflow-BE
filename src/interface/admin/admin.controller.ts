@@ -41,11 +41,8 @@ export class AdminController {
 
     async approveProvider(req: Request, res: Response) {
         try{
-            console.log("call")
             const { providerId } = req.params;
-            console.log("ProviderId : ",providerId);
             const result = await this.adminProviderUseCase.approveProvider(providerId);
-            console.log("result : ",result);
             res.status(200).json(result);
         }catch(error){
             HandleError.handle(error, res);
