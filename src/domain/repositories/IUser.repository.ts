@@ -6,4 +6,5 @@ export interface IUserRepository {
   getVerificationData(verificationToken: string): Promise<User | null>;
   updateUser(user: User): Promise<User | null>;
   findAllUsers(): Promise<User[]>;
+  updateUserStatus(userId: string, status: boolean): Promise<Partial<User> | null>;
 }

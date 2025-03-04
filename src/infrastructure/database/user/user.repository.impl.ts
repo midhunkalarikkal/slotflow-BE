@@ -23,7 +23,7 @@ export class UserRepositoryImpl implements IUserRepository {
             const createdUser = await UserModel.create(user);
             return this.mapToEntity(createdUser);
         } catch (error) {
-            console.log("error : ",error);
+            console.log("error : ", error);
             throw new Error("Unable to register, please try again after a few minutes.");
         }
     }
@@ -38,13 +38,13 @@ export class UserRepositoryImpl implements IUserRepository {
     }
 
     async findAllUsers(): Promise<User[]> {
-        try{
-            return await UserModel.find({},{_id:1, username:1, email: 1, isBlocked: 1, isEmailVerified: 1});
-        }catch(error){
+        try {
+            return await UserModel.find({}, { _id: 1, username: 1, email: 1, isBlocked: 1, isEmailVerified: 1 });
+        } catch (error) {
             throw new Error("Failed to fetch users from database.")
         }
     }
-    
+
     async getVerificationData(verificationToken: string): Promise<User | null> {
         try {
             const User = await UserModel.findOne({ verificationToken });
@@ -53,7 +53,7 @@ export class UserRepositoryImpl implements IUserRepository {
             throw new Error("Unable to retrieve verification data.");
         }
     }
-    
+
     async updateUser(user: User): Promise<User | null> {
         try {
             const updatedUser = await UserModel.findByIdAndUpdate(user._id, user, { new: true });
@@ -62,5 +62,19 @@ export class UserRepositoryImpl implements IUserRepository {
             throw new Error("Unable to update user.");
         }
     }
-    
+
+    async updateUserStatus(userId: string, status: boolean): Promise<Partial<User> | null> {
+        try {
+            const updatedUser = await UserModel.findByIdAndUpdate(
+                userId,
+                { isBlocked: status },
+                { new: true, select: '_id isBlocked' }
+            );
+            console.log("updatedUser : ", updatedUser);
+            return updatedUser;
+        } catch (error) {
+            throw new Error("Unexpected error, please try again.");
+        }
+    }
+
 }
