@@ -36,6 +36,8 @@ export class LoginUseCase {
         }
 
         if(!userOrProvider) throw new Error("Invalid credentials")
+
+        if(userOrProvider.isBlocked) throw new Error("Your account is blocked, please contact us.");
         
         const valid = await PasswordHasher.comparePassword(password, userOrProvider.password);
         if(!valid) throw new Error("Invalid credentials.");
