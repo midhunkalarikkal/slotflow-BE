@@ -11,7 +11,7 @@ export class RegisterUseCase {
 
   constructor(private userRepository: UserRepositoryImpl, private providerRepository: ProviderRepositoryImpl) { }
 
-  async execute(username: string, email: string, password: string, role: string): Promise<{ success: boolean; message: string, verificationToken: string, role: string }> {
+  async execute(username: string, email: string, password: string, role: string): Promise<{ success: boolean; message: string, authUser: {verificationToken: string, role: string} }> {
 
     Validator.validateUsername(username);
     Validator.validateEmail(email);
@@ -80,6 +80,6 @@ export class RegisterUseCase {
       }
     }
 
-    return { success: true, message: `OTP sent to email`, verificationToken, role };
+    return { success: true, message: `OTP sent to email`, authUser: {verificationToken, role} };
   }
 }

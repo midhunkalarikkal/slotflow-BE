@@ -8,7 +8,7 @@ export class ResendOtpUseCase {
 
   constructor(private userRepository: UserRepositoryImpl, private providerRepository: ProviderRepositoryImpl) { }
 
-  async execute(role: string, verificationToken?: string, email?: string): Promise<{ success: boolean; message: string, verificationToken: string, role: string, }> {
+  async execute(role: string, verificationToken?: string, email?: string): Promise<{ success: boolean; message: string, authUser: {verificationToken: string, role: string } }> {
 
     let userOrProvider: Provider | User | null = null;
 
@@ -40,7 +40,7 @@ export class ResendOtpUseCase {
 
     console.log(userOrProvider.verificationToken, role)
 
-    return { success: true, message: `OTP sent to email.`, verificationToken: userOrProvider.verificationToken, role };
+    return { success: true, message: `OTP sent to email.`, authUser: {verificationToken: userOrProvider.verificationToken, role } };
 
   }
 }

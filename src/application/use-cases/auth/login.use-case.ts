@@ -10,7 +10,7 @@ import { ProviderRepositoryImpl } from "../../../infrastructure/database/provide
 export class LoginUseCase {
     constructor(private userRepository: UserRepositoryImpl, private providerRepository: ProviderRepositoryImpl){ }
 
-    async execute(email: string, password: string, role: string): Promise<{ success: boolean; message: string, accessToken?: string, refreshToken?: string, role?: string,  userData?: {username: string, profileImage: string | null} }> {
+    async execute(email: string, password: string, role: string): Promise<{ success: boolean; message: string, token: string,  authUser: {username: string, profileImage?: string | null, role: string} }> {
         
         Validator.validateEmail(email);
         Validator.validatePassword(password);
@@ -28,9 +28,8 @@ export class LoginUseCase {
             if (email !== adminConfig.adminEmail || password !== adminConfig.adminPassword) {
                 throw new Error("Invalid credentials.");
             }
-            const accessToken = JWTService.generateAccessToken({email: email, role : role});
-            const refreshToken = JWTService.generateRefreshToken({email: email, role : role});
-            return { success: true, message: "Logged In Successfully.", accessToken, refreshToken, role };
+            const token = JWTService.generateToken({email: email, role : role});
+            return { success: true, message: "Logged In Successfully.", token, authUser: { username: "Admin", profileImage: "", role: role} };
         }else{
             throw new Error("Invalid request.");
         }
@@ -42,9 +41,8 @@ export class LoginUseCase {
         const valid = await PasswordHasher.comparePassword(password, userOrProvider.password);
         if(!valid) throw new Error("Invalid credentials.");
         
-        const accessToken = JWTService.generateAccessToken({userOrProviderId: userOrProvider._id, role : role});
-        const refreshToken = JWTService.generateRefreshToken({userOrProviderId: userOrProvider._id, role : role});
+        const token = JWTService.generateToken({userOrProviderId: userOrProvider._id, role : role});
 
-        return { success: true, message: 'Logged In Successfully.', accessToken, refreshToken, role, userData : {username : userOrProvider.username, profileImage: userOrProvider.profileImage }};
+        return { success: true, message: 'Logged In Successfully.', token, authUser : {username : userOrProvider.username, profileImage: userOrProvider.profileImage, role: role }};
     }
 }
