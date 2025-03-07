@@ -70,8 +70,7 @@ export class UserRepositoryImpl implements IUserRepository {
                 { isBlocked: status },
                 { new: true, select: '_id isBlocked' }
             );
-            console.log("updatedUser : ", updatedUser);
-            return updatedUser;
+            return updatedUser || null;
         } catch (error) {
             throw new Error("Unexpected error, please try again.");
         }

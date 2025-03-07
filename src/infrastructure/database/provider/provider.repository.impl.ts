@@ -88,9 +88,10 @@ export class ProviderRepositoryImpl implements IProviderRepository {
                 { new: true, select: '_id isBlocked' }
             );
             console.log("updatedProvider : ",updatedProvider);
-            return updatedProvider;
+            return updatedProvider || null;
         } catch (error) {
             throw new Error("Unexpected error, please try again.");
         }
     }
+
 }

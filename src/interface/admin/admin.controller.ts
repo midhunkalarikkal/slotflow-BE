@@ -74,6 +74,8 @@ export class AdminController {
             HandleError.handle(error, res);
         }
     }
+
+   
 }
 
 const adminController = new AdminController(adminProviderUseCase, adminUserUseCase);
