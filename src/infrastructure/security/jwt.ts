@@ -5,7 +5,7 @@ const JWT_SECRET = jwtConfig.jwtSecret as string;
 
 export class JWTService {
 
-    static generateToken(payload: object, expiresIn: string = "7d") : string {
+    static generateToken(payload: object, expiresIn: string = "2d") : string {
         try{
             return jwt.sign(payload, JWT_SECRET as jwt.Secret, { expiresIn: expiresIn as jwt.SignOptions["expiresIn"]});
         }catch(error){

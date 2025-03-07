@@ -13,6 +13,8 @@ const app = express();
 app.use(cors({
     origin: "http://localhost:5173",
     credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'X-Requested-With'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
 }));
 
 app.use(helmet());
