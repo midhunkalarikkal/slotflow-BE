@@ -1,0 +1,9 @@
+import { Types } from "mongoose";
+
+export class Service {
+    constructor(
+        public serviceName: string,
+        public isBlocked: boolean,
+        _id?: Types.ObjectId,
+    ){}
+}

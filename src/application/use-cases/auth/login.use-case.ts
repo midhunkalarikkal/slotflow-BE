@@ -21,9 +21,6 @@ export class LoginUseCase {
             userOrProvider = await this.userRepository.findUserByEmail(email);
         }else if(role === "PROVIDER"){
             userOrProvider = await this.providerRepository.findProviderByEmail(email);
-            if (userOrProvider && !(userOrProvider as Provider).isAdminVerified) {
-                throw new Error("Your admin verification is pending.");
-            }
         }else if(role === "ADMIN"){
             if (email !== adminConfig.adminEmail || password !== adminConfig.adminPassword) {
                 throw new Error("Invalid credentials.");
