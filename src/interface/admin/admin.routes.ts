@@ -11,6 +11,8 @@ router.put('/provider/changeStatus/:providerId',authMiddleware,adminController.c
 router.get('/users',authMiddleware, adminController.getAllUsers);
 router.put('/user/changeStatus/:userId',authMiddleware,adminController.changeUserStatus);
 
-router.get('/services',authMiddleware, adminController.getAllServices)
+router.get('/services',authMiddleware, adminController.getAllServices);
+router.post('/addNewService',authMiddleware,adminController.addService);
+router.put('/changeServiceStatus/:serviceId',authMiddleware, adminController.changeServiceStatus);
 
 export default router;

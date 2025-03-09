@@ -26,6 +26,8 @@ export class AdminController {
         this.changeProviderStatus = this.changeProviderStatus.bind(this);
         this.changeUserStatus = this.changeUserStatus.bind(this);
         this.getAllServices = this.getAllServices.bind(this);
+        this.addService = this.addService.bind(this);
+        this.changeServiceStatus = this.changeServiceStatus.bind(this);
     }
 
     async getAllProviders(req: Request, res: Response) {
@@ -90,6 +92,27 @@ export class AdminController {
         }
     }
 
+    async addService(req: Request, res: Response) {
+        try{
+            const  { serviceName } = req.body;
+            const result = await this.adminServiceUseCase.addService(serviceName);
+            res.status(200).json(result);
+        }catch(error){
+            HandleError.handle(error,res);
+        }
+    }
+
+    async changeServiceStatus(req: Request, res: Response) {
+        try{
+            const { serviceId } = req.params;
+            const { status } = req.query;
+            const statusValue = status === 'true';
+            const result = await this.adminServiceUseCase.changeStatus(serviceId, statusValue);
+            res.status(200).json(result);
+        }catch(error){
+            HandleError.handle(error,res);
+        }
+    }
    
 }
 

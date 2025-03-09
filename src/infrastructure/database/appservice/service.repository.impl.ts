@@ -11,9 +11,11 @@ export class ServiceRepositoryImpl implements IServiceRepository {
         )
     }
 
-    async createService(service: Service): Promise<Service> {
+    async createService(service: String): Promise<Service> {
         try {
-            const createdService = await ServiceModel.create(service);
+            const createdService = await ServiceModel.create({
+                serviceName: service
+              });
             return this.mapToEntity(createdService);
         } catch (error) {
             throw new Error("Unable to register, Please try again after a few minutes.");
@@ -25,6 +27,19 @@ export class ServiceRepositoryImpl implements IServiceRepository {
             return await ServiceModel.find({}, { _id: 1, serviceName: 1, isBlocked: 1 });
         } catch (error) {
             throw new Error("Failed to fetch services from database.");
+        }
+    }
+
+    async updateServiceStatus(serviceId: string, status: boolean): Promise<Partial<Service> | null> {
+        try{
+            const updatedService = await ServiceModel.findByIdAndUpdate(
+                serviceId,
+                { isBlocked: status },
+                { new: true, select: '_id isBlocked' }
+            )
+            return updatedService || null;
+        }catch(error){
+            throw new Error("Failed to update service status.");
         }
     }
 }

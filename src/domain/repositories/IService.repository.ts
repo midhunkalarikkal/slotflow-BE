@@ -1,6 +1,6 @@
 import { Service } from "../entities/service.entity";
 
 export interface IServiceRepository {
-    createService(service: Service): Promise<Service>;
+    createService(service: String): Promise<Service>;
     findAllServices(): Promise<Service[]>;
 }
