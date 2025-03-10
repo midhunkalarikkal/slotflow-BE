@@ -18,7 +18,16 @@ export class ServiceRepositoryImpl implements IServiceRepository {
               });
             return this.mapToEntity(createdService);
         } catch (error) {
-            throw new Error("Unable to register, Please try again after a few minutes.");
+            throw new Error("Unable to create service, Please try again after a few minutes.");
+        }
+    }
+    
+    async findByName(serviceName: string): Promise<Boolean> {
+        try{
+            const existingService = await ServiceModel.findOne({ serviceName: serviceName });
+            return !!existingService;
+        }catch (error){
+            throw new Error("Unexpected error, Please try again after a few minutes.");
         }
     }
 

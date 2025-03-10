@@ -4,6 +4,6 @@ export class Service {
     constructor(
         public serviceName: string,
         public isBlocked: boolean,
-        _id?: Types.ObjectId,
+        public _id?: Types.ObjectId,
     ){}
 }

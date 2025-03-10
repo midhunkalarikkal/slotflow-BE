@@ -72,7 +72,6 @@ export class AdminController {
 
     async changeUserStatus(req: Request, res: Response) {
         try{
-            console.log("Call")
             const { userId } = req.params;
             const { status } = req.query;
             const statusValue = status === 'true';
