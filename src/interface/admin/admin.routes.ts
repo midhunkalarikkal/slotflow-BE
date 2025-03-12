@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { adminController } from "./admin.controller";
 import { authMiddleware } from "../middleware/auth.middleware";
+import { adminPlanController } from "./adminPlanController";
 
 const router = Router();
 
@@ -14,5 +15,8 @@ router.put('/user/changeStatus/:userId',authMiddleware,adminController.changeUse
 router.get('/services',authMiddleware, adminController.getAllServices);
 router.post('/addNewService',authMiddleware,adminController.addService);
 router.put('/changeServiceStatus/:serviceId',authMiddleware, adminController.changeServiceStatus);
+
+router.get('/plans', authMiddleware,adminPlanController.getAllPLans);
+router.post('/addNewPlan', authMiddleware, adminPlanController.addNewPlan)
 
 export default router;

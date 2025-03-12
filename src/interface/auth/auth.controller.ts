@@ -70,14 +70,14 @@ export class AuthController {
   async login(req: Request, res: Response) {
     try {
       const { email, password, role } = req.body;
-      const { success, message, token, authUser } = await this.loginUseCase.execute(email, password, role);
-        res.cookie("token", token, {
+      const { success, message, authUser } = await this.loginUseCase.execute(email, password, role);
+        res.cookie("token", authUser.token, {
             maxAge: 2 * 24 * 60 * 60 * 1000,
             httpOnly: true,
             sameSite: 'strict',
             secure: appConfig.nodeEnv !== 'development'
         });
-    res.status(200).json({ success, message, authUser, token });
+    res.status(200).json({ success, message, authUser });
     } catch (error) {
       HandleError.handle(error, res);
     }

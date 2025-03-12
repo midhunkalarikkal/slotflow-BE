@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { HandleError } from "../../infrastructure/error/error";
 import { AdminUserUseCase } from "../../application/use-cases/admin/adminUser.use-case";
 import { UserRepositoryImpl } from "../../infrastructure/database/user/user.repository.impl";
-import { AdminServiceUseCase } from "../../application/use-cases/admin/admin_service.use-case";
+import { AdminServiceUseCase } from "../../application/use-cases/admin/adminService.use-case";
 import { AdminProviderUseCase } from "../../application/use-cases/admin/adminProvider.use-case";
 import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/provider.repository.impl";
 import { ServiceRepositoryImpl } from "../../infrastructure/database/appservice/service.repository.impl";
@@ -14,7 +14,7 @@ const adminUserUseCase = new AdminUserUseCase(userRepositoryImpl);
 const adminProviderUseCase = new AdminProviderUseCase(providerRepositoryImpl);
 const adminServiceUseCase = new AdminServiceUseCase(serviceRepositoryImpl)
 
-export class AdminController {
+class AdminController {
     constructor(
         private adminProviderUseCase : AdminProviderUseCase,
         private adminUserUseCase : AdminUserUseCase,
@@ -85,6 +85,7 @@ export class AdminController {
     async getAllServices(req: Request, res: Response) {
         try{
             const result = await this.adminServiceUseCase.serviceList();
+            console.log("result : ",result);
             res.status(200).json(result);
         }catch(error){
             HandleError.handle(error, res);
