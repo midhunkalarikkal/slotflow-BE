@@ -76,4 +76,13 @@ export class UserRepositoryImpl implements IUserRepository {
         }
     }
 
+    async checkUserStatus(userId: string): Promise<boolean | null> {
+        try{
+            const user = await UserModel.findById(userId,{select: "isBlocked"});
+            return user && user.isBlocked;
+        }catch(error){
+            throw new Error("Status checking error.");
+        }
+    }
+
 }

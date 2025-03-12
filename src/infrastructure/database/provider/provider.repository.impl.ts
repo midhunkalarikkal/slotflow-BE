@@ -87,12 +87,18 @@ export class ProviderRepositoryImpl implements IProviderRepository {
                 { isBlocked: status },
                 { new: true, select: '_id isBlocked' }
             );
-            console.log("updatedProvider : ",updatedProvider);
             return updatedProvider || null;
         } catch (error) {
             throw new Error("Unexpected error, please try again.");
         }
     }
 
-
+    async checkProviderStatus(providerId: string): Promise<boolean | null> {
+        try{
+            const provider = await ProviderModel.findById(providerId);
+            return provider && provider.isBlocked;
+        }catch(error){
+            throw new Error("Status checking error.");
+        }
+    }
 }

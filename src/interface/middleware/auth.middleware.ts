@@ -2,21 +2,26 @@ import { NextFunction, Request, Response } from "express";
 import { JWTService } from "../../infrastructure/security/jwt";
 
 export const authMiddleware = (req: Request, res: Response, next: NextFunction): void => {
-  console.log("authenticating")
-    const token = req.cookies.token;
-    if (!token) {
-      res.status(401).json({ success: false, message: "Unauthorized, no token." });
+  const token = req.cookies.token;
+  const currentTime = Date.now();
+
+  if (!token) {
+    res.status(401).json({ success: false, message: "Unauthorized, no token." });
+    return;
+  }
+
+  try {
+    const decoded = JWTService.verifyToken(token);
+
+    if (decoded && decoded.exp && currentTime > decoded.exp * 1000) {
+      console.log("token expired");
+      res.status(401).json({ success: false, message: "Unauthorized: Token expired." });
       return;
     }
-  
-    try {
-      console.log("decoding")
-      const decoded = JWTService.verifyToken(token);
-      (req as any).user = decoded;
-      console.log("authorised");
-      next();
-    } catch (error) {
-      console.log("unauthorized");
-      res.status(401).json({ success: false, message: "Unauthorized: Invalid token." });
-    }
-  };
+
+    (req as any).user = decoded;
+    next();
+  } catch (error) {
+    res.status(401).json({ success: false, message: "Unauthorized: Invalid token." });
+  }
+};

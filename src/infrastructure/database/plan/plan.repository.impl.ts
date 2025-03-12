@@ -30,7 +30,7 @@ export class PlanRepositoryImpl implements IPlanRepository {
     async updatePlan(planId: Types.ObjectId | string, updateData: Partial<Plan>): Promise<Partial<Plan> | null> {
         try{
             if(!planId) throw new Error("Plan not found.");
-            const updatedPlan = await PlanModel.findByIdAndUpdate(planId,updateData,{ new: true});
+            const updatedPlan = await PlanModel.findByIdAndUpdate(planId,updateData,{ new: true });
             return updatedPlan || null;
         }catch{
             throw new Error("Fialed to updated plan.");
@@ -40,8 +40,8 @@ export class PlanRepositoryImpl implements IPlanRepository {
     async changePlanStatus(planId: Types.ObjectId | string, status: boolean): Promise<Partial<Plan> | null> {
         try{
             if(!planId) throw new Error("No plan found.");
-            const updatedPlan = await PlanModel.findByIdAndUpdate(planId, { isBlocked: status },{ new: true});
-            return updatedPlan || null
+            const updatedPlan = await PlanModel.findByIdAndUpdate(planId, { isBlocked: status },{ new: true, select: '_id isBlocked'});
+            return updatedPlan || null;
         }catch{
             throw new Error("Failed to update plan status.");
         }
@@ -59,7 +59,7 @@ export class PlanRepositoryImpl implements IPlanRepository {
 
     async getAllPlans(): Promise<Plan[]> {
         try{
-            const plans = await PlanModel.find();
+            const plans = await PlanModel.find({},{_id:1, planName: 1, isBlocked: 1});
             return plans.map(plan => this.mapToEntity(plan));
         }catch{
             throw new Error("Failed to fetch all plans.");

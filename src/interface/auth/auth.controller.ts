@@ -7,17 +7,17 @@ import { ResendOtpUseCase } from '../../application/use-cases/auth/resend-otp.us
 import { VerifyOTPUseCase } from '../../application/use-cases/auth/verify-otp.use-case';
 import { UserRepositoryImpl } from '../../infrastructure/database/user/user.repository.impl';
 import { UpdatePasswordUseCase } from '../../application/use-cases/auth/updatePassword.use-case';
+import { CheckUserStatusUseCase } from '../../application/use-cases/auth/checkUserStatus.use-case';
 import { ProviderRepositoryImpl } from '../../infrastructure/database/provider/provider.repository.impl';
-import { RefreshAccessTokenUseCase } from '../../application/use-cases/auth/refreshAccessToekn.use-case';
 
 const userRepositoryImpl = new UserRepositoryImpl();
 const providerRepositoryImpl = new ProviderRepositoryImpl();
-const refreshAccessToeknUseCase = new RefreshAccessTokenUseCase();
 const loginUseCase = new LoginUseCase(userRepositoryImpl, providerRepositoryImpl);
 const registerUseCase = new RegisterUseCase(userRepositoryImpl, providerRepositoryImpl);
 const verifyOTPUseCase = new VerifyOTPUseCase(userRepositoryImpl, providerRepositoryImpl);
 const resendOtpUseCase = new ResendOtpUseCase(userRepositoryImpl, providerRepositoryImpl);
 const updatePasswordUseCase = new UpdatePasswordUseCase(userRepositoryImpl, providerRepositoryImpl);
+const checkUserStatusUseCase = new CheckUserStatusUseCase(userRepositoryImpl, providerRepositoryImpl);
 
 export class AuthController {
 
@@ -26,15 +26,15 @@ export class AuthController {
     private verifyOTPUseCase: VerifyOTPUseCase,
     private resendOtpUseCase: ResendOtpUseCase,
     private loginUseCase: LoginUseCase,
-    private refreshAccessToeknUseCase: RefreshAccessTokenUseCase,
     private updatePasswordUseCase: UpdatePasswordUseCase,
+    private checkUserStatusUseCase: CheckUserStatusUseCase
   ) {
     this.register = this.register.bind(this);
     this.verifyOTP = this.verifyOTP.bind(this);
     this.resendOtp = this.resendOtp.bind(this);
     this.login = this.login.bind(this);
-    this.refreshAccessToken = this.refreshAccessToken.bind(this);
     this.updatePassword = this.updatePassword.bind(this);
+    this.checkUserStatus = this.checkUserStatus.bind(this);
   }
 
   async register(req: Request, res: Response) {
@@ -50,7 +50,7 @@ export class AuthController {
   async verifyOTP(req: Request, res: Response) {
     try {
       const { otp, verificationToken, role } = req.body;
-      const result = await this.verifyOTPUseCase.execute(otp,verificationToken, role);
+      const result = await this.verifyOTPUseCase.execute(otp, verificationToken, role);
       res.status(200).json(result);
     } catch (error) {
       HandleError.handle(error, res);
@@ -71,13 +71,13 @@ export class AuthController {
     try {
       const { email, password, role } = req.body;
       const { success, message, authUser } = await this.loginUseCase.execute(email, password, role);
-        res.cookie("token", authUser.token, {
-            maxAge: 2 * 24 * 60 * 60 * 1000,
-            httpOnly: true,
-            sameSite: 'strict',
-            secure: appConfig.nodeEnv !== 'development'
-        });
-    res.status(200).json({ success, message, authUser });
+      res.cookie("token", authUser.token, {
+        maxAge: 2 * 24 * 60 * 60 * 1000,
+        httpOnly: true,
+        sameSite: 'strict',
+        secure: appConfig.nodeEnv !== 'development'
+      });
+      res.status(200).json({ success, message, authUser });
     } catch (error) {
       HandleError.handle(error, res);
     }
@@ -92,27 +92,27 @@ export class AuthController {
     }
   }
 
-  async refreshAccessToken(req: Request, res: Response) {
+  async updatePassword(req: Request, res: Response) {
     try {
-      const refreshToken = req.cookies.refreshToken;
-      if (!refreshToken) throw new Error("Toekn not found");
-      const result = await this.refreshAccessToeknUseCase.execute(refreshToken);
+      const { role, verificationToken, password } = req.body;
+      const result = await this.updatePasswordUseCase.execute(role, verificationToken, password);
       res.status(200).json(result);
     } catch (error) {
       HandleError.handle(error, res);
     }
   }
 
-  async updatePassword(req: Request, res: Response) {
-    try {
-        const { role, verificationToken, password } = req.body;
-        const result = await this.updatePasswordUseCase.execute(role, verificationToken, password);
-        res.status(200).json(result);
-    } catch (error) {
-        HandleError.handle(error, res);
+  async checkUserStatus(req: Request, res: Response) {
+    try{
+      const authHeader = req.headers.authorization;
+      const token = authHeader?.split(' ')[1];
+      const result = await this.checkUserStatusUseCase.checkStatus(token!);
+      res.status(result.status).json(result);
+    }catch(error){
+      HandleError.handle(error, res);
     }
-}
+  }
 }
 
-const authController = new AuthController(registerUseCase, verifyOTPUseCase, resendOtpUseCase, loginUseCase, refreshAccessToeknUseCase, updatePasswordUseCase);
+const authController = new AuthController(registerUseCase, verifyOTPUseCase, resendOtpUseCase, loginUseCase, updatePasswordUseCase, checkUserStatusUseCase);
 export { authController };

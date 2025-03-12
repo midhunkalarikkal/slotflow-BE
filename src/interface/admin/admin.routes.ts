@@ -17,6 +17,7 @@ router.post('/addNewService',authMiddleware,adminController.addService);
 router.put('/changeServiceStatus/:serviceId',authMiddleware, adminController.changeServiceStatus);
 
 router.get('/plans', authMiddleware,adminPlanController.getAllPLans);
-router.post('/addNewPlan', authMiddleware, adminPlanController.addNewPlan)
+router.post('/addNewPlan', authMiddleware, adminPlanController.addNewPlan);
+router.put('/changePlanStatus/:planId', authMiddleware, adminPlanController.changePlanStatus)
 
 export default router;

@@ -8,4 +8,5 @@ export interface IProviderRepository {
     getVerificationData(verificationToken: string): Promise<Provider | null>;
     updateProvider(user: Provider): Promise<Provider | null>;
     updateProviderStatus(providerId: string, status: boolean): Promise<Partial<Provider> | null>;
+    checkProviderStatus(providerId: string): Promise<boolean | null>;
 }

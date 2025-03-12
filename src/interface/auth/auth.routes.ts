@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { authController } from './auth.controller';
+import { authMiddleware } from '../middleware/auth.middleware';
 
 const router = Router();
 
@@ -9,6 +10,6 @@ router.post('/verify-otp', authController.verifyOTP);
 router.post("/signin", authController.login);
 router.post('/signout', authController.logout);
 router.put('/updatePassword',authController.updatePassword);
-router.post('/refresh',authController.refreshAccessToken);
+router.post('/checkUserStatus',authMiddleware,authController.checkUserStatus);
 
 export default router;

@@ -10,7 +10,7 @@ import { ProviderRepositoryImpl } from "../../../infrastructure/database/provide
 export class LoginUseCase {
     constructor(private userRepository: UserRepositoryImpl, private providerRepository: ProviderRepositoryImpl){ }
 
-    async execute(email: string, password: string, role: string): Promise<{ success: boolean; message: string,  authUser: {username: string, profileImage?: string | null, role: string, token: string} }> {
+    async execute(email: string, password: string, role: string): Promise<{ success: boolean; message: string,  authUser: {username: string, profileImage?: string | null, role: string, token: string, email: string} }> {
         
         Validator.validateEmail(email);
         Validator.validatePassword(password);
@@ -26,7 +26,7 @@ export class LoginUseCase {
                 throw new Error("Invalid credentials.");
             }
             const token = JWTService.generateToken({email: email, role : role});
-            return { success: true, message: "Logged In Successfully.", authUser: { username: "Admin", profileImage: "", role: role, token} };
+            return { success: true, message: "Logged In Successfully.", authUser: { username: "Admin", profileImage: "", role: role, token, email} };
         }else{
             throw new Error("Invalid request.");
         }
@@ -40,6 +40,6 @@ export class LoginUseCase {
         
         const token = JWTService.generateToken({userOrProviderId: userOrProvider._id, role : role});
 
-        return { success: true, message: 'Logged In Successfully.', authUser : {username : userOrProvider.username, profileImage: userOrProvider.profileImage, role: role, token }};
+        return { success: true, message: 'Logged In Successfully.', authUser : {username : userOrProvider.username, profileImage: userOrProvider.profileImage, role: role, token, email }};
     }
 }
