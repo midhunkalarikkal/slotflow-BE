@@ -41,6 +41,12 @@ export class AuthController {
     try {
       const { username, email, password, role } = req.body;
       const result = await this.registerUseCase.execute(username, email, password, role);
+      res.cookie("token", result.authUser.token, {
+        maxAge: 2 * 24 * 60 * 60 * 1000,
+        httpOnly: true,
+        sameSite: 'strict',
+        secure: appConfig.nodeEnv !== 'development'
+      });
       res.status(200).json(result);
     } catch (error) {
       HandleError.handle(error, res);
@@ -107,8 +113,10 @@ export class AuthController {
       const authHeader = req.headers.authorization;
       const token = authHeader?.split(' ')[1];
       const result = await this.checkUserStatusUseCase.checkStatus(token!);
+      console.log("result : ",result);
       res.status(result.status).json(result);
     }catch(error){
+      console.log("error : ",error);
       HandleError.handle(error, res);
     }
   }

@@ -10,6 +10,6 @@ router.post('/verify-otp', authController.verifyOTP);
 router.post("/signin", authController.login);
 router.post('/signout', authController.logout);
 router.put('/updatePassword',authController.updatePassword);
-router.post('/checkUserStatus',authMiddleware,authController.checkUserStatus);
+router.post('/checkUserStatus',authController.checkUserStatus);
 
 export default router;

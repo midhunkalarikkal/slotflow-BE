@@ -31,6 +31,7 @@ export class UserRepositoryImpl implements IUserRepository {
     async findUserByEmail(email: string): Promise<User | null> {
         try {
             const user = await UserModel.findOne({ email });
+            console.log("user : ",user)
             return user ? this.mapToEntity(user) : null;
         } catch (error) {
             throw new Error("Unable to find user by email.");
@@ -78,7 +79,7 @@ export class UserRepositoryImpl implements IUserRepository {
 
     async checkUserStatus(userId: string): Promise<boolean | null> {
         try{
-            const user = await UserModel.findById(userId,{select: "isBlocked"});
+            const user = await UserModel.findById(userId,{_id: 1, isBlocked: 1});
             return user && user.isBlocked;
         }catch(error){
             throw new Error("Status checking error.");

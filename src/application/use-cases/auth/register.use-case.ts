@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { User } from '../../../domain/entities/user.entity';
+import { JWTService } from '../../../infrastructure/security/jwt';
 import { Provider } from '../../../domain/entities/provider.entity';
 import { Validator } from '../../../infrastructure/validator/validator';
 import { OTPService } from '../../../infrastructure/services/otp.service';
@@ -11,7 +12,7 @@ export class RegisterUseCase {
 
   constructor(private userRepository: UserRepositoryImpl, private providerRepository: ProviderRepositoryImpl) { }
 
-  async execute(username: string, email: string, password: string, role: string): Promise<{ success: boolean; message: string, authUser: {verificationToken: string, role: string} }> {
+  async execute(username: string, email: string, password: string, role: string): Promise<{ success: boolean; message: string, authUser: {verificationToken: string, role: string, token: string} }> {
 
     Validator.validateUsername(username);
     Validator.validateEmail(email);
@@ -79,7 +80,8 @@ export class RegisterUseCase {
         });
       }
     }
+    const token = JWTService.generateToken({email, role});
 
-    return { success: true, message: `OTP sent to email`, authUser: {verificationToken, role} };
+    return { success: true, message: `OTP sent to email`, authUser: {verificationToken, role, token} };
   }
 }
