@@ -1,14 +1,17 @@
+import { AddressRepositoryImpl } from "../../../infrastructure/database/address/address.repository.impl";
 import { ProviderRepositoryImpl } from "../../../infrastructure/database/provider/provider.repository.impl";
 
 export class ProviderUseCase {
-    constructor(private providerRepository: ProviderRepositoryImpl){}
+    constructor(
+        private providerRepository: ProviderRepositoryImpl, 
+        private addressRepository: AddressRepositoryImpl,
+    ){}
 
-    async execute(providerId: string): Promise<{success: boolean, address: boolean, service: boolean, verified: boolean, message: string}> {
+    async execute(providerId: string, addressLine: string, phone: string, place: string, city: string, district: string, pincode: string, state: string,  country: string, googleMapLink: string): Promise<{success: boolean, message: string, address: boolean}> {
         if(!providerId) throw new Error("Invalid request.");
         const provider = await this.providerRepository.findProviderById(providerId);
-        const address = provider?.addressId ? true : false;
-        const service = provider?.serviceId ? true : false;
-        const isVerified = provider?.isAdminVerified ? true : false;
-        return {success: true, address: address, service: service, verified: isVerified, message: "Provder approval details"}
+        if(!provider) throw new Error("No user foun.d");
+        const result = await this.addressRepository.createAddress({userId: providerId, addressLine, phone, place, city, district, pincode, state, country, googleMapLink});
+        return {success: true, message: "Address added successfully", address: result };
     }
 }
