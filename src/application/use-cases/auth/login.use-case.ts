@@ -6,11 +6,12 @@ import { Validator } from "../../../infrastructure/validator/validator";
 import { PasswordHasher } from "../../../infrastructure/security/password-hashing";
 import { UserRepositoryImpl } from "../../../infrastructure/database/user/user.repository.impl";
 import { ProviderRepositoryImpl } from "../../../infrastructure/database/provider/provider.repository.impl";
+import { Types } from "mongoose";
 
 export class LoginUseCase {
     constructor(private userRepository: UserRepositoryImpl, private providerRepository: ProviderRepositoryImpl){ }
 
-    async execute(email: string, password: string, role: string): Promise<{ success: boolean; message: string,  authUser: {username: string, profileImage?: string | null, role: string, token: string, email: string, isLoggedIn: boolean} }> {
+    async execute(email: string, password: string, role: string): Promise<{ success: boolean; message: string,  authUser: {username: string, profileImage?: string | null, role: string, token: string, email: string, isLoggedIn: boolean, _id?: string | Types.ObjectId, address?: boolean, service?: boolean, approved?: boolean} }> {
         
         Validator.validateEmail(email);
         Validator.validatePassword(password);
@@ -40,6 +41,17 @@ export class LoginUseCase {
         
         const token = JWTService.generateToken({userOrProviderId: userOrProvider._id, role : role});
 
-        return { success: true, message: 'Logged In Successfully.', authUser : {username : userOrProvider.username, profileImage: userOrProvider.profileImage, role: role, token, email, isLoggedIn: true }};
+        let address;
+        let service;
+        let approved;
+
+        if(role === "PROVIDER"){
+            address = (userOrProvider as Provider).addressId ? true : false;
+            service = (userOrProvider as Provider).serviceId ? true : false;
+            approved = (userOrProvider as Provider).isAdminVerified ? true : false;
+        }
+
+
+        return { success: true, message: 'Logged In Successfully.', authUser : {username : userOrProvider.username, profileImage: userOrProvider.profileImage, role: role, token, email, isLoggedIn: true, _id: userOrProvider._id, address, service, approved }};
     }
 }

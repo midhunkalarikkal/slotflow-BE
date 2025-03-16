@@ -38,8 +38,6 @@ export class ResendOtpUseCase {
 
     await OTPService.sendOTP(userOrProvider?.email, otp);
 
-    console.log(userOrProvider.verificationToken, role)
-
     return { success: true, message: `OTP sent to email.`, authUser: {verificationToken: userOrProvider.verificationToken, role } };
 
   }

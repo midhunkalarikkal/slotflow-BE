@@ -113,10 +113,8 @@ export class AuthController {
       const authHeader = req.headers.authorization;
       const token = authHeader?.split(' ')[1];
       const result = await this.checkUserStatusUseCase.checkStatus(token!);
-      console.log("result : ",result);
       res.status(result.status).json(result);
     }catch(error){
-      console.log("error : ",error);
       HandleError.handle(error, res);
     }
   }

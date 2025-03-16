@@ -9,4 +9,5 @@ export interface IProviderRepository {
     updateProvider(user: Provider): Promise<Provider | null>;
     updateProviderStatus(providerId: string, status: boolean): Promise<Partial<Provider> | null>;
     checkProviderStatus(providerId: string): Promise<boolean | null>;
+    findProviderById(providerId: string): Promise<Provider | null>;
 }

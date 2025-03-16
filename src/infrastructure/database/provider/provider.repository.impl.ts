@@ -101,4 +101,13 @@ export class ProviderRepositoryImpl implements IProviderRepository {
             throw new Error("Status checking error.");
         }
     }
+
+    async findProviderById(providerId: string): Promise<Provider | null> {
+        try{
+            const provider = await ProviderModel.findById(providerId);
+            return provider ? this.mapToEntity(provider) : null;
+        }catch(error){
+            throw new Error('Provider finding error.');
+        }
+    }
 }
