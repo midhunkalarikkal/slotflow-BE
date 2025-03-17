@@ -1,13 +1,19 @@
 import { Request, Response } from "express";
 import { HandleError } from "../../infrastructure/error/error";
-import { AdminPlanUseCase } from "../../application/use-cases/admin/adminPlan.use-case";
 import { PlanRepositoryImpl } from "../../infrastructure/database/plan/plan.repository.impl";
+import { AdminChangePlanStatusUseCase, AdminCreatePlanUseCase, AdminPlanListUseCase } from "../../application/use-cases/admin/adminPlan.use-case";
 
 const planRepositoryImpl = new PlanRepositoryImpl();
-const adminPlanUseCase = new AdminPlanUseCase(planRepositoryImpl);
+const adminPlanListUseCase = new AdminPlanListUseCase(planRepositoryImpl);
+const adminCreatePlanUseCase = new AdminCreatePlanUseCase(planRepositoryImpl);
+const adminChangePlanStatusUseCase = new AdminChangePlanStatusUseCase(planRepositoryImpl);
 
 class AdminPlanController {
-    constructor(private adminPlanUseCase : AdminPlanUseCase){
+    constructor(
+        private adminPlanListUseCase : AdminPlanListUseCase,
+        private adminCreatePlanUseCase : AdminCreatePlanUseCase,
+        private adminChangePlanStatusUseCase : AdminChangePlanStatusUseCase,
+    ){
         this.getAllPLans = this.getAllPLans.bind(this);
         this.addNewPlan = this.addNewPlan.bind(this);
         this.changePlanStatus = this.changePlanStatus.bind(this);
@@ -15,7 +21,7 @@ class AdminPlanController {
 
     async getAllPLans(req: Request, res: Response) {
         try{
-            const result = await this.adminPlanUseCase.planList();
+            const result = await this.adminPlanListUseCase.execute();
             res.status(200).json(result);
         }catch(error){
             HandleError.handle(error, res);
@@ -26,7 +32,7 @@ class AdminPlanController {
         try{
             const { planName, description, price, features, billingCycle, maxBookingPerMonth, adVisibility } = req.body;
             if(!planName || !description || !price || !features || !billingCycle || !maxBookingPerMonth || !adVisibility) throw new Error("Invalid request.");
-            const result = await this.adminPlanUseCase.createPlan( planName, description, price, features, billingCycle, maxBookingPerMonth, adVisibility );
+            const result = await this.adminCreatePlanUseCase.execute( planName, description, price, features, billingCycle, maxBookingPerMonth, adVisibility );
             res.status(200).json(result);
         }catch(error){
             HandleError.handle(error,res);
@@ -39,7 +45,7 @@ class AdminPlanController {
             const { status } = req.query;
             if(!planId || !status) throw new Error("Invalid request.");
             const statusValue = status === "true";
-            const result = await this.adminPlanUseCase.changeStatus(planId, statusValue);
+            const result = await this.adminChangePlanStatusUseCase.execute(planId, statusValue);
             res.status(200).json(result);
         }catch(error){
             HandleError.handle(error, res);
@@ -47,5 +53,5 @@ class AdminPlanController {
     }
 }
 
-const adminPlanController = new AdminPlanController(adminPlanUseCase);
+const adminPlanController = new AdminPlanController(adminPlanListUseCase,adminCreatePlanUseCase, adminChangePlanStatusUseCase);
 export { adminPlanController };

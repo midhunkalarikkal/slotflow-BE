@@ -1,14 +1,16 @@
 import { Request, Response } from "express";
 import { HandleError } from "../../infrastructure/error/error";
-import { AdminUserUseCase } from "../../application/use-cases/admin/adminUser.use-case";
 import { UserRepositoryImpl } from "../../infrastructure/database/user/user.repository.impl";
+import { AdminChangeUserStatusUseCase, AdminUserListUseCase } from "../../application/use-cases/admin/adminUser.use-case";
 
 const userRepositoryImpl = new UserRepositoryImpl();
-const adminUserUseCase = new AdminUserUseCase(userRepositoryImpl);
+const adminUserListUseCase = new AdminUserListUseCase(userRepositoryImpl);
+const adminChangeUserStatusUseCase = new AdminChangeUserStatusUseCase(userRepositoryImpl);
 
 class AdminUserController {
     constructor(
-        private adminUserUseCase : AdminUserUseCase,
+        private adminUserListUseCase : AdminUserListUseCase,
+        private adminChangeUserStatusUseCase : AdminChangeUserStatusUseCase,
     ){
         this.getAllUsers = this.getAllUsers.bind(this);
         this.changeUserStatus = this.changeUserStatus.bind(this);
@@ -16,7 +18,7 @@ class AdminUserController {
 
     async getAllUsers(req: Request, res: Response) {
         try{
-            const result = await this.adminUserUseCase.usersList();
+            const result = await this.adminUserListUseCase.execute();
             res.status(200).json(result);
         }catch(error){
             HandleError.handle(error, res);
@@ -29,7 +31,7 @@ class AdminUserController {
             const { status } = req.query;
             if(!userId || !status) throw new Error("Invalid request");
             const statusValue = status === 'true';
-            const result = await this.adminUserUseCase.changeStatus(userId, statusValue);
+            const result = await this.adminChangeUserStatusUseCase.execute(userId, statusValue);
             res.status(200).json(result);
         }catch(error){
             HandleError.handle(error, res);
@@ -37,6 +39,6 @@ class AdminUserController {
     }
 }
 
-const adminUserController = new AdminUserController(adminUserUseCase);
+const adminUserController = new AdminUserController(adminUserListUseCase, adminChangeUserStatusUseCase);
 export { adminUserController };
 
