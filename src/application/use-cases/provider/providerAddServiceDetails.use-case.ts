@@ -12,13 +12,14 @@ export class ProviderAddServiceDetailsUseCase {
     ){}
 
     async execute(providerId: string, serviceCategory: string, serviceName: string, serviceDescription: string, servicePrice: number, providerAdhaar: string, providerExperience: string, file: Express.Multer.File): Promise<{success:boolean, message: string}> {
-
+        console.log("Call");
         if(!providerId || !serviceCategory || !serviceName || !serviceDescription || !servicePrice || !providerAdhaar || !providerExperience || !file) throw new Error("Invalid Request.");
         Validator.validateServiceName(serviceName);
         Validator.validateServiceDescription(serviceDescription);
-        Validator.validateServicePrice(servicePrice);
+        Validator.validateServicePrice(Number(servicePrice));   
         Validator.validateProviderAdhaar(providerAdhaar);
         Validator.validateProviderExperience(providerExperience);
+        console.log(providerId, serviceCategory, serviceName, serviceDescription, servicePrice, providerAdhaar, providerExperience, file)
         
         try {
             const params = {
@@ -34,11 +35,13 @@ export class ProviderAddServiceDetailsUseCase {
             });
 
             const s3UploadResponse = await upload.done();
+            console.log("s3UploadResponse : ",s3UploadResponse);
             if(!s3UploadResponse)throw new Error("Image uploading error, please try again");
             const result = await this.providerServiceRepository.createProviderService({providerId, serviceCategory, serviceName, serviceDescription, servicePrice, providerAdhaar, providerExperience, providerCertificateUrl: s3UploadResponse.Location!})
             if(!result) throw new Error("Service details adding error.");
             return { success: true, message: 'Service details saved.' };
-        } catch{
+        } catch(error){
+            console.log("error : ",error);
             throw new Error('Failed to save service details.')
         }
     }

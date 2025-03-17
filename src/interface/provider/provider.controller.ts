@@ -25,6 +25,7 @@ class ProviderController {
     ) {
         this.addAddress = this.addAddress.bind(this);
         this.fetchAllServices = this.fetchAllServices.bind(this);
+        this.addServiceDetails = this.addServiceDetails.bind(this);
     }
 
     async addAddress(req: Request, res: Response) {
@@ -53,6 +54,9 @@ class ProviderController {
             const { providerId } = req.params;
             const { serviceCategory, serviceName, serviceDescription, servicePrice, providerAdhaar, providerExperience } = req.body;
             const file = req.file;
+            console.log("providerId : ",providerId);
+            console.log("req.body : ",req.body);
+            console.log("req.file : ",req.file);
             if(!providerId || !serviceCategory || !serviceName || !serviceDescription || !servicePrice || !providerAdhaar || !providerExperience || !file) throw new Error("Invalid Request.");
             const result = await this.providerAddServiceDetailsUseCase.execute(providerId, serviceCategory, serviceName, serviceDescription, servicePrice, providerAdhaar, providerExperience, file);
             res.status(200).json(result);

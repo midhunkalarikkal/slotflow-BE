@@ -4,7 +4,7 @@ export class HandleError {
     static handle(error : any, res : Response) : void {
         console.log("Error : ",error);
         if (error instanceof Error) {
-            console.log("instance error calling")
+            console.log("instance error calling",error);
             res.status(400).json({ success: false, message: error.message });
             return ;
         }

@@ -87,6 +87,7 @@ export class Validator {
     // Google Map Link
     static validateGoogleMapLink(googleMapLink: string): void {
         if (!validator.isURL(googleMapLink)) throw new Error("Invalid Google Map link.");
+        if(!googleMapLink.startsWith("https://maps.app.goo.gl/")) throw new Error("Invalid google map url.");
     }
 
 
@@ -108,7 +109,8 @@ export class Validator {
 
     // Service price
     static validateServicePrice(servicePrice: number): void {
-        if (typeof servicePrice !== 'number' || isNaN(servicePrice)) throw new Error("Service price is required and must be a number.");
+        console.log("servicePrice : ",servicePrice);
+        console.log("type of servicePrice : ",typeof servicePrice);
         if (servicePrice < 1 || servicePrice > 10000000) throw new Error("Invalid service price. Service price must be between 1 and 10000000.");
     }
 
