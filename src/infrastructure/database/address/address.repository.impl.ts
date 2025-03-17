@@ -19,10 +19,10 @@ export class AddressRepositoryImpl implements IAddressRepository {
             )
         }
 
-    async createAddress(address: Address): Promise<boolean> {
+    async createAddress(address: Address): Promise<Address | null> {
         try{
             const newAddress = await AddressModel.create(address);
-            return newAddress ? true : false;
+            return newAddress ? newAddress : null;
         }catch(error){
             console.log("error : ",error);
             throw new Error("Address adding error.");

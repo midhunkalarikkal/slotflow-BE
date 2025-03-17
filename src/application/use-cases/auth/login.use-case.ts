@@ -46,9 +46,16 @@ export class LoginUseCase {
         let approved;
 
         if(role === "PROVIDER"){
+            console.log("Provider : ",userOrProvider);
+            console.log("addressId: ",userOrProvider.addressId);
+            console.log("serviceId : ",(userOrProvider as Provider ).serviceId);
+            console.log("approved : ",(userOrProvider as Provider).isAdminVerified);
             address = (userOrProvider as Provider).addressId ? true : false;
             service = (userOrProvider as Provider).serviceId ? true : false;
             approved = (userOrProvider as Provider).isAdminVerified ? true : false;
+            console.log("address : ",address);
+            console.log("service :",service);
+            console.log("approved : ",approved);
         }
 
 

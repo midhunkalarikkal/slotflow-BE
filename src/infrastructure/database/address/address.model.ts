@@ -1,7 +1,7 @@
 import mongoose, { Document, Schema, Types } from "mongoose";
 
 export interface IAddress extends Document {
-    _id: Types.ObjectId | string,
+    _id: Types.ObjectId,
     userId: Types.ObjectId,
     addressLine: string,
     phone: string,
