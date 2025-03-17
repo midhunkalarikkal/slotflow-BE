@@ -5,7 +5,7 @@ import { ProviderAddAddressUseCase } from "../../application/use-cases/provider/
 import { AddressRepositoryImpl } from "../../infrastructure/database/address/address.repository.impl";
 import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/provider.repository.impl";
 import { ServiceRepositoryImpl } from "../../infrastructure/database/appservice/service.repository.impl";
-import { ProviderFetchAllServicesUseCase } from "../../application/use-cases/provider/providerFetchAllServices.use-case";
+import { ProviderFetchAllAppServicesUseCase } from "../../application/use-cases/provider/providerFetchAlApplServices.use-case";
 import { ProviderAddServiceDetailsUseCase } from "../../application/use-cases/provider/providerAddServiceDetails.use-case";
 import { ProviderServiceRepositoryImpl } from "../../infrastructure/database/providerService/providerService.repository.impl";
 
@@ -14,13 +14,13 @@ const addressRepositoryImpl = new AddressRepositoryImpl();
 const serviceRepositoryImpl = new ServiceRepositoryImpl();
 const providerServiceRepositoryImpl = new ProviderServiceRepositoryImpl();
 const providerAddAddressUseCase = new ProviderAddAddressUseCase(providerRepositoryImpl, addressRepositoryImpl);
-const providerFetchAllServicesUseCase = new ProviderFetchAllServicesUseCase(serviceRepositoryImpl);
+const providerFetchAllServicesUseCase = new ProviderFetchAllAppServicesUseCase(serviceRepositoryImpl);
 const providerAddServiceDetailsUseCase = new ProviderAddServiceDetailsUseCase(providerServiceRepositoryImpl, s3Client);
 
 class ProviderController {
     constructor(
         private providerAddAddressUseCase: ProviderAddAddressUseCase,
-        private providerFetchAllServicesUseCase: ProviderFetchAllServicesUseCase,
+        private providerFetchAllServicesUseCase: ProviderFetchAllAppServicesUseCase,
         private providerAddServiceDetailsUseCase: ProviderAddServiceDetailsUseCase,
     ) {
         this.addAddress = this.addAddress.bind(this);

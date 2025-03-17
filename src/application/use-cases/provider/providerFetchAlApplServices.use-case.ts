@@ -1,7 +1,7 @@
 import { Service } from "../../../domain/entities/service.entity";
 import { ServiceRepositoryImpl } from '../../../infrastructure/database/appservice/service.repository.impl';
 
-export class ProviderFetchAllServicesUseCase {
+export class ProviderFetchAllAppServicesUseCase {
     constructor(private serviceRepository: ServiceRepositoryImpl) { }
 
     async execute(): Promise<{ success: boolean; message: string; services?: Partial<Service>[] }> {
