@@ -22,10 +22,10 @@ export class ProviderRepositoryImpl implements IProviderRepository {
         )
     }
 
-    async createProvider(provider: Provider): Promise<Provider> {
+    async createProvider(provider: Provider): Promise<Provider | null> {
         try {
             const createdProvider = await ProviderModel.create(provider);
-            return this.mapToEntity(createdProvider);
+            return createdProvider ? this.mapToEntity(createdProvider) : null;
         } catch (error) {
             throw new Error("Unable to register, Please try again after a few minutes.");
         }
@@ -40,9 +40,10 @@ export class ProviderRepositoryImpl implements IProviderRepository {
         }
     }
 
-    async findAllProviders(): Promise<Partial<Provider>[]> {
+    async findAllProviders(): Promise<Partial<Provider>[] | null> {
         try {
-            return await ProviderModel.find({}, { _id: 1, username: 1, email: 1, isBlocked: 1, isAdminVerified: 1 });
+            const providers = await ProviderModel.find({}, { _id: 1, username: 1, email: 1, isBlocked: 1, isAdminVerified: 1 });
+            return providers ? providers.map((provider) => this.mapToEntity(provider)) : null;
         } catch (error) {
             throw new Error("Failed to fetch providers from database.");
         }
@@ -65,7 +66,7 @@ export class ProviderRepositoryImpl implements IProviderRepository {
     async getVerificationData(verificationToken: string): Promise<Provider | null> {
         try {
             const User = await ProviderModel.findOne({ verificationToken });
-            return User;
+            return User || null;
         } catch (error) {
             throw new Error("Unable to retrieve verification data.");
         }
@@ -96,7 +97,7 @@ export class ProviderRepositoryImpl implements IProviderRepository {
     async checkProviderStatus(providerId: string): Promise<boolean | null> {
         try{
             const provider = await ProviderModel.findById(providerId);
-            return provider && provider.isBlocked;
+            return provider && provider.isBlocked || null;
         }catch(error){
             throw new Error("Status checking error.");
         }

@@ -40,6 +40,7 @@ export class AuthController {
   async register(req: Request, res: Response) {
     try {
       const { username, email, password, role } = req.body;
+      if(!username || !email || !password || !role) throw new Error("Invalid request");
       const result = await this.registerUseCase.execute(username, email, password, role);
       res.cookie("token", result.authUser.token, {
         maxAge: 2 * 24 * 60 * 60 * 1000,
@@ -56,6 +57,7 @@ export class AuthController {
   async verifyOTP(req: Request, res: Response) {
     try {
       const { otp, verificationToken, role } = req.body;
+      if(!otp || !verificationToken || !role) throw new Error("Invalid request.");
       const result = await this.verifyOTPUseCase.execute(otp, verificationToken, role);
       res.status(200).json(result);
     } catch (error) {
@@ -66,6 +68,7 @@ export class AuthController {
   async resendOtp(req: Request, res: Response) {
     try {
       const { role, verificationToken, email } = req.body;
+      if(!role || (!verificationToken && !email)) throw new Error("Invalid request.");
       const result = await this.resendOtpUseCase.execute(role, verificationToken, email);
       res.status(200).json(result);
     } catch (error) {
@@ -76,6 +79,7 @@ export class AuthController {
   async login(req: Request, res: Response) {
     try {
       const { email, password, role } = req.body;
+      if(!email || !password || !role) throw new Error("Invalid request.");
       const { success, message, authUser } = await this.loginUseCase.execute(email, password, role);
       res.cookie("token", authUser.token, {
         maxAge: 2 * 24 * 60 * 60 * 1000,
@@ -101,6 +105,7 @@ export class AuthController {
   async updatePassword(req: Request, res: Response) {
     try {
       const { role, verificationToken, password } = req.body;
+      if(!role || !verificationToken || !password) throw new Error("Invalid request.");
       const result = await this.updatePasswordUseCase.execute(role, verificationToken, password);
       res.status(200).json(result);
     } catch (error) {
@@ -112,6 +117,7 @@ export class AuthController {
     try{
       const authHeader = req.headers.authorization;
       const token = authHeader?.split(' ')[1];
+      if(!token) throw new Error("Unexpected error, please logout and try again.");
       const result = await this.checkUserStatusUseCase.checkStatus(token!);
       res.status(result.status).json(result);
     }catch(error){

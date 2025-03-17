@@ -11,14 +11,10 @@ export class AdminUserUseCase {
     }
 
     async changeStatus(userId: string, status: boolean): Promise<{ success: boolean, message: string, updatedUser: Partial<User> }> {
-        try {
-            if (!userId) throw new Error("Invalid request");
+            if (!userId || status === null) throw new Error("Invalid request");
             const updatedUser = await this.userRepository.updateUserStatus(userId, status);
             if (!updatedUser) throw new Error("User not found");
             return { success: true, message: `User ${status ? "blocked" : "Unblocked"} successfully.`, updatedUser };
-        } catch (error) {
-            throw new Error("Unexpected error occurred, please try again.");
-        }
     }
 
 }

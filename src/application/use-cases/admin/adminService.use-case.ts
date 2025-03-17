@@ -11,6 +11,7 @@ export class AdminServiceUseCase {
     }
 
     async addService(serviceName: string): Promise<{ success: boolean, message: string, service: Service }> {
+        if(!serviceName) throw new Error("Invalid request.");
         const exist = await this.seriveRepository.findByName(serviceName);
         if (exist) throw new Error("Service already exist.");
         const service = await this.seriveRepository.createService(serviceName);
@@ -19,6 +20,7 @@ export class AdminServiceUseCase {
     }
 
     async changeStatus(serviceId: string, status: boolean): Promise<{ success: boolean, message: string, updatedService: Partial<Service> }> {
+        if(!serviceId || status === null) throw new Error("Invalid request.");
         const updatedService = await this.seriveRepository.updateServiceStatus(serviceId, status);
         if (!updatedService) throw new Error("Service status changing error.");
         return { success: true, message: `Service ${status ? "Blocked" : "Unblocked"} successfully.`, updatedService }

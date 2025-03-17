@@ -1,6 +1,7 @@
 import { IService, ServiceModel } from "./service.model";
 import { Service } from "../../../domain/entities/service.entity";
 import { IServiceRepository } from "../../../domain/repositories/IService.repository";
+import { Types } from "mongoose";
 
 export class ServiceRepositoryImpl implements IServiceRepository {
     private mapToEntity(service: IService): Service {
@@ -11,12 +12,12 @@ export class ServiceRepositoryImpl implements IServiceRepository {
         )
     }
 
-    async createService(service: String): Promise<Service> {
+    async createService(service: String): Promise<Service | null> {
         try {
             const createdService = await ServiceModel.create({
                 serviceName: service
               });
-            return this.mapToEntity(createdService);
+            return createdService ? this.mapToEntity(createdService) : null;
         } catch (error) {
             throw new Error("Unable to create service, Please try again after a few minutes.");
         }
@@ -31,15 +32,16 @@ export class ServiceRepositoryImpl implements IServiceRepository {
         }
     }
 
-    async findAllServices(): Promise<Service[]> {
+    async findAllServices(): Promise<Service[] | null> {
         try {
-            return await ServiceModel.find({}, { _id: 1, serviceName: 1, isBlocked: 1 });
+            const services = await ServiceModel.find({}, { _id: 1, serviceName: 1, isBlocked: 1 });
+            return services ? services.map((service) => this.mapToEntity(service)) : null;
         } catch (error) {
             throw new Error("Failed to fetch services from database.");
         }
     }
 
-    async updateServiceStatus(serviceId: string, status: boolean): Promise<Partial<Service> | null> {
+    async updateServiceStatus(serviceId: Types.ObjectId, status: boolean): Promise<Partial<Service> | null> {
         try{
             const updatedService = await ServiceModel.findByIdAndUpdate(
                 serviceId,

@@ -27,6 +27,7 @@ class AdminServiceController {
     async addService(req: Request, res: Response) {
         try{
             const  { serviceName } = req.body;
+            if(!serviceName) throw new Error("Invalid request.");
             const result = await this.adminServiceUseCase.addService(serviceName);
             res.status(200).json(result);
         }catch(error){
@@ -38,6 +39,7 @@ class AdminServiceController {
         try{
             const { serviceId } = req.params;
             const { status } = req.query;
+            if(!serviceId || !status) throw new Error("Invalid request.");
             const statusValue = status === 'true';
             const result = await this.adminServiceUseCase.changeStatus(serviceId, statusValue);
             res.status(200).json(result);

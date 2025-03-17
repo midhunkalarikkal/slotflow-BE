@@ -27,6 +27,7 @@ class AdminProviderController {
     async approveProvider(req: Request, res: Response) {
         try{
             const { providerId } = req.params;
+            if(!providerId) throw new Error("Invalid request.");
             const result = await this.adminProviderUseCase.approveProvider(providerId);
             res.status(200).json(result);
         }catch(error){
@@ -38,6 +39,7 @@ class AdminProviderController {
         try{
             const { providerId } = req.params;
             const { status } = req.query;
+            if(!providerId || !status) throw new Error("Invalid request.");
             const statusValue = status === 'true';
             const result = await this.adminProviderUseCase.changeStatus(providerId, statusValue);
             res.status(200).json(result);

@@ -1,9 +1,8 @@
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import { S3Client } from '@aws-sdk/client-s3';
 import { Upload } from "@aws-sdk/lib-storage";
 import { aws_s3Config } from '../../../config/env';
-import { s3Client } from '../../../config/aws_s3';
-import { ProviderServiceRepositoryImpl } from '../../../infrastructure/database/providerService/providerService.repository.impl';
 import { Validator } from '../../../infrastructure/validator/validator';
+import { ProviderServiceRepositoryImpl } from '../../../infrastructure/database/providerService/providerService.repository.impl';
 
 export class ProviderAddServiceDetailsUseCase {
     

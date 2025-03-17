@@ -27,6 +27,7 @@ class AdminUserController {
         try{
             const { userId } = req.params;
             const { status } = req.query;
+            if(!userId || !status) throw new Error("Invalid request");
             const statusValue = status === 'true';
             const result = await this.adminUserUseCase.changeStatus(userId, statusValue);
             res.status(200).json(result);

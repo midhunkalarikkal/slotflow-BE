@@ -8,6 +8,7 @@ export class VerifyOTPUseCase {
 
   async execute(otp: string, verificationToken: string, role: string): Promise<{ success: boolean; message: string }> {
 
+    if(!otp || !verificationToken || !role) throw new Error("Invalid request.");
     Validator.validateOtp(otp);
 
     const isValidOTP = OTPService.verifyOTP(verificationToken, otp);
@@ -25,7 +26,9 @@ export class VerifyOTPUseCase {
       if(!provider) throw new Error("Verification failed");
 
       provider.isEmailVerified = true;
-      await this.providerRepository.updateProvider(provider);
+      const updateProvider = await this.providerRepository.updateProvider(provider);
+      if(!updateProvider) throw new Error("Unexpected error, please try again.");
+      
     }else{
       throw new Error("Unexpected error, please try again."); 
     }

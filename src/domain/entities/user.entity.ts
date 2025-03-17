@@ -7,10 +7,10 @@ export class User {
         public password: string,
         public phone: string | null,
         public profileImage: string | null,
-        public addressId: Types.ObjectId | null,
+        public addressId: Types.ObjectId | null | string,
         public isBlocked: boolean,
         public isEmailVerified: boolean,
-        public _id?: Types.ObjectId | string,
+        public _id?: Types.ObjectId,
         public verificationToken?: string | null,
     ) {}
 }

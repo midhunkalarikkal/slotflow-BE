@@ -9,6 +9,7 @@ export class ProviderService {
         public servicePrice: number,
         public providerAdhaar: string,
         public providerExperience: string,
-        public providerCertificateUrl: string
+        public providerCertificateUrl: string,
+        public _id?: Types.ObjectId,
     ){}
 }

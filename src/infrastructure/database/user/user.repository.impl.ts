@@ -18,10 +18,10 @@ export class UserRepositoryImpl implements IUserRepository {
         );
     }
 
-    async createUser(user: User): Promise<User> {
+    async createUser(user: User): Promise<User | null> {
         try {
             const createdUser = await UserModel.create(user);
-            return this.mapToEntity(createdUser);
+            return createdUser ? this.mapToEntity(createdUser) : null;
         } catch (error) {
             throw new Error("Unable to register, please try again after a few minutes.");
         }
@@ -36,9 +36,10 @@ export class UserRepositoryImpl implements IUserRepository {
         }
     }
 
-    async findAllUsers(): Promise<User[]> {
+    async findAllUsers(): Promise<User[] | null> {
         try {
-            return await UserModel.find({}, { _id: 1, username: 1, email: 1, isBlocked: 1, isEmailVerified: 1 });
+            const users =  await UserModel.find({}, { _id: 1, username: 1, email: 1, isBlocked: 1, isEmailVerified: 1 });
+            return users ? users.map((user) => this.mapToEntity(user)) : null;
         } catch (error) {
             throw new Error("Failed to fetch users from database.")
         }
@@ -47,7 +48,7 @@ export class UserRepositoryImpl implements IUserRepository {
     async getVerificationData(verificationToken: string): Promise<User | null> {
         try {
             const User = await UserModel.findOne({ verificationToken });
-            return User;
+            return User || null
         } catch (error) {
             throw new Error("Unable to retrieve verification data.");
         }
@@ -78,7 +79,7 @@ export class UserRepositoryImpl implements IUserRepository {
     async checkUserStatus(userId: string): Promise<boolean | null> {
         try{
             const user = await UserModel.findById(userId,{_id: 1, isBlocked: 1});
-            return user && user.isBlocked;
+            return user && user.isBlocked || null;
         }catch(error){
             throw new Error("Status checking error.");
         }

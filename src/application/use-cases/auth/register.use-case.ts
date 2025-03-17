@@ -14,6 +14,7 @@ export class RegisterUseCase {
 
   async execute(username: string, email: string, password: string, role: string): Promise<{ success: boolean; message: string, authUser: {verificationToken: string, role: string, token: string} }> {
 
+    if(!username || !email || !password || !role) throw new Error("Invalid request");
     Validator.validateUsername(username);
     Validator.validateEmail(email);
     Validator.validatePassword(password);
@@ -80,6 +81,7 @@ export class RegisterUseCase {
         });
       }
     }
+    
     const token = JWTService.generateToken({email, role});
 
     return { success: true, message: `OTP sent to email`, authUser: {verificationToken, role, token} };

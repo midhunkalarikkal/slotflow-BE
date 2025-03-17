@@ -12,6 +12,6 @@ export class Address {
         public state: string,
         public country: string,
         public googleMapLink: string,
-        public _id?: Types.ObjectId | null,
+        public _id?: Types.ObjectId,
     ){}
 }
