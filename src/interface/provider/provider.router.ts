@@ -9,6 +9,7 @@ const router = Router();
 
 router.post('/addAddress/:providerId',authMiddleware, providerController.addAddress);
 router.get('/fetchAllServices', authMiddleware, providerController.fetchAllServices);
-router.post('/addServiceDetails/:providerId', authMiddleware,upload.single('certificate'), providerController.addServiceDetails)
+router.post('/addServiceDetails/:providerId', authMiddleware,upload.single('certificate'), providerController.addServiceDetails);
+router.post('/addProviderServiceAvailability', authMiddleware, providerController.addProviderServiceAvailability);
 
 export default router;  

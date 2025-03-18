@@ -26,6 +26,7 @@ class ProviderController {
         this.addAddress = this.addAddress.bind(this);
         this.fetchAllServices = this.fetchAllServices.bind(this);
         this.addServiceDetails = this.addServiceDetails.bind(this);
+        this.addProviderServiceAvailability = this.addProviderServiceAvailability.bind(this);
     }
 
     async addAddress(req: Request, res: Response) {
@@ -62,6 +63,18 @@ class ProviderController {
             res.status(200).json(result);
         }catch(error){
             HandleError.handle(error,res);
+        }
+    }
+
+    async addProviderServiceAvailability(req: Request, res: Response) {
+        try{
+            const  providerId = req?.user?.userOrProviderId;
+            const availability = req.body;
+            if(!providerId || !availability || availability.length  === 0) throw new Error("Invalid request.");
+            console.log("providerId : ", providerId);
+            console.log("req.body : ",req.body);
+        }catch(error){
+            HandleError.handle(error, res);
         }
     }
 }
