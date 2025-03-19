@@ -14,7 +14,7 @@ export class ProviderAddServiceAvailabilityUseCase {
         if(!providerId || !availability || availability.length  === 0) throw new Error("Invalid request.");
 
         const convertedProviderId = new Types.ObjectId(providerId);
-        const provider = await this.providerRepository.findProviderById(providerId);
+        const provider = await this.providerRepository.findProviderById(new Types.ObjectId(providerId));
         if(!provider) throw new Error("Please logout and try again.");
 
         console.log("Before validation")
@@ -32,7 +32,7 @@ export class ProviderAddServiceAvailabilityUseCase {
 
         if (provider && serviceAvailability && serviceAvailability._id) {
             console.log("Service availability :",serviceAvailability);
-            provider.serviceAvailability = serviceAvailability._id;
+            provider.serviceAvailabilityId = serviceAvailability._id;
             console.log("provider : ",provider);
             const updatedProvider = await this.providerRepository.updateProvider(provider);
             if (!updatedProvider) throw new Error("Failed to update provider with service availability ID.");

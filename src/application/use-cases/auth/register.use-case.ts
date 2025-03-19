@@ -19,7 +19,7 @@ export class RegisterUseCase {
     Validator.validateEmail(email);
     Validator.validatePassword(password);
 
-    let userOrProvider: Provider | User | null;
+    let userOrProvider: Partial<Provider> | Partial<User> | null;
 
     if (role === "USER") {
       userOrProvider = await this.userRepository.findUserByEmail(email);
@@ -45,9 +45,9 @@ export class RegisterUseCase {
       userOrProvider.verificationToken = verificationToken;
       userOrProvider.password = hashedPassword;
       if (role === "USER") {
-        await this.userRepository.updateUser(userOrProvider as User);
+        await this.userRepository.updateUser(userOrProvider as Partial<User>);
       } else if (role === "PROVIDER") {
-        await this.providerRepository.updateProvider(userOrProvider as Provider);
+        await this.providerRepository.updateProvider(userOrProvider as Partial<Provider>);
       }
     } else {
       if (role === "USER") {

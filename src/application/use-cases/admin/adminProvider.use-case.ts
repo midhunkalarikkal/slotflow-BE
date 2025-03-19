@@ -1,3 +1,4 @@
+import { Types } from "mongoose";
 import { Provider } from "../../../domain/entities/provider.entity";
 import { ProviderRepositoryImpl } from "../../../infrastructure/database/provider/provider.repository.impl";
 
@@ -22,7 +23,7 @@ export class AdminApproveProviderUseCase {
     async execute(providerId: string): Promise<{ success: boolean, message: string, updatedProvider: Partial<Provider> }> {
         try {
             if (!providerId) throw new Error("Invalid request");
-            const updatedProvider = await this.providerRepository.updateProviderVerificationStatus(providerId, true);
+            const updatedProvider = await this.providerRepository.updateProviderVerificationStatus(new Types.ObjectId(providerId), true);
             if (!updatedProvider) throw new Error("Provider not found");
             return { success: true, message: "Provider approved successfully.", updatedProvider };
         } catch (error) {
@@ -38,7 +39,7 @@ export class AdminChangeProviderStatusUseCase {
     async execute(providerId: string, status: boolean): Promise<{ success: boolean, message: string, updatedProvider: Partial<Provider> }> {
         try {
             if (!providerId || status === null) throw new Error("Invalid request");
-            const updatedProvider = await this.providerRepository.updateProviderStatus(providerId, status);
+            const updatedProvider = await this.providerRepository.updateProviderStatus(new Types.ObjectId(providerId), status);
             if (!updatedProvider) throw new Error("Provider not found");
             return { success: true, message: `Provider ${status ? "blocked" : "Unblocked"} successfully.`, updatedProvider };
         } catch (error) {

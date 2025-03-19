@@ -24,7 +24,7 @@ export class ProviderAddServiceDetailsUseCase {
         Validator.validateProviderExperience(providerExperience);
         console.log(providerId, serviceCategory, serviceName, serviceDescription, servicePrice, providerAdhaar, providerExperience, file)
         
-        const provider = await this.providerRepository.findProviderById(providerId);
+        const provider = await this.providerRepository.findProviderById(new Types.ObjectId(providerId));
         if(!provider) throw new Error("Please logout and try again.");
 
         try {

@@ -1,6 +1,7 @@
 import { IProvider, ProviderModel } from "./provider.model";
 import { Provider } from "../../../domain/entities/provider.entity";
 import { IProviderRepository } from '../../../domain/repositories/IProvider.repository';
+import { Types } from "mongoose";
 
 
 export class ProviderRepositoryImpl implements IProviderRepository {
@@ -52,7 +53,7 @@ export class ProviderRepositoryImpl implements IProviderRepository {
     }
 
 
-    async updateProviderVerificationStatus(providerId: string, isAdminVerified: boolean): Promise<Partial<Provider> | null> {
+    async updateProviderVerificationStatus(providerId: Types.ObjectId, isAdminVerified: boolean): Promise<Partial<Provider> | null> {
         try {
             const updatedProvider = await ProviderModel.findByIdAndUpdate(
                 providerId,
@@ -74,7 +75,7 @@ export class ProviderRepositoryImpl implements IProviderRepository {
         }
     }
 
-    async updateProvider(provider: Provider): Promise<Provider | null> {
+    async updateProvider(provider: Partial<Provider>): Promise<Partial<Provider> | null> {
         try {
             const updatedProvider = await ProviderModel.findByIdAndUpdate(provider._id, provider, { new: true });
             return updatedProvider ? this.mapToEntity(updatedProvider) : null;
@@ -83,7 +84,7 @@ export class ProviderRepositoryImpl implements IProviderRepository {
         }
     }
 
-    async updateProviderStatus(providerId: string, status: boolean): Promise<Partial<Provider> | null> {
+    async updateProviderStatus(providerId: Types.ObjectId, status: boolean): Promise<Partial<Provider> | null> {
         try {
             const updatedProvider = await ProviderModel.findByIdAndUpdate(
                 providerId,
@@ -96,16 +97,16 @@ export class ProviderRepositoryImpl implements IProviderRepository {
         }
     }
 
-    async checkProviderStatus(providerId: string): Promise<boolean | null> {
+    async checkProviderStatus(providerId: Types.ObjectId): Promise<Partial<Provider> | null> {
         try{
             const provider = await ProviderModel.findById(providerId);
-            return provider && provider.isBlocked || null;
+            return provider ? provider : null;
         }catch(error){
             throw new Error("Status checking error.");
         }
     }
 
-    async findProviderById(providerId: string): Promise<Provider | null> {
+    async findProviderById(providerId: Types.ObjectId): Promise<Provider | null> {
         try{
             const provider = await ProviderModel.findById(providerId);
             return provider ? this.mapToEntity(provider) : null;
