@@ -1,8 +1,8 @@
 import { Types } from "mongoose";
 import { Validator } from "../../../infrastructure/validator/validator";
 import { availability } from "../../../domain/entities/serviceAvailability.entity";
-import { ServiceAvailabilityRepositoryImpl } from "../../../infrastructure/database/serviceAvailability/serviceAvailability.repository.impl";
 import { ProviderRepositoryImpl } from "../../../infrastructure/database/provider/provider.repository.impl";
+import { ServiceAvailabilityRepositoryImpl } from "../../../infrastructure/database/serviceAvailability/serviceAvailability.repository.impl";
 
 export class ProviderAddServiceAvailabilityUseCase {
     constructor(
@@ -33,8 +33,8 @@ export class ProviderAddServiceAvailabilityUseCase {
         if (provider && serviceAvailability && serviceAvailability._id) {
             console.log("Service availability :",serviceAvailability);
             provider.serviceAvailabilityId = serviceAvailability._id;
-            console.log("provider : ",provider);
             const updatedProvider = await this.providerRepository.updateProvider(provider);
+            console.log("provider : ",provider);
             if (!updatedProvider) throw new Error("Failed to update provider with service availability ID.");
         }
 

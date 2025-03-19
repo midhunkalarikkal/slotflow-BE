@@ -1,10 +1,10 @@
+import { Types } from 'mongoose';
 import { S3Client } from '@aws-sdk/client-s3';
 import { Upload } from "@aws-sdk/lib-storage";
 import { aws_s3Config } from '../../../config/env';
 import { Validator } from '../../../infrastructure/validator/validator';
-import { ProviderServiceRepositoryImpl } from '../../../infrastructure/database/providerService/providerService.repository.impl';
-import { Types } from 'mongoose';
 import { ProviderRepositoryImpl } from '../../../infrastructure/database/provider/provider.repository.impl';
+import { ProviderServiceRepositoryImpl } from '../../../infrastructure/database/providerService/providerService.repository.impl';
 
 export class ProviderAddServiceDetailsUseCase {
     
@@ -22,7 +22,6 @@ export class ProviderAddServiceDetailsUseCase {
         Validator.validateServicePrice(Number(servicePrice));   
         Validator.validateProviderAdhaar(providerAdhaar);
         Validator.validateProviderExperience(providerExperience);
-        console.log(providerId, serviceCategory, serviceName, serviceDescription, servicePrice, providerAdhaar, providerExperience, file)
         
         const provider = await this.providerRepository.findProviderById(new Types.ObjectId(providerId));
         if(!provider) throw new Error("Please logout and try again.");
@@ -56,7 +55,6 @@ export class ProviderAddServiceDetailsUseCase {
             return { success: true, message: 'Service details saved.' };
 
         } catch(error){
-            console.log("error : ",error);
             throw new Error('Failed to save service details.')
         }
     }
