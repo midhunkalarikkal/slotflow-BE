@@ -14,6 +14,7 @@ export interface IProvider extends Document {
   isEmailVerified: boolean;
   isAdminVerified: boolean;
   verificationToken?: string;
+  serviceAvailability?: Types.ObjectId;
 }
 
 const ProviderSchema = new Schema<IProvider>({
@@ -29,6 +30,7 @@ const ProviderSchema = new Schema<IProvider>({
   isEmailVerified: { type: Boolean, default: false },
   isAdminVerified: { type: Boolean, default: false },
   verificationToken: { type: String, default: null },
+  serviceAvailability: { type: Schema.Types.ObjectId, ref: "ServiceAvailability" }
 }, {
   timestamps: true
 });

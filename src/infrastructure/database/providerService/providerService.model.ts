@@ -45,7 +45,7 @@ const ProviderServiceSchema = new Schema<IProviderService>({
     providerCertificateUrl: {
         type: String,
         required: true,
-    },
+    }
 },{
     timestamps: true
 });

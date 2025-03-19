@@ -18,7 +18,9 @@ export class ProviderRepositoryImpl implements IProviderRepository {
             provider.isEmailVerified,
             provider.isAdminVerified,
             provider._id,
-            provider.verificationToken
+            provider.verificationToken,
+            provider.serviceAvailability,
+
         )
     }
 

@@ -13,13 +13,14 @@ export class ProviderServiceRepositoryImpl implements IProviderServiceRepository
             providerService.providerAdhaar,
             providerService.providerExperience,
             providerService.providerCertificateUrl,
+            providerService._id,
         );
     }
 
-    async createProviderService(providerService: ProviderService): Promise<boolean> {
+    async createProviderService(providerService: ProviderService): Promise<ProviderService> {
         try{
             const newProviderService = await ProviderServiceModel.create(providerService);
-            return newProviderService ? true : false;
+            return newProviderService;
         }catch(error){
             throw new Error("Service details adding error.");
         }

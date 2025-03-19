@@ -15,5 +15,6 @@ export class Provider {
         public isAdminVerified: boolean,
         public _id?: Types.ObjectId,
         public verificationToken?: string,
+        public serviceAvailability?: Types.ObjectId,
     ){}
 }

@@ -8,25 +8,31 @@ import { ServiceRepositoryImpl } from "../../infrastructure/database/appservice/
 import { ProviderFetchAllAppServicesUseCase } from "../../application/use-cases/provider/providerFetchAlApplServices.use-case";
 import { ProviderAddServiceDetailsUseCase } from "../../application/use-cases/provider/providerAddServiceDetails.use-case";
 import { ProviderServiceRepositoryImpl } from "../../infrastructure/database/providerService/providerService.repository.impl";
+import { ProviderAddServiceAvailabilityUseCase } from "../../application/use-cases/provider/providerAddServiceAvailabilityDetails.use-case";
+import { ServiceAvailabilityRepositoryImpl } from "../../infrastructure/database/serviceAvailability/serviceAvailability.repository.impl";
 
 const providerRepositoryImpl = new ProviderRepositoryImpl();
 const addressRepositoryImpl = new AddressRepositoryImpl();
 const serviceRepositoryImpl = new ServiceRepositoryImpl();
+const serviceAvailabilityImpl = new ServiceAvailabilityRepositoryImpl();
+
 const providerServiceRepositoryImpl = new ProviderServiceRepositoryImpl();
 const providerAddAddressUseCase = new ProviderAddAddressUseCase(providerRepositoryImpl, addressRepositoryImpl);
 const providerFetchAllServicesUseCase = new ProviderFetchAllAppServicesUseCase(serviceRepositoryImpl);
-const providerAddServiceDetailsUseCase = new ProviderAddServiceDetailsUseCase(providerServiceRepositoryImpl, s3Client);
+const providerAddServiceDetailsUseCase = new ProviderAddServiceDetailsUseCase(providerRepositoryImpl, providerServiceRepositoryImpl, s3Client);
+const providerAddServiceAvailabilityUseCase = new ProviderAddServiceAvailabilityUseCase(providerRepositoryImpl, serviceAvailabilityImpl)
 
 class ProviderController {
     constructor(
         private providerAddAddressUseCase: ProviderAddAddressUseCase,
         private providerFetchAllServicesUseCase: ProviderFetchAllAppServicesUseCase,
         private providerAddServiceDetailsUseCase: ProviderAddServiceDetailsUseCase,
+        private providerAddServiceAvailabilityUseCase: ProviderAddServiceAvailabilityUseCase
     ) {
         this.addAddress = this.addAddress.bind(this);
         this.fetchAllServices = this.fetchAllServices.bind(this);
         this.addServiceDetails = this.addServiceDetails.bind(this);
-        this.addProviderServiceAvailability = this.addProviderServiceAvailability.bind(this);
+        this.addServiceAvailability = this.addServiceAvailability.bind(this);
     }
 
     async addAddress(req: Request, res: Response) {
@@ -66,18 +72,20 @@ class ProviderController {
         }
     }
 
-    async addProviderServiceAvailability(req: Request, res: Response) {
+    async addServiceAvailability(req: Request, res: Response) {
         try{
             const  providerId = req?.user?.userOrProviderId;
             const availability = req.body;
             if(!providerId || !availability || availability.length  === 0) throw new Error("Invalid request.");
             console.log("providerId : ", providerId);
             console.log("req.body : ",req.body);
+            const result = await this.providerAddServiceAvailabilityUseCase.execute(providerId, availability);
+            res.status(200).json(result);
         }catch(error){
             HandleError.handle(error, res);
         }
     }
 }
 
-const providerController = new ProviderController(providerAddAddressUseCase, providerFetchAllServicesUseCase, providerAddServiceDetailsUseCase);
+const providerController = new ProviderController(providerAddAddressUseCase, providerFetchAllServicesUseCase, providerAddServiceDetailsUseCase, providerAddServiceAvailabilityUseCase);
 export { providerController };

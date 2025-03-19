@@ -126,4 +126,61 @@ export class Validator {
         if (!providerExperience || providerExperience.trim().length === 0) throw new Error("Provider experience is required.");
         if (!/^[\w\d !"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~]{1,100}$/.test(providerExperience.trim())) throw new Error("Invalid experience. Provider experience should contain alphanumeric characters, spaces, and special characters, and be between 1 and 100 characters.");
     }
+
+
+
+
+
+    // Service availability
+    static validateDay(day: string): void {
+        const validDays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+        if (!day || day.trim().length === 0) throw new Error("Day is required.");
+        if (!validDays.includes(day)) throw new Error("Invalid day. Day must be one of: Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday.");
+    }
+
+    static validateDuration(duration: string): void {
+        const validDurations = ["15 minutes", "30 minutes", "1 hour"];
+        if (!duration || duration.trim().length === 0) throw new Error("Duration is required.");
+        if (!validDurations.includes(duration.trim().toLowerCase())) throw new Error("Invalid duration. Duration must be one of: 15 minutes, 30 minutes, 1 hour.");
+    }
+
+    static validateTime(time: string, fieldName: string): void {
+        if (!time || time.trim().length === 0) {
+            throw new Error(`${fieldName} is required.`);
+        }
+        if (!/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/.test(time.trim())) throw new Error(`Invalid ${fieldName}. ${fieldName} must be in HH:MM format (24-hour).`);
+    }
+
+    static validateStartTime(startTime: string): void {
+        this.validateTime(startTime, "Start time");
+    }
+
+    static validateEndTime(endTime: string, startTime: string): void {
+        this.validateTime(endTime, "End time");
+
+        if (startTime && endTime) {
+            if (endTime <= startTime) {
+                throw new Error("End time must be after start time.");
+            }
+        }
+    }
+
+    static validateModes(modes: string[]): void {
+        const validModes = ["online", "offline"];
+    
+        if (!modes) {
+            throw new Error("Modes is required.");
+        }
+    
+        if (Array.isArray(modes)) {
+            if (modes.length === 0) {
+                throw new Error("Modes array cannot be empty.");
+            }
+            for (const mode of modes) {
+                if (typeof mode !== "string" || !validModes.includes(mode.trim().toLowerCase())) {
+                    throw new Error("Invalid mode. Mode must be 'online' or 'offline'.");
+                }
+            }
+        } 
+    }
 }
