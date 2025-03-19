@@ -1,3 +1,4 @@
+import { Types } from "mongoose";
 import { BillingCycle, Plan } from "../../../domain/entities/plan.entity";
 import { PlanRepositoryImpl } from "../../../infrastructure/database/plan/plan.repository.impl";
 
@@ -28,7 +29,7 @@ export class AdminChangePlanStatusUseCase {
 
     async execute(planId: string, status: boolean): Promise<{ success: boolean, message: string, updatedPlan : Partial<Plan>}> {
         if(!planId || status === null) throw new Error("Invalid request");
-        const updatedPlan = await this.planRepository.changePlanStatus(planId, status);
+        const updatedPlan = await this.planRepository.changePlanStatus(new Types.ObjectId(planId), status);
         if(!updatedPlan) throw new Error("Plan status changing failed.");
         return { success: true, message: `Plan ${status ? "Blocked" : "Unblocked"} successfully.`, updatedPlan}
     }

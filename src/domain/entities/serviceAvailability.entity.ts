@@ -16,7 +16,7 @@ export interface availability {
 
 export class ServiceAvailability {
     constructor(
-        public providerId: Types.ObjectId | string,
+        public providerId: Types.ObjectId,
         public availability: availability[],
         public _id?: Types.ObjectId,
     ){}

@@ -1,3 +1,4 @@
+import { Types } from "mongoose";
 import { Service } from "../../../domain/entities/service.entity";
 import { ServiceRepositoryImpl } from "../../../infrastructure/database/appservice/service.repository.impl";
 
@@ -29,7 +30,7 @@ export class AdminChnageServiceStatusUseCase {
 
     async execute(serviceId: string, status: boolean): Promise<{ success: boolean, message: string, updatedService: Partial<Service> }> {
         if(!serviceId || status === null) throw new Error("Invalid request.");
-        const updatedService = await this.seriveRepository.updateServiceStatus(serviceId, status);
+        const updatedService = await this.seriveRepository.updateServiceStatus(new Types.ObjectId(serviceId), status);
         if (!updatedService) throw new Error("Service status changing error.");
         return { success: true, message: `Service ${status ? "Blocked" : "Unblocked"} successfully.`, updatedService }
     }

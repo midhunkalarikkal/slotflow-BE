@@ -2,7 +2,7 @@ import { Types } from "mongoose";
 
 export class Address {
     constructor(
-        public userId: Types.ObjectId | string,
+        public userId: Types.ObjectId,
         public addressLine: string,
         public phone: string,
         public place: string,

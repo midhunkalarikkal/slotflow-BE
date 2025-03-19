@@ -27,7 +27,7 @@ export class PlanRepositoryImpl implements IPlanRepository {
         }
     }
 
-    async updatePlan(planId: Types.ObjectId | string, updateData: Partial<Plan>): Promise<Partial<Plan> | null> {
+    async updatePlan(planId: Types.ObjectId, updateData: Partial<Plan>): Promise<Partial<Plan> | null> {
         try{
             if(!planId) throw new Error("Plan not found.");
             const updatedPlan = await PlanModel.findByIdAndUpdate(planId,updateData,{ new: true });
@@ -37,7 +37,7 @@ export class PlanRepositoryImpl implements IPlanRepository {
         }
     }
 
-    async changePlanStatus(planId: Types.ObjectId | string, status: boolean): Promise<Partial<Plan> | null> {
+    async changePlanStatus(planId: Types.ObjectId, status: boolean): Promise<Partial<Plan> | null> {
         try{
             if(!planId) throw new Error("No plan found.");
             const updatedPlan = await PlanModel.findByIdAndUpdate(planId, { isBlocked: status },{ new: true, select: '_id isBlocked'});
@@ -47,7 +47,7 @@ export class PlanRepositoryImpl implements IPlanRepository {
         }
     }
 
-    async findPlanById(planId: Types.ObjectId | string): Promise<Plan | null> {
+    async findPlanById(planId: Types.ObjectId): Promise<Plan | null> {
         try{
             if(!planId) throw new Error("Plan not found.");
             const plan = await PlanModel.findById(planId);

@@ -41,7 +41,7 @@ export class ServiceRepositoryImpl implements IServiceRepository {
         }
     }
 
-    async updateServiceStatus(serviceId: string, status: boolean): Promise<Partial<Service> | null> {
+    async updateServiceStatus(serviceId: Types.ObjectId, status: boolean): Promise<Partial<Service> | null> {
         try{
             const updatedService = await ServiceModel.findByIdAndUpdate(
                 serviceId,

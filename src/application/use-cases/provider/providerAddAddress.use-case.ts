@@ -25,7 +25,7 @@ export class ProviderAddAddressUseCase {
         const provider = await this.providerRepository.findProviderById(new Types.ObjectId(providerId));
         if(!provider) throw new Error("Please logout and try again.");
 
-        const address = await this.addressRepository.createAddress({userId: providerId, addressLine, phone, place, city, district, pincode, state, country, googleMapLink});
+        const address = await this.addressRepository.createAddress({userId: new Types.ObjectId(providerId), addressLine, phone, place, city, district, pincode, state, country, googleMapLink});
         if(!address) throw new Error("Address adding error.");
 
         if (provider && address && address._id) {
