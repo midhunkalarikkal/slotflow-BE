@@ -35,7 +35,7 @@ export class ResendOtpUseCase {
       }
     }
 
-    if (!userOrProvider?.email || !userOrProvider?.verificationToken) throw new Error("Please register.")
+    if (!userOrProvider || !userOrProvider?.email || !userOrProvider?.verificationToken) throw new Error("Please register.")
 
     const otp = OTPService.generateOTP(userOrProvider?.verificationToken);
     if (!otp) throw new Error("Unexpected error, please try again.");

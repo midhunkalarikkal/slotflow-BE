@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { JWTService } from "../../infrastructure/security/jwt";
+import { DecodedUser } from "../../express";
 
 export const authMiddleware = (req: Request, res: Response, next: NextFunction): void => {
   const token = req.cookies.token;
@@ -18,7 +19,7 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction):
       return;
     }
 
-    req.user = decoded;
+    req.user = decoded as DecodedUser;
     next();
   } catch (error) {
     res.status(401).json({ success: false, message: "Unauthorized: Invalid token." });

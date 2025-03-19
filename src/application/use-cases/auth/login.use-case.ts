@@ -11,7 +11,7 @@ import { ProviderRepositoryImpl } from "../../../infrastructure/database/provide
 export class LoginUseCase {
     constructor(private userRepository: UserRepositoryImpl, private providerRepository: ProviderRepositoryImpl){ }
 
-    async execute(email: string, password: string, role: string): Promise<{ success: boolean; message: string,  authUser: {username: string, profileImage?: string | null, role: string, token: string, email: string, isLoggedIn: boolean, _id?: string | Types.ObjectId, address?: boolean, serviceDetails?: boolean,serviceAvailability?: boolean, approved?: boolean} }> {
+    async execute(email: string, password: string, role: string): Promise<{ success: boolean; message: string,  authUser: { username: string, profileImage: string | null, role: string, token: string, isLoggedIn: boolean, address?: boolean, serviceDetails?: boolean,serviceAvailability?: boolean, approved?: boolean} }> {
         
         if(!email || !password || !role) throw new Error("Invalid request.");
         Validator.validateEmail(email);
@@ -28,7 +28,7 @@ export class LoginUseCase {
                 throw new Error("Invalid credentials.");
             }
             const token = JWTService.generateToken({email: email, role : role});
-            return { success: true, message: "Logged In Successfully.", authUser: { username: "Admin", profileImage: "", role: role, token, email, isLoggedIn: true} };
+            return { success: true, message: "Logged In Successfully.", authUser: { username: "Admin", profileImage: "", role: role, token, isLoggedIn: true} };
         }else{
             throw new Error("Invalid request.");
         }
@@ -36,6 +36,7 @@ export class LoginUseCase {
         if(!userOrProvider) throw new Error("Invalid credentials")
 
         if(userOrProvider.isBlocked) throw new Error("Your account is blocked, please contact us.");
+        if(!userOrProvider.isEmailVerified) throw new Error("Your registration was incomplete, please register again.");
         
         const valid = await PasswordHasher.comparePassword(password, userOrProvider.password);
         if(!valid) throw new Error("Invalid credentials.");
@@ -47,13 +48,20 @@ export class LoginUseCase {
         let serviceAvailability;
         let approved;
 
+        console.log("userOrProvider : ",userOrProvider);
+
         if(role === "PROVIDER"){
             address = (userOrProvider as Provider).addressId ? true : false;
             serviceDetails = (userOrProvider as Provider).serviceId ? true : false;
-            serviceAvailability = (userOrProvider as Provider).serviceAvailability ? true : false;
+            serviceAvailability = (userOrProvider as Provider).serviceAvailabilityId ? true : false;
             approved = (userOrProvider as Provider).isAdminVerified ? true : false;
         }
 
-        return { success: true, message: 'Logged In Successfully.', authUser : {username : userOrProvider.username, profileImage: userOrProvider.profileImage, role: role, token, email, isLoggedIn: true, _id: userOrProvider._id, address, serviceDetails, serviceAvailability, approved }};
+        console.log("address : ",address);
+        console.log("serviceDetails : ",serviceDetails);
+        console.log("serviceAvailability : ",serviceAvailability);
+        console.log("approved : ",approved);
+
+        return { success: true, message: 'Logged In Successfully.', authUser : {username : userOrProvider.username, profileImage: userOrProvider.profileImage, role: role, token, isLoggedIn: true, address, serviceDetails, serviceAvailability, approved }};
     }
 }

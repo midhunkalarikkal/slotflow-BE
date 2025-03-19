@@ -1,7 +1,7 @@
 import { Provider } from "../entities/provider.entity";
 
 export interface IProviderRepository {
-    createProvider(provider : Provider) : Promise<Provider | null>;
+    createProvider(provider : Partial<Provider>) : Promise<Partial<Provider> | null>;
     findProviderByEmail(email : string) : Promise<Provider | null>;
     findAllProviders(): Promise<Partial<Provider>[] | null>;
     updateProviderVerificationStatus(providerId: string, isAdminVerified: boolean): Promise<Partial<Provider> | null>;

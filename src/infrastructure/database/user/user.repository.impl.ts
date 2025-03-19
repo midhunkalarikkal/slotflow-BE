@@ -1,24 +1,26 @@
 import { IUser, UserModel } from "./user.model";
 import { User } from "../../../domain/entities/user.entity";
 import { IUserRepository } from "../../../domain/repositories/IUser.repository";
+import { Types } from "mongoose";
 
 export class UserRepositoryImpl implements IUserRepository {
     private mapToEntity(user: IUser): User {
         return new User(
+            user._id,
             user.username,
             user.email,
             user.password,
+            user.isBlocked,
+            user.isEmailVerified,
             user.phone,
             user.profileImage,
             user.addressId,
-            user.isBlocked,
-            user.isEmailVerified,
-            user._id,
-            user.verificationToken
+            user.bookingsId,
+            user.verificationToken,
         );
     }
 
-    async createUser(user: User): Promise<User | null> {
+    async createUser(user: Partial<User>): Promise<Partial<User> | null> {
         try {
             const createdUser = await UserModel.create(user);
             return createdUser ? this.mapToEntity(createdUser) : null;
@@ -54,7 +56,7 @@ export class UserRepositoryImpl implements IUserRepository {
         }
     }
 
-    async updateUser(user: User): Promise<User | null> {
+    async updateUser(user: Partial<User>): Promise<Partial<User> | null> {
         try {
             const updatedUser = await UserModel.findByIdAndUpdate(user._id, user, { new: true });
             return updatedUser ? this.mapToEntity(updatedUser) : null;
@@ -63,7 +65,7 @@ export class UserRepositoryImpl implements IUserRepository {
         }
     }
 
-    async updateUserStatus(userId: string, status: boolean): Promise<Partial<User> | null> {
+    async updateUserStatus(userId: Types.ObjectId, status: boolean): Promise<Partial<User> | null> {
         try {
             const updatedUser = await UserModel.findByIdAndUpdate(
                 userId,
@@ -76,10 +78,10 @@ export class UserRepositoryImpl implements IUserRepository {
         }
     }
 
-    async checkUserStatus(userId: string): Promise<boolean | null> {
+    async checkUserStatus(userId: Types.ObjectId): Promise<Partial<User> | null> {
         try{
             const user = await UserModel.findById(userId,{_id: 1, isBlocked: 1});
-            return user && user.isBlocked || null;
+            return user ? user : null;
         }catch(error){
             throw new Error("Status checking error.");
         }

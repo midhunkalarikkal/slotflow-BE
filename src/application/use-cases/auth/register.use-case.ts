@@ -28,7 +28,7 @@ export class RegisterUseCase {
       userOrProvider = await this.providerRepository.findProviderByEmail(email);
       if (userOrProvider?.isEmailVerified) throw new Error("Email already exist.");
     } else {
-      throw new Error("Invalid request from test.");
+      throw new Error("Invalid request.");
     }
 
     const hashedPassword = await PasswordHasher.hashPassword(password);
@@ -42,43 +42,30 @@ export class RegisterUseCase {
     await OTPService.sendOTP(email, otp);
 
     if (userOrProvider) {
+      userOrProvider.verificationToken = verificationToken;
+      userOrProvider.password = hashedPassword;
       if (role === "USER") {
-        userOrProvider.verificationToken = verificationToken;
-        userOrProvider.password = hashedPassword;
         await this.userRepository.updateUser(userOrProvider as User);
       } else if (role === "PROVIDER") {
-        userOrProvider.verificationToken = verificationToken;
-        userOrProvider.password = hashedPassword;
         await this.providerRepository.updateProvider(userOrProvider as Provider);
       }
     } else {
       if (role === "USER") {
-        await this.userRepository.createUser({
+       const newUser = await this.userRepository.createUser({
           username: username,
           email: email,
           password: hashedPassword,
-          phone: null,
-          profileImage: null,
-          addressId: null,
-          isBlocked: false,
-          isEmailVerified: false,
           verificationToken: verificationToken,
         });
+        if(!newUser) throw new Error("Registration failed, please try again");
       } else if (role === "PROVIDER") {
-        await this.providerRepository.createProvider({
+        const newProvider = await this.providerRepository.createProvider({
           username: username,
           email: email,
           password: hashedPassword,
-          phone: null,
-          profileImage: null,
-          addressId: null,
-          serviceId: null,
-          subscription: null,
-          isBlocked: false,
-          isEmailVerified: false,
-          isAdminVerified: false,
           verificationToken: verificationToken
         });
+        if(!newProvider) throw new Error("Registration failed, please try again.");
       }
     }
     

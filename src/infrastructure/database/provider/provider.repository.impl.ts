@@ -6,25 +6,25 @@ import { IProviderRepository } from '../../../domain/repositories/IProvider.repo
 export class ProviderRepositoryImpl implements IProviderRepository {
     private mapToEntity(provider: IProvider): Provider {
         return new Provider(
+            provider._id,
             provider.username,
             provider.email,
             provider.password,
+            provider.isBlocked,
+            provider.isEmailVerified,
+            provider.isAdminVerified,
             provider.phone,
             provider.profileImage,
             provider.addressId,
             provider.serviceId,
+            provider.serviceAvailabilityId,
             provider.subscription,
-            provider.isBlocked,
-            provider.isEmailVerified,
-            provider.isAdminVerified,
-            provider._id,
             provider.verificationToken,
-            provider.serviceAvailability,
 
         )
     }
 
-    async createProvider(provider: Provider): Promise<Provider | null> {
+    async createProvider(provider: Partial<Provider>): Promise<Partial<Provider> | null> {
         try {
             const createdProvider = await ProviderModel.create(provider);
             return createdProvider ? this.mapToEntity(createdProvider) : null;
