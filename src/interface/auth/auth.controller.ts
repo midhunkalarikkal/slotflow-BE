@@ -53,7 +53,6 @@ export class AuthController {
         ...result,
         authUser: authUserWithoutToken,
     };
-      console.log("result : ",resultWithoutToken);
       res.status(200).json(resultWithoutToken);
     } catch (error) {
       HandleError.handle(error, res);
@@ -98,8 +97,7 @@ export class AuthController {
         success, message,
         authUser: authUserWithoutToken,
       };
-      console.log("result : ",resultWithoutToken);
-      res.status(200).json({ success, message, authUser: authUserWithoutToken });
+      res.status(200).json(resultWithoutToken);
     } catch (error) {
       HandleError.handle(error, res);
     }
@@ -127,12 +125,7 @@ export class AuthController {
 
   async checkUserStatus(req: Request, res: Response) {
     try {
-      console.log("req.user : ",req.user);
       const user = req.user;
-      // const authHeader = req.headers.authorization;
-      // const token = authHeader?.split(' ')[1];
-      // if (!token) throw new Error("Unexpected error, please logout and try again.");
-      // const result = await this.checkUserStatusUseCase.checkStatus(token!);
       const result = await this.checkUserStatusUseCase.execute(user.userOrProviderId, user.role);
       res.status(result.status).json(result);
     } catch (error) {
