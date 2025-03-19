@@ -31,7 +31,9 @@ export class ProviderAddServiceAvailabilityUseCase {
         if(!serviceAvailability) throw new Error("Service availability adding failed.");
 
         if (provider && serviceAvailability && serviceAvailability._id) {
+            console.log("Service availability :",serviceAvailability);
             provider.serviceAvailability = serviceAvailability._id;
+            console.log("provider : ",provider);
             const updatedProvider = await this.providerRepository.updateProvider(provider);
             if (!updatedProvider) throw new Error("Failed to update provider with service availability ID.");
         }

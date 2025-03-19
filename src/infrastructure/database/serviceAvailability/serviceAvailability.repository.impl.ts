@@ -24,9 +24,6 @@ export class ServiceAvailabilityRepositoryImpl implements IServiceAvailabilityRe
                     slots: slotsMap,
                 };
             }));
-
-            console.log("timeSlots : ", modifiedAvailability);
-
             const serviceAvailability = new ServiceAvailability(availability.providerId, modifiedAvailability)
             const newServiceAvailability = await ServiceAvailabilityModel.create(serviceAvailability);
             return this.mapToEntity(newServiceAvailability);

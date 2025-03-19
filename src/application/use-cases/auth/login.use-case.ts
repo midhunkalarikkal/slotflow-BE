@@ -50,7 +50,7 @@ export class LoginUseCase {
         if(role === "PROVIDER"){
             address = (userOrProvider as Provider).addressId ? true : false;
             serviceDetails = (userOrProvider as Provider).serviceId ? true : false;
-            serviceAvailability = 
+            serviceAvailability = (userOrProvider as Provider).serviceAvailability ? true : false;
             approved = (userOrProvider as Provider).isAdminVerified ? true : false;
         }
 
