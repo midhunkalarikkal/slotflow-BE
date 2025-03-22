@@ -16,5 +16,6 @@ export class Provider {
         public serviceAvailabilityId: Types.ObjectId,
         public subscription: [Types.ObjectId],
         public verificationToken: string,
+        public createdAt: Date,
     ){}
 }

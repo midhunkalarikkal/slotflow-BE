@@ -10,6 +10,8 @@ const router = Router();
 router.get('/providers',authMiddleware, adminProviderController.getAllProviders);
 router.put('/provider/approve/:providerId',authMiddleware,adminProviderController.approveProvider);
 router.put('/provider/changeStatus/:providerId',authMiddleware,adminProviderController.changeProviderStatus);
+router.get('/fetchProviderDetails/:providerId', authMiddleware, adminProviderController.fetchProviderDetails);
+router.get('/fetchProviderAddress/:providerId', authMiddleware, adminProviderController.fetchProviderAddress);
 
 router.get('/users',authMiddleware, adminUserController.getAllUsers);
 router.put('/user/changeStatus/:userId',authMiddleware,adminUserController.changeUserStatus);
