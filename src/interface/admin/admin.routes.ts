@@ -12,6 +12,7 @@ router.put('/provider/approve/:providerId',authMiddleware,adminProviderControlle
 router.put('/provider/changeStatus/:providerId',authMiddleware,adminProviderController.changeProviderStatus);
 router.get('/fetchProviderDetails/:providerId', authMiddleware, adminProviderController.fetchProviderDetails);
 router.get('/fetchProviderAddress/:providerId', authMiddleware, adminProviderController.fetchProviderAddress);
+router.get('/fetchProviderService/:providerId', authMiddleware, adminProviderController.fetchProviderService);
 
 router.get('/users',authMiddleware, adminUserController.getAllUsers);
 router.put('/user/changeStatus/:userId',authMiddleware,adminUserController.changeUserStatus);

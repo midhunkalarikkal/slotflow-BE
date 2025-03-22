@@ -3,6 +3,8 @@ import { Provider } from "../../../domain/entities/provider.entity";
 import { ProviderRepositoryImpl } from "../../../infrastructure/database/provider/provider.repository.impl";
 import { Address } from "../../../domain/entities/address.entity";
 import { AddressRepositoryImpl } from "../../../infrastructure/database/address/address.repository.impl";
+import { ProviderServiceRepositoryImpl } from "../../../infrastructure/database/providerService/providerService.repository.impl";
+import { ProviderService } from "../../../domain/entities/providerService.entity";
 
 export class AdminProviderListUseCase {
     constructor(private providerRepository: ProviderRepositoryImpl) { }
@@ -72,12 +74,30 @@ export class AdminFetchProviderAddressUseCase {
     async execute(providerId: string): Promise<{ success: boolean, message: string, address: Partial<Address>}> {
         try{
             if(!providerId) throw new Error("Invalid request.");
-            const fetchingData = "_id addressLine place phone city district pincode state country googleMapLink"
+            const fetchingData = "addressLine place phone city district pincode state country googleMapLink";
             const address = await this.addressRepository.findByUserId(new Types.ObjectId(providerId),fetchingData);
             if(!address) throw new Error("Address fetching error.");
             return { success: true, message: "Address fetched successfully.", address }
         }catch(error){
             throw new Error("Provider Address fetching error, please try again.");
+        }
+    }
+}
+
+export class AdminFetchProviderServiceUseCase {
+    constructor(private providerServiceRepository: ProviderServiceRepositoryImpl){ }
+
+    async execute(providerId: string): Promise<{success: boolean, message: string, service: Partial<ProviderService>}> {
+        try{
+            if(!providerId) throw new Error("Invalid request.");
+            console.log("UseCase providerId : ",providerId);
+            const fetchingData = "serviceCategory serviceName serviceDescription servicePrice providerAdhaar providerExperience providerCertificateUrl";
+            const service = await this.providerServiceRepository.findByProviderId(new Types.ObjectId(providerId),fetchingData);
+            if(!service) throw new Error("Service fetching error.");
+            return { success: true, message: "Service fetched successfully.", service}
+        }catch(error){
+            console.log('error custom error: ',error);
+            throw new Error("Provider service fetching error, please try again.");
         }
     }
 }

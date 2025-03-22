@@ -1,6 +1,7 @@
 import { IProviderService, ProviderServiceModel } from "./providerService.model";
 import { ProviderService } from "../../../domain/entities/providerService.entity";
 import { IProviderServiceRepository } from "../../../domain/repositories/IProviderService.repository";
+import { Types } from "mongoose";
 
 export class ProviderServiceRepositoryImpl implements IProviderServiceRepository {
     private mapToEntity(providerService: IProviderService): ProviderService {
@@ -23,6 +24,16 @@ export class ProviderServiceRepositoryImpl implements IProviderServiceRepository
             return newProviderService;
         }catch(error){
             throw new Error("Service details adding error.");
+        }
+    }
+
+    async findByProviderId(providerId: Types.ObjectId, fetchingData: string): Promise<Partial<ProviderService> | null> {
+        try{
+            if(!providerId) throw new Error("Invalid request.");
+            const service = await ProviderServiceModel.findOne({ providerId }).select(fetchingData);
+            return service ? this.mapToEntity(service) : null;
+        }catch(error){
+            throw new Error("Service fetching error.");
         }
     }
 }
