@@ -7,6 +7,7 @@ import { ProviderServiceRepositoryImpl } from "../../../infrastructure/database/
 import { ProviderService } from "../../../domain/entities/providerService.entity";
 import { ServiceAvailabilityRepositoryImpl } from "../../../infrastructure/database/serviceAvailability/serviceAvailability.repository.impl";
 import { ServiceAvailability } from "../../../domain/entities/serviceAvailability.entity";
+import { generateSignedUrl } from "../../../config/aws_s3";
 
 export class AdminProviderListUseCase {
     constructor(private providerRepository: ProviderRepositoryImpl) { }
@@ -95,6 +96,15 @@ export class AdminFetchProviderServiceUseCase {
             const serviceData = await this.providerServiceRepository.findProviderServiceByProviderId(new Types.ObjectId(providerId));
             if(!serviceData) throw new Error("Service fetching error.");
             const {_id,  ...service} = serviceData;
+            const providerCertifiacteUrl = service.providerCertificateUrl;
+            if(!providerCertifiacteUrl) throw new Error("Service details fetching error.");
+            const urlParts = providerCertifiacteUrl?.split('/');
+            if(!urlParts) throw new Error("UrlParts error.");
+            const s3Key = urlParts.slice(3).join('/');
+            if(!s3Key) throw new Error("Image retrieving.");
+            const signedUrl = await generateSignedUrl(s3Key);
+            if(!signedUrl) throw new Error("Image fetching error.");
+            service.providerCertificateUrl = signedUrl;
             return { success: true, message: "Service fetched successfully.", service}
         }catch(error){
             throw new Error("Provider service fetching error, please try again.");

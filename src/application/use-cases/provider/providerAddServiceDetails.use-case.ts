@@ -55,6 +55,7 @@ export class ProviderAddServiceDetailsUseCase {
             return { success: true, message: 'Service details saved.' };
 
         } catch(error){
+            console.log("error : ",error);
             throw new Error('Failed to save service details.')
         }
     }
