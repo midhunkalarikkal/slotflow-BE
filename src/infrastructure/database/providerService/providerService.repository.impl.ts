@@ -27,10 +27,10 @@ export class ProviderServiceRepositoryImpl implements IProviderServiceRepository
         }
     }
 
-    async findByProviderId(providerId: Types.ObjectId, fetchingData: string): Promise<Partial<ProviderService> | null> {
+    async findProviderServiceByProviderId(providerId: Types.ObjectId): Promise<Partial<ProviderService> | null> {
         try{
             if(!providerId) throw new Error("Invalid request.");
-            const service = await ProviderServiceModel.findOne({ providerId }).select(fetchingData);
+            const service = await ProviderServiceModel.findOne({ providerId });
             return service ? this.mapToEntity(service) : null;
         }catch(error){
             throw new Error("Service fetching error.");

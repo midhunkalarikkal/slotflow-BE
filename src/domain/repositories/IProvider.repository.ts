@@ -18,5 +18,5 @@ export interface IProviderRepository {
 
     checkProviderStatus(providerId: Types.ObjectId): Promise<Partial<Provider> | null>;
     
-    findProviderById(providerId: Types.ObjectId, fetchingData?: string): Promise<Provider | null>;
+    findProviderById(providerId: Types.ObjectId): Promise<Provider | null>;
 }

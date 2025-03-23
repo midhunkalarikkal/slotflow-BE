@@ -106,9 +106,9 @@ export class ProviderRepositoryImpl implements IProviderRepository {
         }
     }
 
-    async findProviderById(providerId: Types.ObjectId, fetchingData: string): Promise<Provider | null> {
+    async findProviderById(providerId: Types.ObjectId): Promise<Provider | null> {
         try{
-            const provider = await ProviderModel.findById(providerId).select(fetchingData);
+            const provider = await ProviderModel.findById(providerId)
             return provider ? this.mapToEntity(provider) : null;
         }catch(error){
             throw new Error('Provider finding error.');

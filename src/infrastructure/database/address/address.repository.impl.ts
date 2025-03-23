@@ -29,10 +29,10 @@ export class AddressRepositoryImpl implements IAddressRepository {
         }
     }
 
-    async findByUserId(userId: Types.ObjectId, fetchingData: string): Promise<Partial<Address> | null> {
+    async findAddressByUserId(userId: Types.ObjectId): Promise<Partial<Address> | null> {
         try{
             if(!userId) throw new Error("Invalid request");
-            const address = await AddressModel.findOne({ userId: userId }).select(fetchingData);
+            const address = await AddressModel.findOne({ userId: userId });
             return address ? this.mapToEntity(address) : null;
         }catch(error){
             throw new Error("Address fetching error.");

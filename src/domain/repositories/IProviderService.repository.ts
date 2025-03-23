@@ -4,5 +4,5 @@ import { ProviderService } from "../entities/providerService.entity";
 export interface IProviderServiceRepository {
     createProviderService(providerService: ProviderService): Promise<ProviderService>;
 
-    findByProviderId(providerId: Types.ObjectId, fetchingData: string): Promise<Partial<ProviderService> | null>;
+    findProviderServiceByProviderId(providerId: Types.ObjectId): Promise<Partial<ProviderService> | null>;
 }
