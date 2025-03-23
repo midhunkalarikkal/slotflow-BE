@@ -1,8 +1,8 @@
 import { Types } from "mongoose";
 import { Validator } from "../../../infrastructure/validator/validator";
-import { availability } from "../../../domain/entities/serviceAvailability.entity";
 import { ProviderRepositoryImpl } from "../../../infrastructure/database/provider/provider.repository.impl";
 import { ServiceAvailabilityRepositoryImpl } from "../../../infrastructure/database/serviceAvailability/serviceAvailability.repository.impl";
+import { Availability, FontendAvailability } from "../../../domain/entities/serviceAvailability.entity";
 
 export class ProviderAddServiceAvailabilityUseCase {
     constructor(
@@ -10,7 +10,7 @@ export class ProviderAddServiceAvailabilityUseCase {
         private serviceAvailabilityRepository: ServiceAvailabilityRepositoryImpl,
     ){}
 
-    async execute(providerId: string, availability: availability[]): Promise<{success: boolean, message: string }> {
+    async execute(providerId: string, availability: FontendAvailability[]): Promise<{success: boolean, message: string }> {
         if(!providerId || !availability || availability.length  === 0) throw new Error("Invalid request.");
 
         const convertedProviderId = new Types.ObjectId(providerId);
@@ -26,8 +26,19 @@ export class ProviderAddServiceAvailabilityUseCase {
             Validator.validateModes(data.modes);
         })
         console.log("after validation")
+        console.log("ProviderId : ",providerId);
+        console.log("Availability : ",availability);
 
-        const serviceAvailability = await this.serviceAvailabilityRepository.createServiceAvailability({providerId: convertedProviderId, availability})
+        const newAvailability: Availability[] = availability.map((avail: FontendAvailability) => ({
+            ...avail,
+            slots: avail.slots.map((slot: string) => ({
+                slot: slot, available: true
+            }))
+        }));
+
+        console.log("new availability : ",newAvailability);
+
+        const serviceAvailability = await this.serviceAvailabilityRepository.createServiceAvailability(convertedProviderId, newAvailability)
         if(!serviceAvailability) throw new Error("Service availability adding failed.");
 
         if (provider && serviceAvailability && serviceAvailability._id) {

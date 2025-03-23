@@ -5,19 +5,23 @@ export interface TimeSlot {
     available: boolean,
 }
 
-export interface availability {
+export interface Availability {
     day: string,
     duration: string,
     startTime: string,
     endTime: string,
-    modes: [string],
+    modes: string[],
     slots: TimeSlot[],
+}
+
+export interface FontendAvailability extends Omit<Availability, "slots"> {
+    slots : string[]
 }
 
 export class ServiceAvailability {
     constructor(
         public providerId: Types.ObjectId,
-        public availability: availability[],
-        public _id?: Types.ObjectId,
+        public availability: Availability[],
+        public _id: Types.ObjectId,
     ){}
 }

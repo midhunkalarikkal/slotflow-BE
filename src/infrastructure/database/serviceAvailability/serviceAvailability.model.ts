@@ -1,10 +1,10 @@
 import mongoose, { Document, Schema, Types } from "mongoose";
-import { availability } from "../../../domain/entities/serviceAvailability.entity";
+import { Availability } from "../../../domain/entities/serviceAvailability.entity";
 
 export interface IServiceAvailability extends Document {
     _id: Types.ObjectId,
-    providerId: Types.ObjectId | string,
-    availability: availability[],
+    providerId: Types.ObjectId,
+    availability: Availability[],
 }
 
 
@@ -17,7 +17,12 @@ const serviceAvailabilitySchema = new Schema<IServiceAvailability>({
             startTime: { type: String, required: true },
             endTime: { type: String, required: true },
             modes: { type: [String], required: true, enum: ["online","offline"]},
-            slots: { type: Map, of: Boolean, required: true },
+            slots: [
+                {
+                  slot: { type: String, required: true },
+                  available: { type: Boolean, required: true, default: true },
+                },
+              ],
         }
     ]
 },{

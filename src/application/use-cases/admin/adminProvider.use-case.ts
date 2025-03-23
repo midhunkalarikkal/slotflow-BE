@@ -5,6 +5,8 @@ import { Address } from "../../../domain/entities/address.entity";
 import { AddressRepositoryImpl } from "../../../infrastructure/database/address/address.repository.impl";
 import { ProviderServiceRepositoryImpl } from "../../../infrastructure/database/providerService/providerService.repository.impl";
 import { ProviderService } from "../../../domain/entities/providerService.entity";
+import { ServiceAvailabilityRepositoryImpl } from "../../../infrastructure/database/serviceAvailability/serviceAvailability.repository.impl";
+import { ServiceAvailability } from "../../../domain/entities/serviceAvailability.entity";
 
 export class AdminProviderListUseCase {
     constructor(private providerRepository: ProviderRepositoryImpl) { }
@@ -90,14 +92,27 @@ export class AdminFetchProviderServiceUseCase {
     async execute(providerId: string): Promise<{success: boolean, message: string, service: Partial<ProviderService>}> {
         try{
             if(!providerId) throw new Error("Invalid request.");
-            console.log("UseCase providerId : ",providerId);
             const serviceData = await this.providerServiceRepository.findProviderServiceByProviderId(new Types.ObjectId(providerId));
             if(!serviceData) throw new Error("Service fetching error.");
             const {_id,  ...service} = serviceData;
             return { success: true, message: "Service fetched successfully.", service}
         }catch(error){
-            console.log('error custom error: ',error);
             throw new Error("Provider service fetching error, please try again.");
+        }
+    }
+}
+
+export class AdminfetchProviderServiceAvailabilityUseCase {
+    constructor(private serviceAvailabilityRepository: ServiceAvailabilityRepositoryImpl){ }
+
+    async execute(providerId: string): Promise<{success: boolean, message: string, availability: ServiceAvailability}> {
+        try{
+            if(!providerId) throw new Error("Invalid request.");
+            const availability = await this.serviceAvailabilityRepository.findServiceAvailabilityByProviderId(new Types.ObjectId(providerId));
+            if(!availability) throw new Error("Provider service availability fetching error.");
+            return { success: true, message: "Service availability fetched successfully.", availability}
+        }catch(error){
+            throw new Error("Provider service availability fetching error.");
         }
     }
 }

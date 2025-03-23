@@ -1,5 +1,9 @@
-import { ServiceAvailability } from "../entities/serviceAvailability.entity";
+import { Types } from "mongoose";
+import { Availability, ServiceAvailability } from "../entities/serviceAvailability.entity";
 
 export interface IServiceAvailabilityRepository {
-    createServiceAvailability(serviceAvailability: ServiceAvailability): Promise<ServiceAvailability>;
+    createServiceAvailability(providerId: Types.ObjectId, serviceAvailability: Availability[]): Promise<ServiceAvailability>;
+
+    findServiceAvailabilityByProviderId(providerId: Types.ObjectId): Promise<ServiceAvailability | null>;
+
 }

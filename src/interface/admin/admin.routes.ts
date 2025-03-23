@@ -13,6 +13,7 @@ router.put('/provider/changeStatus/:providerId',authMiddleware,adminProviderCont
 router.get('/fetchProviderDetails/:providerId', authMiddleware, adminProviderController.fetchProviderDetails);
 router.get('/fetchProviderAddress/:providerId', authMiddleware, adminProviderController.fetchProviderAddress);
 router.get('/fetchProviderService/:providerId', authMiddleware, adminProviderController.fetchProviderService);
+router.get('/fetchProviderServiceAvailability/:providerId', authMiddleware, adminProviderController.fetchProviderServiceAvailability);
 
 router.get('/users',authMiddleware, adminUserController.getAllUsers);
 router.put('/user/changeStatus/:userId',authMiddleware,adminUserController.changeUserStatus);
