@@ -36,8 +36,29 @@ export class ProviderRepositoryImpl implements IProviderRepository {
         }
     }
 
+    async verifyProvider(verificationToken: string): Promise<Provider | null> {
+        try {
+            if(!verificationToken) throw new Error("Invalid request.");
+            const User = await ProviderModel.findOne({ verificationToken });
+            return User || null;
+        } catch (error) {
+            throw new Error("Unable to retrieve verification data.");
+        }
+    }
+
+    async updateProvider(provider: Provider): Promise<Provider | null> {
+        try {
+            if(!provider) throw new Error("Invalid request.");
+            const updatedProvider = await ProviderModel.findByIdAndUpdate(provider._id, provider, { new: true });
+            return updatedProvider ? this.mapToEntity(updatedProvider) : null;
+        } catch (error) {
+            throw new Error("Unable to update user.");
+        }
+    }
+
     async findProviderByEmail(email: string): Promise<Provider | null> {
         try {
+            if(!email) throw new Error("Invalid request.");
             const provider = await ProviderModel.findOne({ email });
             return provider ? this.mapToEntity(provider) : null;
         } catch (error) {
@@ -65,24 +86,6 @@ export class ProviderRepositoryImpl implements IProviderRepository {
             return updatedProvider ? this.mapToEntity(updatedProvider) : null;
         } catch (error) {
             throw new Error("Unexpected error, please try again.");
-        }
-    }
-
-    async getVerificationData(verificationToken: string): Promise<Provider | null> {
-        try {
-            const User = await ProviderModel.findOne({ verificationToken });
-            return User || null;
-        } catch (error) {
-            throw new Error("Unable to retrieve verification data.");
-        }
-    }
-
-    async updateProvider(provider: Partial<Provider>): Promise<Partial<Provider> | null> {
-        try {
-            const updatedProvider = await ProviderModel.findByIdAndUpdate(provider._id, provider, { new: true });
-            return updatedProvider ? this.mapToEntity(updatedProvider) : null;
-        } catch (error) {
-            throw new Error("Unable to update user.");
         }
     }
 

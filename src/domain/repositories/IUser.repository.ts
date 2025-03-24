@@ -7,11 +7,11 @@ export interface IUserRepository {
 
   createUser(user: CreateUserProps): Promise<User | null>;
 
+  verifyUser(verificationToken: string): Promise<User | null>;
+  
+  updateUser(user: User): Promise<User | null>;
+  
   findUserByEmail(email: string): Promise<User | null>;
-
-  getVerificationData(verificationToken: string): Promise<User | null>;
-
-  updateUser(user: Partial<User>): Promise<Partial<User> | null>;
 
   findAllUsers(): Promise<User[] | null>;
 

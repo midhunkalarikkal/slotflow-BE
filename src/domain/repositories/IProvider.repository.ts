@@ -6,15 +6,15 @@ export type CreateProviderProps = Pick<Provider, "username" | "email" | "passwor
 export interface IProviderRepository {
     createProvider(provider : CreateProviderProps) : Promise<Provider | null>;
 
+    verifyProvider(verificationToken: string): Promise<Provider | null>;
+    
+    updateProvider(user: Provider): Promise<Provider | null>;
+    
     findProviderByEmail(email : string) : Promise<Provider | null>;
-
+    
     findAllProviders(): Promise<Partial<Provider>[] | null>;
-
+    
     updateProviderVerificationStatus(providerId: Types.ObjectId, isAdminVerified: boolean): Promise<Partial<Provider> | null>;
-
-    getVerificationData(verificationToken: string): Promise<Provider | null>;
-
-    updateProvider(user: Partial<Provider>): Promise<Partial<Provider> | null>;
 
     updateProviderStatus(providerId: Types.ObjectId, status: boolean): Promise<Partial<Provider> | null>;
 

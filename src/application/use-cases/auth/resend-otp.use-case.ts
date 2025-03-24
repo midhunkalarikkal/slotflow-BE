@@ -27,9 +27,9 @@ export class ResendOtpUseCase {
 
     } else if (verificationToken && role) {
       if (role === "USER") {
-        userOrProvider = await this.userRepository.getVerificationData(verificationToken);
+        userOrProvider = await this.userRepository.verifyUser(verificationToken);
       } else if (role === "PROVIDER") {
-        userOrProvider = await this.providerRepository.getVerificationData(verificationToken);
+        userOrProvider = await this.providerRepository.verifyProvider(verificationToken);
       } else {
         throw new Error("Invalid request.");
       }

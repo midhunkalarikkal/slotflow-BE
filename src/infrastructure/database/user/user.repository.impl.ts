@@ -1,7 +1,7 @@
+import { Types } from "mongoose";
 import { IUser, UserModel } from "./user.model";
 import { User } from "../../../domain/entities/user.entity";
 import { CreateUserProps, IUserRepository } from "../../../domain/repositories/IUser.repository";
-import { Types } from "mongoose";
 
 export class UserRepositoryImpl implements IUserRepository {
     private mapToEntity(user: IUser): User {
@@ -32,8 +32,29 @@ export class UserRepositoryImpl implements IUserRepository {
         }
     }
 
+    async verifyUser(verificationToken: string): Promise<User | null> {
+        try {
+            if(!verificationToken) throw new Error("Invalid request.");
+            const user = await UserModel.findOne({ verificationToken });
+            return user ? this.mapToEntity(user) : null;
+        } catch (error) {
+            throw new Error("Unable to retrieve verification data.");
+        }
+    }
+
+    async updateUser(user: User): Promise<User | null> {
+        try {
+            if(!user) throw new Error("Invalid request.");
+            const updatedUser = await UserModel.findByIdAndUpdate(user._id, user, { new: true });
+            return updatedUser ? this.mapToEntity(updatedUser) : null;
+        } catch (error) {
+            throw new Error("Unable to update user.");
+        }
+    }
+
     async findUserByEmail(email: string): Promise<User | null> {
         try {
+            if(!email) throw new Error("Invalid request.");
             const user = await UserModel.findOne({ email });
             return user ? this.mapToEntity(user) : null;
         } catch (error) {
@@ -50,23 +71,8 @@ export class UserRepositoryImpl implements IUserRepository {
         }
     }
 
-    async getVerificationData(verificationToken: string): Promise<User | null> {
-        try {
-            const User = await UserModel.findOne({ verificationToken });
-            return User || null
-        } catch (error) {
-            throw new Error("Unable to retrieve verification data.");
-        }
-    }
 
-    async updateUser(user: Partial<User>): Promise<Partial<User> | null> {
-        try {
-            const updatedUser = await UserModel.findByIdAndUpdate(user._id, user, { new: true });
-            return updatedUser ? this.mapToEntity(updatedUser) : null;
-        } catch (error) {
-            throw new Error("Unable to update user.");
-        }
-    }
+    
 
     async updateUserStatus(userId: Types.ObjectId, status: boolean): Promise<Partial<User> | null> {
         try {

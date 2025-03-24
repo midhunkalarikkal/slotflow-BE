@@ -15,14 +15,14 @@ export class VerifyOTPUseCase {
     if (!isValidOTP) throw new Error("Invalid or expired OTP.");  
       
     if (role === "USER") {
-      const user = await this.userRepository.getVerificationData(verificationToken);
+      const user = await this.userRepository.verifyUser(verificationToken);
       if(!user) throw new Error("Verification failed");
 
       user.isEmailVerified = true;
       await this.userRepository.updateUser(user);
       
     } else if (role === "PROVIDER") {
-      const provider = await this.providerRepository.getVerificationData(verificationToken);
+      const provider = await this.providerRepository.verifyProvider(verificationToken);
       if(!provider) throw new Error("Verification failed");
 
       provider.isEmailVerified = true;
