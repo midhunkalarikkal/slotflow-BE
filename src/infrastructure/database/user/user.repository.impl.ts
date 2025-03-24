@@ -1,6 +1,6 @@
 import { IUser, UserModel } from "./user.model";
 import { User } from "../../../domain/entities/user.entity";
-import { IUserRepository } from "../../../domain/repositories/IUser.repository";
+import { CreateUserProps, IUserRepository } from "../../../domain/repositories/IUser.repository";
 import { Types } from "mongoose";
 
 export class UserRepositoryImpl implements IUserRepository {
@@ -17,11 +17,14 @@ export class UserRepositoryImpl implements IUserRepository {
             user.addressId,
             user.bookingsId,
             user.verificationToken,
+            user.createdAt,
+            user.updatedAt,
         );
     }
 
-    async createUser(user: Partial<User>): Promise<Partial<User> | null> {
+    async createUser(user: CreateUserProps): Promise<User | null> {
         try {
+            if(!user) throw new Error("Invalid request.");
             const createdUser = await UserModel.create(user);
             return createdUser ? this.mapToEntity(createdUser) : null;
         } catch (error) {

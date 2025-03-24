@@ -13,5 +13,7 @@ export class User {
         public addressId: Types.ObjectId,
         public bookingsId: Types.ObjectId,
         public verificationToken: string,
+        public createdAt: Date,
+        public updatedAt: Date,
     ) {}
 }

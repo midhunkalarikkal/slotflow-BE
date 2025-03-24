@@ -15,7 +15,7 @@ export class AdminPlanListUseCase {
 export class AdminCreatePlanUseCase {
     constructor(private planRepository: PlanRepositoryImpl) { }
 
-    async execute(planName: string, description: string, price: number, features: [string], billingCycle: BillingCycle, maxBookingPerMonth: number, adVisibility: boolean): Promise<{ success: boolean, message: string, plan?: Plan}> {
+    async execute(planName: string, description: string, price: number, features: [string], billingCycle: BillingCycle, maxBookingPerMonth: number, adVisibility: boolean): Promise<{ success: boolean, message: string, plan: Plan}> {
         if (!planName || !description || price < 0 || !features || !billingCycle || maxBookingPerMonth < 0) throw new Error("Invalid plan data.");
         const newPlan = await this.planRepository.createPlan({ planName, description, price, features, billingCycle, maxBookingPerMonth, adVisibility, isBlocked: false,});
         if(!newPlan) throw new Error("Plan adding failed, please try again.");

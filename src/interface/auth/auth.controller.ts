@@ -39,21 +39,27 @@ export class AuthController {
 
   async register(req: Request, res: Response) {
     try {
+
       const { username, email, password, role } = req.body;
       if (!username || !email || !password || !role) throw new Error("Invalid request");
+      
       const result = await this.registerUseCase.execute(username, email, password, role);
+
       res.cookie("token", result.authUser.token, {
         maxAge: 2 * 24 * 60 * 60 * 1000,
         httpOnly: true,
         sameSite: 'strict',
         secure: appConfig.nodeEnv !== 'development'
       });
+
       const { token: token, ...authUserWithoutToken } = result.authUser;
       const resultWithoutToken = {
         ...result,
         authUser: authUserWithoutToken,
     };
+
       res.status(200).json(resultWithoutToken);
+      
     } catch (error) {
       HandleError.handle(error, res);
     }

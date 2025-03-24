@@ -31,7 +31,8 @@ class AdminPlanController {
     async addNewPlan(req: Request, res: Response) {
         try{
             const { planName, description, price, features, billingCycle, maxBookingPerMonth, adVisibility } = req.body;
-            if(!planName || !description || !price || !features || !billingCycle || !maxBookingPerMonth || !adVisibility) throw new Error("Invalid request.");
+            console.log("req.body : ",req.body);
+            if(!planName || !description || !price || !features || !billingCycle || !maxBookingPerMonth || adVisibility === null) throw new Error("Invalid request.");
             const result = await this.adminCreatePlanUseCase.execute( planName, description, price, features, billingCycle, maxBookingPerMonth, adVisibility );
             res.status(200).json(result);
         }catch(error){

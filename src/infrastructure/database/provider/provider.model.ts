@@ -16,6 +16,7 @@ export interface IProvider extends Document {
   subscription: [Types.ObjectId];
   verificationToken: string;
   createdAt: Date;
+  updatedAt: Date;
 }
 
 const ProviderSchema = new Schema<IProvider>({

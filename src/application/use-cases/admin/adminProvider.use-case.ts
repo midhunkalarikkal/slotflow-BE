@@ -63,7 +63,7 @@ export class AdminFetchProviderDetailsUseCase {
             if (!providerId) throw new Error("Invalid request.");
             const providerData = await this.providerRepository.findProviderById(new Types.ObjectId(providerId));
             if (!providerData) throw new Error("Provider details fetching error, please try again.");
-            const {addressId, subscription, serviceId, serviceAvailabilityId, verificationToken,...provider } = providerData;
+            const {addressId, subscription, serviceId, serviceAvailabilityId, verificationToken, password, ...provider } = providerData;
             return { success: true, message: "Provider details fetched", provider };
         } catch (error) {
             throw new Error("Provider details fetching error, please try again.");

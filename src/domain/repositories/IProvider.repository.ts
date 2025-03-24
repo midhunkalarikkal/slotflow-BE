@@ -1,8 +1,10 @@
 import { Types } from "mongoose";
 import { Provider } from "../entities/provider.entity";
 
+export type CreateProviderProps = Pick<Provider, "username" | "email" | "password" | "verificationToken">;
+
 export interface IProviderRepository {
-    createProvider(provider : Partial<Provider>) : Promise<Partial<Provider> | null>;
+    createProvider(provider : CreateProviderProps) : Promise<Provider | null>;
 
     findProviderByEmail(email : string) : Promise<Provider | null>;
 

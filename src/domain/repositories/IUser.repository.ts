@@ -1,8 +1,11 @@
 import { Types } from "mongoose";
 import { User } from "../entities/user.entity";
 
+export type CreateUserProps = Pick<User, "username" | "email" | "password" | "verificationToken">;
+
 export interface IUserRepository {
-  createUser(user: Partial<User>): Promise<Partial<User> | null>;
+
+  createUser(user: CreateUserProps): Promise<User | null>;
 
   findUserByEmail(email: string): Promise<User | null>;
 

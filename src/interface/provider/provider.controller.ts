@@ -7,7 +7,7 @@ import { ServiceRepositoryImpl } from "../../infrastructure/database/appservice/
 import { ProviderAddAddressUseCase } from "../../application/use-cases/provider/providerAddAddress.use-case";
 import { ProviderAddServiceDetailsUseCase } from "../../application/use-cases/provider/providerAddServiceDetails.use-case";
 import { ProviderServiceRepositoryImpl } from "../../infrastructure/database/providerService/providerService.repository.impl";
-import { ProviderFetchAllAppServicesUseCase } from "../../application/use-cases/provider/providerFetchAlApplServices.use-case";
+import { ProviderFetchAllAppServicesUseCase } from "../../application/use-cases/provider/providerFetchAllAppServices.use-case";
 import { ServiceAvailabilityRepositoryImpl } from "../../infrastructure/database/serviceAvailability/serviceAvailability.repository.impl";
 import { ProviderAddServiceAvailabilityUseCase } from "../../application/use-cases/provider/providerAddServiceAvailabilityDetails.use-case";
 

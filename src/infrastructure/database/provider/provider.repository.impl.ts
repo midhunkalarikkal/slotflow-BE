@@ -1,7 +1,7 @@
+import { Types } from "mongoose";
 import { IProvider, ProviderModel } from "./provider.model";
 import { Provider } from "../../../domain/entities/provider.entity";
-import { IProviderRepository } from '../../../domain/repositories/IProvider.repository';
-import { Types } from "mongoose";
+import { CreateProviderProps, IProviderRepository } from '../../../domain/repositories/IProvider.repository';
 
 
 export class ProviderRepositoryImpl implements IProviderRepository {
@@ -22,11 +22,13 @@ export class ProviderRepositoryImpl implements IProviderRepository {
             provider.subscription,
             provider.verificationToken,
             provider.createdAt,
+            provider.updatedAt,
         )
     }
 
-    async createProvider(provider: Partial<Provider>): Promise<Partial<Provider> | null> {
+    async createProvider(provider: CreateProviderProps): Promise<Provider | null> {
         try {
+            if(!provider) throw new Error("Invalid request.");
             const createdProvider = await ProviderModel.create(provider);
             return createdProvider ? this.mapToEntity(createdProvider) : null;
         } catch (error) {
@@ -58,7 +60,7 @@ export class ProviderRepositoryImpl implements IProviderRepository {
             const updatedProvider = await ProviderModel.findByIdAndUpdate(
                 providerId,
                 { isAdminVerified: isAdminVerified },
-                { new: true, select: '_id isVerified' }
+                { new: true, select: '_id isAdminVerified' }
             );
             return updatedProvider ? this.mapToEntity(updatedProvider) : null;
         } catch (error) {
