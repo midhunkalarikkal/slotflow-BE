@@ -17,14 +17,14 @@ export class UpdatePasswordUseCase {
         const hashedPassword = await PasswordHasher.hashPassword(password);
 
         if(role === "USER"){
-            const user = await this.userRepository.getVerificationData(verificationToken);
+            const user = await this.userRepository.verifyUser(verificationToken);
             if(!user) throw new Error("User not found.");
 
             user.password = hashedPassword;
             await this.userRepository.updateUser(user as User);
             
         }else if(role === "PROVIDER"){
-            const provider = await this.providerRepository.getVerificationData(verificationToken);
+            const provider = await this.providerRepository.verifyProvider(verificationToken);
             if(!provider) throw new Error("User not found.");
             
             provider.password = hashedPassword;

@@ -39,7 +39,7 @@ export class ResendOtpUseCase {
 
     const otp = OTPService.generateOTP(userOrProvider?.verificationToken);
     if (!otp) throw new Error("Unexpected error, please try again.");
-
+  
     await OTPService.sendOTP(userOrProvider?.email, otp);
 
     return { success: true, message: `OTP sent to email.`, authUser: {verificationToken: userOrProvider.verificationToken, role } };
