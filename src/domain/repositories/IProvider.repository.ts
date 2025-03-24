@@ -2,6 +2,7 @@ import { Types } from "mongoose";
 import { Provider } from "../entities/provider.entity";
 
 export type CreateProviderProps = Pick<Provider, "username" | "email" | "password" | "verificationToken">;
+export type FindAllProvidersProps = Pick<Provider, "_id" | "username" | "email" | "isBlocked" | "isAdminVerified">;
 
 export interface IProviderRepository {
     createProvider(provider : CreateProviderProps) : Promise<Provider | null>;
@@ -12,7 +13,7 @@ export interface IProviderRepository {
     
     findProviderByEmail(email : string) : Promise<Provider | null>;
     
-    findAllProviders(): Promise<Partial<Provider>[] | null>;
+    findAllProviders(): Promise<FindAllProvidersProps[] | null>;
     
     updateProviderVerificationStatus(providerId: Types.ObjectId, isAdminVerified: boolean): Promise<Partial<Provider> | null>;
 

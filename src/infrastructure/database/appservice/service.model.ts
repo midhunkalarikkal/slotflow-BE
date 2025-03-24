@@ -4,6 +4,8 @@ export interface IService extends Document {
     _id: Types.ObjectId;
     serviceName: string;
     isBlocked: boolean;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 const serviceSchema = new Schema<IService>({

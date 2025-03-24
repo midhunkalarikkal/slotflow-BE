@@ -1,7 +1,7 @@
 import { Types } from "mongoose";
 import { IUser, UserModel } from "./user.model";
 import { User } from "../../../domain/entities/user.entity";
-import { CreateUserProps, IUserRepository } from "../../../domain/repositories/IUser.repository";
+import { CreateUserProps, FindAllUsersProps, IUserRepository } from "../../../domain/repositories/IUser.repository";
 
 export class UserRepositoryImpl implements IUserRepository {
     private mapToEntity(user: IUser): User {
@@ -62,17 +62,14 @@ export class UserRepositoryImpl implements IUserRepository {
         }
     }
 
-    async findAllUsers(): Promise<User[] | null> {
+    async findAllUsers(): Promise<FindAllUsersProps[] | null> {
         try {
             const users =  await UserModel.find({}, { _id: 1, username: 1, email: 1, isBlocked: 1, isEmailVerified: 1 });
             return users ? users.map((user) => this.mapToEntity(user)) : null;
         } catch (error) {
             throw new Error("Failed to fetch users from database.")
         }
-    }
-
-
-    
+    }    
 
     async updateUserStatus(userId: Types.ObjectId, status: boolean): Promise<Partial<User> | null> {
         try {

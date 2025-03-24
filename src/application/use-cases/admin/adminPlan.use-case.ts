@@ -1,12 +1,13 @@
 import { Types } from "mongoose";
 import { BillingCycle, Plan } from "../../../domain/entities/plan.entity";
+import { FindAllPlansProps } from "../../../domain/repositories/IPlan.repository";
 import { PlanRepositoryImpl } from "../../../infrastructure/database/plan/plan.repository.impl";
 
 export class AdminPlanListUseCase {
     constructor(private planRepository: PlanRepositoryImpl) { }
 
-    async execute(): Promise<{ success: boolean, message: string, plans: Plan[] }> {
-        const plans = await this.planRepository.getAllPlans();
+    async execute(): Promise<{ success: boolean, message: string, plans: FindAllPlansProps[] }> {
+        const plans = await this.planRepository.findAllPlans();
         if (!plans) throw new Error("Plans fetching error");
         return { success: true, message: "Plans fetched", plans };
     }

@@ -1,7 +1,7 @@
 import { Types } from "mongoose";
 import { IProvider, ProviderModel } from "./provider.model";
 import { Provider } from "../../../domain/entities/provider.entity";
-import { CreateProviderProps, IProviderRepository } from '../../../domain/repositories/IProvider.repository';
+import { CreateProviderProps, FindAllProvidersProps, IProviderRepository } from '../../../domain/repositories/IProvider.repository';
 
 
 export class ProviderRepositoryImpl implements IProviderRepository {
@@ -66,7 +66,7 @@ export class ProviderRepositoryImpl implements IProviderRepository {
         }
     }
 
-    async findAllProviders(): Promise<Partial<Provider>[] | null> {
+    async findAllProviders(): Promise<FindAllProvidersProps[] | null> {
         try {
             const providers = await ProviderModel.find({}, { _id: 1, username: 1, email: 1, isBlocked: 1, isAdminVerified: 1 });
             return providers ? providers.map((provider) => this.mapToEntity(provider)) : null;
@@ -74,7 +74,6 @@ export class ProviderRepositoryImpl implements IProviderRepository {
             throw new Error("Failed to fetch providers from database.");
         }
     }
-
 
     async updateProviderVerificationStatus(providerId: Types.ObjectId, isAdminVerified: boolean): Promise<Partial<Provider> | null> {
         try {

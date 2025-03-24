@@ -1,11 +1,12 @@
 import { Types } from "mongoose";
 import { IPlan, PlanModel } from "./plan.model";
 import { Plan } from "../../../domain/entities/plan.entity";
-import { IPlanRepository } from "../../../domain/repositories/IPlan.repository";
+import { FindAllPlansProps, IPlanRepository } from "../../../domain/repositories/IPlan.repository";
 
 export class PlanRepositoryImpl implements IPlanRepository {
     private mapToEntity(plan: IPlan): Plan {
         return new Plan (
+            plan._id,
             plan.planName,
             plan.description,
             plan.price,
@@ -14,7 +15,8 @@ export class PlanRepositoryImpl implements IPlanRepository {
             plan.maxBookingPerMonth,
             plan.adVisibility,
             plan.isBlocked,
-            plan._id,
+            plan.createdAt,
+            plan.updatedAt,
         )
     }
 
@@ -57,10 +59,10 @@ export class PlanRepositoryImpl implements IPlanRepository {
         }
     }
 
-    async getAllPlans(): Promise<Plan[]> {
+    async findAllPlans(): Promise<FindAllPlansProps[] | null> {
         try{
             const plans = await PlanModel.find({},{_id:1, planName: 1, isBlocked: 1});
-            return plans.map(plan => this.mapToEntity(plan));
+            return plans ?  plans.map(plan => this.mapToEntity(plan)) : null;
         }catch{
             throw new Error("Failed to fetch all plans.");
         }

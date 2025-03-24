@@ -30,7 +30,7 @@ class AdminServiceController {
 
     async addService(req: Request, res: Response) {
         try{
-            const  { serviceName } = req.body;
+            const { serviceName } = req.body as { serviceName: string };
             if(!serviceName) throw new Error("Invalid request.");
             const result = await this.adminAddServiceUseCase.execute(serviceName);
             res.status(200).json(result);
@@ -42,7 +42,7 @@ class AdminServiceController {
     async changeServiceStatus(req: Request, res: Response) {
         try{
             const { serviceId } = req.params;
-            const { status } = req.query;
+            const { status } = req.query as { status: string };
             if(!serviceId || !status) throw new Error("Invalid request.");
             const statusValue = status === 'true';
             const result = await this.adminChnageServiceStatusUseCase.execute(serviceId, statusValue);

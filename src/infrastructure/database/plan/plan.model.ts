@@ -11,6 +11,8 @@ export interface IPlan extends Document {
     maxBookingPerMonth: number;
     adVisibility: boolean;
     isBlocked: boolean;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 const PlanSchema = new Schema<IPlan>({

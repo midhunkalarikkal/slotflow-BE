@@ -7,6 +7,7 @@ export enum BillingCycle {
 
 export class Plan {
     constructor(
+        public _id: Types.ObjectId,
         public planName: string,
         public description: string,
         public price: number,
@@ -15,6 +16,7 @@ export class Plan {
         public maxBookingPerMonth: number,
         public adVisibility: boolean,
         public isBlocked: boolean,
-        public _id?: Types.ObjectId,
+        public createdAt: Date,
+        public updatedAt: Date,
     ){}
 }

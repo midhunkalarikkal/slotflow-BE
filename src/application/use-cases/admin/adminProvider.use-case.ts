@@ -1,18 +1,19 @@
 import { Types } from "mongoose";
-import { Provider } from "../../../domain/entities/provider.entity";
-import { ProviderRepositoryImpl } from "../../../infrastructure/database/provider/provider.repository.impl";
-import { Address } from "../../../domain/entities/address.entity";
-import { AddressRepositoryImpl } from "../../../infrastructure/database/address/address.repository.impl";
-import { ProviderServiceRepositoryImpl } from "../../../infrastructure/database/providerService/providerService.repository.impl";
-import { ProviderService } from "../../../domain/entities/providerService.entity";
-import { ServiceAvailabilityRepositoryImpl } from "../../../infrastructure/database/serviceAvailability/serviceAvailability.repository.impl";
-import { ServiceAvailability } from "../../../domain/entities/serviceAvailability.entity";
 import { generateSignedUrl } from "../../../config/aws_s3";
+import { Address } from "../../../domain/entities/address.entity";
+import { Provider } from "../../../domain/entities/provider.entity";
+import { ProviderService } from "../../../domain/entities/providerService.entity";
+import { FindAllProvidersProps } from "../../../domain/repositories/IProvider.repository";
+import { ServiceAvailability } from "../../../domain/entities/serviceAvailability.entity";
+import { AddressRepositoryImpl } from "../../../infrastructure/database/address/address.repository.impl";
+import { ProviderRepositoryImpl } from "../../../infrastructure/database/provider/provider.repository.impl";
+import { ProviderServiceRepositoryImpl } from "../../../infrastructure/database/providerService/providerService.repository.impl";
+import { ServiceAvailabilityRepositoryImpl } from "../../../infrastructure/database/serviceAvailability/serviceAvailability.repository.impl";
 
 export class AdminProviderListUseCase {
     constructor(private providerRepository: ProviderRepositoryImpl) { }
 
-    async execute(): Promise<{ success: boolean, message: string, providers?: Partial<Provider>[] }> {
+    async execute(): Promise<{ success: boolean, message: string, providers: FindAllProvidersProps[] }> {
         try {
             const providers = await this.providerRepository.findAllProviders();
             if (!providers) throw new Error("Fetching error, please try again.");
