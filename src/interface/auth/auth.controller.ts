@@ -59,7 +59,7 @@ export class AuthController {
     };
 
       res.status(200).json(resultWithoutToken);
-      
+
     } catch (error) {
       HandleError.handle(error, res);
     }

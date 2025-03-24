@@ -48,19 +48,12 @@ export class LoginUseCase {
         let serviceAvailability;
         let approved;
 
-        console.log("userOrProvider : ",userOrProvider);
-
         if(role === "PROVIDER"){
             address = (userOrProvider as Provider).addressId ? true : false;
             serviceDetails = (userOrProvider as Provider).serviceId ? true : false;
             serviceAvailability = (userOrProvider as Provider).serviceAvailabilityId ? true : false;
             approved = (userOrProvider as Provider).isAdminVerified ? true : false;
         }
-
-        console.log("address : ",address);
-        console.log("serviceDetails : ",serviceDetails);
-        console.log("serviceAvailability : ",serviceAvailability);
-        console.log("approved : ",approved);
 
         return { success: true, message: 'Logged In Successfully.', authUser : {username : userOrProvider.username, profileImage: userOrProvider.profileImage, role: role, token, isLoggedIn: true, address, serviceDetails, serviceAvailability, approved }};
     }
