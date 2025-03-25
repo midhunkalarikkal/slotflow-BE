@@ -10,6 +10,7 @@ import { ProviderServiceRepositoryImpl } from "../../infrastructure/database/pro
 import { ProviderFetchAllAppServicesUseCase } from "../../application/use-cases/provider/providerFetchAllAppServices.use-case";
 import { ServiceAvailabilityRepositoryImpl } from "../../infrastructure/database/serviceAvailability/serviceAvailability.repository.impl";
 import { ProviderAddServiceAvailabilityUseCase } from "../../application/use-cases/provider/providerAddServiceAvailabilityDetails.use-case";
+import { ProviderFetchProfileDetailsUseCase } from "../../application/use-cases/provider/providerProfile.use-case";
 
 const providerRepositoryImpl = new ProviderRepositoryImpl();
 const addressRepositoryImpl = new AddressRepositoryImpl();
@@ -20,19 +21,22 @@ const providerServiceRepositoryImpl = new ProviderServiceRepositoryImpl();
 const providerAddAddressUseCase = new ProviderAddAddressUseCase(providerRepositoryImpl, addressRepositoryImpl);
 const providerFetchAllServicesUseCase = new ProviderFetchAllAppServicesUseCase(serviceRepositoryImpl);
 const providerAddServiceDetailsUseCase = new ProviderAddServiceDetailsUseCase(providerRepositoryImpl, providerServiceRepositoryImpl, s3Client);
-const providerAddServiceAvailabilityUseCase = new ProviderAddServiceAvailabilityUseCase(providerRepositoryImpl, serviceAvailabilityImpl)
+const providerAddServiceAvailabilityUseCase = new ProviderAddServiceAvailabilityUseCase(providerRepositoryImpl, serviceAvailabilityImpl);
+const providerFetchProfileDetailsUseCase = new ProviderFetchProfileDetailsUseCase(providerRepositoryImpl);
 
 class ProviderController {
     constructor(
         private providerAddAddressUseCase: ProviderAddAddressUseCase,
         private providerFetchAllServicesUseCase: ProviderFetchAllAppServicesUseCase,
         private providerAddServiceDetailsUseCase: ProviderAddServiceDetailsUseCase,
-        private providerAddServiceAvailabilityUseCase: ProviderAddServiceAvailabilityUseCase
+        private providerAddServiceAvailabilityUseCase: ProviderAddServiceAvailabilityUseCase,
+        private providerFetchProfileDetailsUseCase: ProviderFetchProfileDetailsUseCase,
     ) {
         this.addAddress = this.addAddress.bind(this);
-        this.fetchAllServices = this.fetchAllServices.bind(this);
+        this.getAllServices = this.getAllServices.bind(this);
         this.addServiceDetails = this.addServiceDetails.bind(this);
         this.addServiceAvailability = this.addServiceAvailability.bind(this);
+        this.getProfileDetails = this.getProfileDetails.bind(this);
     }
 
     async addAddress(req: Request, res: Response) {
@@ -47,7 +51,7 @@ class ProviderController {
         }
     }
 
-    async fetchAllServices(req: Request, res: Response) {
+    async getAllServices(req: Request, res: Response) {
         try{
             const result = await this.providerFetchAllServicesUseCase.execute();
             res.status(200).json(result);
@@ -80,7 +84,18 @@ class ProviderController {
             HandleError.handle(error, res);
         }
     }
+
+    async getProfileDetails(req: Request, res: Response) {
+        try{
+            const providerId = req.user.userOrProviderId;
+            if(!providerId) throw new Error("Invalid request.");
+            const result = await this.providerFetchProfileDetailsUseCase.execute(providerId);
+            res.status(200).json(result);
+        }catch(error){
+            HandleError.handle(error,res);
+        }
+    }
 }
 
-const providerController = new ProviderController(providerAddAddressUseCase, providerFetchAllServicesUseCase, providerAddServiceDetailsUseCase, providerAddServiceAvailabilityUseCase);
+const providerController = new ProviderController(providerAddAddressUseCase, providerFetchAllServicesUseCase, providerAddServiceDetailsUseCase, providerAddServiceAvailabilityUseCase, providerFetchProfileDetailsUseCase);
 export { providerController };
