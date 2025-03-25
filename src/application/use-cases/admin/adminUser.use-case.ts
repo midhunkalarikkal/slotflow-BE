@@ -16,7 +16,7 @@ export class AdminUserListUseCase {
 export class AdminChangeUserStatusUseCase {
     constructor(private userRepository: UserRepositoryImpl) { }
 
-    async execute(userId: string, status: boolean): Promise<{ success: boolean, message: string, updatedUser: Partial<User> }> {
+    async execute(userId: string, status: boolean): Promise<{ success: boolean, message: string, updatedUser: FindAllUsersProps }> {
         if (!userId || status === null) throw new Error("Invalid request");
         const updatedUser = await this.userRepository.updateUserStatus(new Types.ObjectId(userId), status);
         if (!updatedUser) throw new Error("User not found");

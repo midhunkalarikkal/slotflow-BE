@@ -1,7 +1,7 @@
 import { Types } from "mongoose";
 import { IService, ServiceModel } from "./service.model";
 import { Service } from "../../../domain/entities/service.entity";
-import { ServicesProps, IServiceRepository, UpdateServiceBlockProps } from "../../../domain/repositories/IService.repository";
+import { ServicesProps, IServiceRepository } from "../../../domain/repositories/IService.repository";
 
 export class ServiceRepositoryImpl implements IServiceRepository {
     private mapToEntity(service: IService): Service {
@@ -42,10 +42,10 @@ export class ServiceRepositoryImpl implements IServiceRepository {
         }
     }
 
-    async updateServiceBlockStatus(serviceId: Types.ObjectId, status: boolean): Promise<UpdateServiceBlockProps | null> {
+    async updateServiceBlockStatus(serviceId: Types.ObjectId, status: boolean): Promise<ServicesProps | null> {
         try{
-            const updatedService = await ServiceModel.findByIdAndUpdate(serviceId, { isBlocked: status }, { new: true, select: '_id isBlocked' })
-            return updatedService || null;
+            const updatedService = await ServiceModel.findByIdAndUpdate(serviceId, { isBlocked: status }, { new: true, select: '_id serviceName isBlocked' })
+            return updatedService ? this.mapToEntity(updatedService) : null;
         }catch(error){
             throw new Error("Failed to update service status.");
         }

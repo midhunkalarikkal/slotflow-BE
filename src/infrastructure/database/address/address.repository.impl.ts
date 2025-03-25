@@ -1,11 +1,12 @@
+import { Types } from "mongoose";
 import { AddressModel, IAddress } from "./address.model";
 import { Address } from "../../../domain/entities/address.entity";
-import { IAddressRepository } from "../../../domain/repositories/IAddress.repository";
-import { Types } from "mongoose";
+import { CreateAddressReqProps, IAddressRepository } from "../../../domain/repositories/IAddress.repository";
 
 export class AddressRepositoryImpl implements IAddressRepository {
     private mapToEntity(address: IAddress): Address {
             return new Address(
+                address._id,
                 address.userId,
                 address.addressLine,
                 address.phone,
@@ -16,11 +17,12 @@ export class AddressRepositoryImpl implements IAddressRepository {
                 address.state,
                 address.country,
                 address.googleMapLink,
-                address._id,
+                address.createdAt,
+                address.updatedAt,
             )
         }
 
-    async createAddress(address: Address): Promise<Address | null> {
+    async createAddress(address: CreateAddressReqProps): Promise<Address | null> {
         try{
             const newAddress = await AddressModel.create(address);
             return newAddress ? this.mapToEntity(newAddress) : null;
@@ -29,9 +31,8 @@ export class AddressRepositoryImpl implements IAddressRepository {
         }
     }
 
-    async findAddressByUserId(userId: Types.ObjectId): Promise<Partial<Address> | null> {
+    async findAddressByUserId(userId: Types.ObjectId): Promise<Address | null> {
         try{
-            if(!userId) throw new Error("Invalid request");
             const address = await AddressModel.findOne({ userId: userId });
             return address ? this.mapToEntity(address) : null;
         }catch(error){

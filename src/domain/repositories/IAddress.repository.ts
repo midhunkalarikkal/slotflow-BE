@@ -1,7 +1,11 @@
 import { Types } from "mongoose";
 import { Address } from "../entities/address.entity";
 
+export type CreateAddressReqProps = Pick<Address, "userId" | "addressLine" | "phone" | "place" | "city" | "district" | "pincode" | "state" | "country" | "googleMapLink">;
+
 export interface IAddressRepository {
-    createAddress(address: Address): Promise<Address | null>;
-    findAddressByUserId(userId: Types.ObjectId): Promise<Partial<Address> | null>;
+    
+    createAddress(address: CreateAddressReqProps): Promise<Address | null>;
+
+    findAddressByUserId(userId: Types.ObjectId): Promise<Address | null>;
 }

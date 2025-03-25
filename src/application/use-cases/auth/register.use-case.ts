@@ -45,9 +45,9 @@ export class RegisterUseCase {
       userOrProvider.verificationToken = verificationToken;
       userOrProvider.password = hashedPassword;
       if (role === "USER") {
-        await this.userRepository.updateUser(userOrProvider as Partial<User>);
+        await this.userRepository.updateUser(userOrProvider as User);
       } else if (role === "PROVIDER") {
-        await this.providerRepository.updateProvider(userOrProvider as Partial<Provider>);
+        await this.providerRepository.updateProvider(userOrProvider as Provider);
       }
     } else {
       if (role === "USER") {

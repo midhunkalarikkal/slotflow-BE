@@ -1,11 +1,13 @@
 import { Types } from "mongoose";
 import { Provider } from "../entities/provider.entity";
 
-export type CreateProviderProps = Pick<Provider, "username" | "email" | "password" | "verificationToken">;
-export type FindAllProvidersProps = Pick<Provider, "_id" | "username" | "email" | "isBlocked" | "isAdminVerified">;
+export type CreateProviderReqProps = Pick<Provider, "username" | "email" | "password" | "verificationToken">;
+export type FindAllProvidersResProps = Pick<Provider, "_id" | "username" | "email" | "isBlocked" | "isAdminVerified">;
+export type AdminApproveProviderResProps = Pick<Provider, "_id" | "username" | "email" | "isBlocked" | "isAdminVerified">
+export type AdminChangeProviderBlockStatusResProps = Pick<Provider, "_id" | "username" | "email" | "isBlocked" | "isAdminVerified">
 
 export interface IProviderRepository {
-    createProvider(provider : CreateProviderProps) : Promise<Provider | null>;
+    createProvider(provider : CreateProviderReqProps) : Promise<Provider | null>;
 
     verifyProvider(verificationToken: string): Promise<Provider | null>;
     
@@ -13,11 +15,11 @@ export interface IProviderRepository {
     
     findProviderByEmail(email : string) : Promise<Provider | null>;
     
-    findAllProviders(): Promise<FindAllProvidersProps[] | null>;
+    findAllProviders(): Promise<FindAllProvidersResProps[] | null>;
     
-    updateProviderVerificationStatus(providerId: Types.ObjectId, isAdminVerified: boolean): Promise<Partial<Provider> | null>;
+    updateProviderAdminApprovingStatus(providerId: Types.ObjectId, isAdminVerified: boolean): Promise<AdminApproveProviderResProps | null>;
 
-    updateProviderStatus(providerId: Types.ObjectId, status: boolean): Promise<Partial<Provider> | null>;
+    updateProviderBlockStatus(providerId: Types.ObjectId, status: boolean): Promise<AdminChangeProviderBlockStatusResProps | null>;
 
     checkProviderStatus(providerId: Types.ObjectId): Promise<Partial<Provider> | null>;
     

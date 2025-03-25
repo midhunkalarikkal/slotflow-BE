@@ -20,8 +20,10 @@ export interface FontendAvailability extends Omit<Availability, "slots"> {
 
 export class ServiceAvailability {
     constructor(
+        public _id: Types.ObjectId,
         public providerId: Types.ObjectId,
         public availability: Availability[],
-        public _id: Types.ObjectId,
+        public createdAt: Date,
+        public updatedAt: Date,
     ){}
 }

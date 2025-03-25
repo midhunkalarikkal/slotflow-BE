@@ -5,6 +5,8 @@ export interface IServiceAvailability extends Document {
     _id: Types.ObjectId,
     providerId: Types.ObjectId,
     availability: Availability[],
+    createdAt: Date,
+    updatedAt: Date,
 }
 
 

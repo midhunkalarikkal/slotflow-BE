@@ -2,6 +2,7 @@ import { Types } from 'mongoose';
 
 export class ProviderService {
     constructor(
+        public _id: Types.ObjectId,
         public providerId: Types.ObjectId,
         public serviceCategory: string,
         public serviceName: string,
@@ -10,6 +11,7 @@ export class ProviderService {
         public providerAdhaar: string,
         public providerExperience: string,
         public providerCertificateUrl: string,
-        public _id?: Types.ObjectId,
+        public createdAt: Date,
+        public updatedAt: Date,
     ){}
 }

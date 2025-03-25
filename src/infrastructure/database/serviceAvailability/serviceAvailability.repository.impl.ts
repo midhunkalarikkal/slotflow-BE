@@ -6,26 +6,16 @@ import { Types } from 'mongoose';
 export class ServiceAvailabilityRepositoryImpl implements IServiceAvailabilityRepository {
     private mapToEntity(serviceAvailability: IServiceAvailability): ServiceAvailability {
         return new ServiceAvailability(
+            serviceAvailability._id,
             serviceAvailability.providerId,
             serviceAvailability.availability,
-            serviceAvailability._id,
+            serviceAvailability.createdAt,
+            serviceAvailability.updatedAt,
         )
     }
 
     async createServiceAvailability(providerId: Types.ObjectId, availability: Availability[]): Promise<ServiceAvailability> {
         try {
-            // const modifiedAvailability = await Promise.all(availability.availability.map(async (avail: any) => {
-            //     const slotsMap = new Map<string, boolean>();
-            //     avail.slots.forEach((slot: string) => {
-            //         slotsMap.set(slot, false);
-            //     });
-
-            //     return {
-            //         ...avail,
-            //         slots: slotsMap,
-            //     };
-            // }));
-            // const serviceAvailability = new ServiceAvailability(availability.providerId, modifiedAvailability,new Types.ObjectId)
             const serviceAvailability = {
                 providerId,availability
             }

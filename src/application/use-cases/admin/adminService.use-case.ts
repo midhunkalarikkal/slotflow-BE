@@ -1,6 +1,5 @@
 import { Types } from "mongoose";
-import { Service } from "../../../domain/entities/service.entity";
-import { ServicesProps, UpdateServiceBlockProps } from "../../../domain/repositories/IService.repository";
+import { ServicesProps } from "../../../domain/repositories/IService.repository";
 import { ServiceRepositoryImpl } from "../../../infrastructure/database/appservice/service.repository.impl";
 
 export class AdminServiceListUseCase {
@@ -29,7 +28,7 @@ export class AdminAddServiceUseCase {
 export class AdminChnageServiceStatusUseCase {
     constructor(private seriveRepository: ServiceRepositoryImpl) { }
 
-    async execute(serviceId: string, status: boolean): Promise<{ success: boolean, message: string, updatedService: UpdateServiceBlockProps }> {
+    async execute(serviceId: string, status: boolean): Promise<{ success: boolean, message: string, updatedService: ServicesProps }> {
         if(!serviceId || status === null) throw new Error("Invalid request.");
         const updatedService = await this.seriveRepository.updateServiceBlockStatus(new Types.ObjectId(serviceId), status);
         if (!updatedService) throw new Error("Service status changing error.");

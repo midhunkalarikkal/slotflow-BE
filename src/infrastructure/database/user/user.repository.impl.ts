@@ -24,7 +24,6 @@ export class UserRepositoryImpl implements IUserRepository {
 
     async createUser(user: CreateUserProps): Promise<User | null> {
         try {
-            if(!user) throw new Error("Invalid request.");
             const createdUser = await UserModel.create(user);
             return createdUser ? this.mapToEntity(createdUser) : null;
         } catch (error) {
@@ -34,7 +33,6 @@ export class UserRepositoryImpl implements IUserRepository {
 
     async verifyUser(verificationToken: string): Promise<User | null> {
         try {
-            if(!verificationToken) throw new Error("Invalid request.");
             const user = await UserModel.findOne({ verificationToken });
             return user ? this.mapToEntity(user) : null;
         } catch (error) {
@@ -44,7 +42,6 @@ export class UserRepositoryImpl implements IUserRepository {
 
     async updateUser(user: User): Promise<User | null> {
         try {
-            if(!user) throw new Error("Invalid request.");
             const updatedUser = await UserModel.findByIdAndUpdate(user._id, user, { new: true });
             return updatedUser ? this.mapToEntity(updatedUser) : null;
         } catch (error) {
@@ -54,7 +51,6 @@ export class UserRepositoryImpl implements IUserRepository {
 
     async findUserByEmail(email: string): Promise<User | null> {
         try {
-            if(!email) throw new Error("Invalid request.");
             const user = await UserModel.findOne({ email });
             return user ? this.mapToEntity(user) : null;
         } catch (error) {
@@ -71,12 +67,12 @@ export class UserRepositoryImpl implements IUserRepository {
         }
     }    
 
-    async updateUserStatus(userId: Types.ObjectId, status: boolean): Promise<Partial<User> | null> {
+    async updateUserStatus(userId: Types.ObjectId, status: boolean): Promise<FindAllUsersProps | null> {
         try {
             const updatedUser = await UserModel.findByIdAndUpdate(
                 userId,
                 { isBlocked: status },
-                { new: true, select: '_id isBlocked' }
+                { new: true, select: '_id username email isBlocked isEmailVerified' }
             );
             return updatedUser || null;
         } catch (error) {

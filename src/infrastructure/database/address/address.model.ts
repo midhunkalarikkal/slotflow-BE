@@ -12,6 +12,8 @@ export interface IAddress extends Document {
     state: string,
     country: string,
     googleMapLink: string,
+    createdAt: Date,
+    updatedAt: Date,
 }
 
 const addressSchema = new Schema<IAddress>({

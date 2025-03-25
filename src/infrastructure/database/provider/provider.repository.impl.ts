@@ -1,7 +1,7 @@
 import { Types } from "mongoose";
 import { IProvider, ProviderModel } from "./provider.model";
 import { Provider } from "../../../domain/entities/provider.entity";
-import { CreateProviderProps, FindAllProvidersProps, IProviderRepository } from '../../../domain/repositories/IProvider.repository';
+import { AdminApproveProviderResProps, AdminChangeProviderBlockStatusResProps, CreateProviderReqProps, FindAllProvidersResProps, IProviderRepository } from '../../../domain/repositories/IProvider.repository';
 
 
 export class ProviderRepositoryImpl implements IProviderRepository {
@@ -26,7 +26,7 @@ export class ProviderRepositoryImpl implements IProviderRepository {
         )
     }
 
-    async createProvider(provider: CreateProviderProps): Promise<Provider | null> {
+    async createProvider(provider: CreateProviderReqProps): Promise<Provider | null> {
         try {
             if(!provider) throw new Error("Invalid request.");
             const createdProvider = await ProviderModel.create(provider);
@@ -66,7 +66,7 @@ export class ProviderRepositoryImpl implements IProviderRepository {
         }
     }
 
-    async findAllProviders(): Promise<FindAllProvidersProps[] | null> {
+    async findAllProviders(): Promise<FindAllProvidersResProps[] | null> {
         try {
             const providers = await ProviderModel.find({}, { _id: 1, username: 1, email: 1, isBlocked: 1, isAdminVerified: 1 });
             return providers ? providers.map((provider) => this.mapToEntity(provider)) : null;
@@ -75,12 +75,13 @@ export class ProviderRepositoryImpl implements IProviderRepository {
         }
     }
 
-    async updateProviderVerificationStatus(providerId: Types.ObjectId, isAdminVerified: boolean): Promise<Partial<Provider> | null> {
+    async updateProviderAdminApprovingStatus(providerId: Types.ObjectId, isAdminVerified: boolean): Promise<AdminApproveProviderResProps | null> {
         try {
+            if(!providerId || isAdminVerified === null) throw new Error("Invalid request.");
             const updatedProvider = await ProviderModel.findByIdAndUpdate(
                 providerId,
                 { isAdminVerified: isAdminVerified },
-                { new: true, select: '_id isAdminVerified' }
+                { new: true, select: '_id username email isBlocked isAdminVerified' }
             );
             return updatedProvider ? this.mapToEntity(updatedProvider) : null;
         } catch (error) {
@@ -88,12 +89,13 @@ export class ProviderRepositoryImpl implements IProviderRepository {
         }
     }
 
-    async updateProviderStatus(providerId: Types.ObjectId, status: boolean): Promise<Partial<Provider> | null> {
+    async updateProviderBlockStatus(providerId: Types.ObjectId, status: boolean): Promise<AdminChangeProviderBlockStatusResProps | null> {
         try {
+            if(!providerId || status === null) throw new Error("Invalid request."); 
             const updatedProvider = await ProviderModel.findByIdAndUpdate(
                 providerId,
                 { isBlocked: status },
-                { new: true, select: '_id isBlocked' }
+                { new: true, select: '_id username email isBlocked isAdminVerified' }
             );
             return updatedProvider || null;
         } catch (error) {

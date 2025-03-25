@@ -1,7 +1,7 @@
 import { Types } from "mongoose";
 import { IPlan, PlanModel } from "./plan.model";
 import { Plan } from "../../../domain/entities/plan.entity";
-import { FindAllPlansProps, IPlanRepository } from "../../../domain/repositories/IPlan.repository";
+import { CreatePlanProps, FindAllPlansProps, IPlanRepository } from "../../../domain/repositories/IPlan.repository";
 
 export class PlanRepositoryImpl implements IPlanRepository {
     private mapToEntity(plan: IPlan): Plan {
@@ -20,8 +20,9 @@ export class PlanRepositoryImpl implements IPlanRepository {
         )
     }
 
-    async createPlan(plan: Plan): Promise<Plan | null> {
+    async createPlan(plan: CreatePlanProps): Promise<Plan | null> {
         try{
+            if(!plan) throw new Error("Invalid request.");
             const newPlan = await PlanModel.create(plan);
             return newPlan ? this.mapToEntity(newPlan) : null;
         }catch{

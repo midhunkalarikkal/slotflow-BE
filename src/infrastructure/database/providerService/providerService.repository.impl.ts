@@ -1,11 +1,12 @@
+import { Types } from "mongoose";
 import { IProviderService, ProviderServiceModel } from "./providerService.model";
 import { ProviderService } from "../../../domain/entities/providerService.entity";
-import { IProviderServiceRepository } from "../../../domain/repositories/IProviderService.repository";
-import { Types } from "mongoose";
+import { CreateProviderServiceReqProps, IProviderServiceRepository } from "../../../domain/repositories/IProviderService.repository";
 
 export class ProviderServiceRepositoryImpl implements IProviderServiceRepository {
     private mapToEntity(providerService: IProviderService): ProviderService {
         return new ProviderService(
+            providerService._id,
             providerService.providerId,
             providerService.serviceCategory,
             providerService.serviceName,
@@ -14,20 +15,22 @@ export class ProviderServiceRepositoryImpl implements IProviderServiceRepository
             providerService.providerAdhaar,
             providerService.providerExperience,
             providerService.providerCertificateUrl,
-            providerService._id,
+            providerService.createdAt,
+            providerService.updatedAt,
         );
     }
 
-    async createProviderService(providerService: ProviderService): Promise<ProviderService> {
+    async createProviderService(providerService: CreateProviderServiceReqProps): Promise<ProviderService | null> {
         try{
+            if(!providerService) throw new Error("Invalid request.");
             const newProviderService = await ProviderServiceModel.create(providerService);
-            return newProviderService;
+            return newProviderService ? this.mapToEntity(newProviderService) : null;
         }catch(error){
             throw new Error("Service details adding error.");
         }
     }
 
-    async findProviderServiceByProviderId(providerId: Types.ObjectId): Promise<Partial<ProviderService> | null> {
+    async findProviderServiceByProviderId(providerId: Types.ObjectId): Promise<ProviderService | null> {
         try{
             if(!providerId) throw new Error("Invalid request.");
             const service = await ProviderServiceModel.findOne({ providerId });

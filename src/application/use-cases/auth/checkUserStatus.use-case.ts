@@ -1,7 +1,6 @@
 import { Types } from "mongoose";
 import { ProviderRepositoryImpl } from "../../../infrastructure/database/provider/provider.repository.impl";
 import { UserRepositoryImpl } from "../../../infrastructure/database/user/user.repository.impl";
-import { JWTService } from "../../../infrastructure/security/jwt";
 
 export class CheckUserStatusUseCase {
     constructor(private userRepository: UserRepositoryImpl, private providerRepository: ProviderRepositoryImpl){}

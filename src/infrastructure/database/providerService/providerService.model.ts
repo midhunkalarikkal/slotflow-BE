@@ -10,6 +10,8 @@ export interface IProviderService extends Document {
     providerAdhaar: string;
     providerExperience: string;
     providerCertificateUrl: string;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 const ProviderServiceSchema = new Schema<IProviderService>({

@@ -2,6 +2,7 @@ import { Types } from "mongoose";
 
 export class Address {
     constructor(
+        public _id: Types.ObjectId,
         public userId: Types.ObjectId,
         public addressLine: string,
         public phone: string,
@@ -12,6 +13,7 @@ export class Address {
         public state: string,
         public country: string,
         public googleMapLink: string,
-        public _id?: Types.ObjectId,
+        public createdAt: Date,
+        public updatedAt: Date,
     ){}
 }
