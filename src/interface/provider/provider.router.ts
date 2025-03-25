@@ -14,5 +14,6 @@ router.post('/addServiceDetails', authMiddleware,upload.single('certificate'), p
 router.post('/addProviderServiceAvailability', authMiddleware, providerController.addServiceAvailability);
 
 router.get('/getProfileDetails', authMiddleware, providerController.getProfileDetails);
+router.get('/getAddress', authMiddleware, providerController.getAddress);
 
 export default router;  
