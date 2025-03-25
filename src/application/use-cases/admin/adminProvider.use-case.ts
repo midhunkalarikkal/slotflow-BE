@@ -9,6 +9,7 @@ import { AddressRepositoryImpl } from "../../../infrastructure/database/address/
 import { ProviderRepositoryImpl } from "../../../infrastructure/database/provider/provider.repository.impl";
 import { ProviderServiceRepositoryImpl } from "../../../infrastructure/database/providerService/providerService.repository.impl";
 import { ServiceAvailabilityRepositoryImpl } from "../../../infrastructure/database/serviceAvailability/serviceAvailability.repository.impl";
+import { OTPService } from "../../../infrastructure/services/otp.service";
 
 export class AdminProviderListUseCase {
     constructor(private providerRepository: ProviderRepositoryImpl) { }
@@ -33,6 +34,7 @@ export class AdminApproveProviderUseCase {
             if (!providerId) throw new Error("Invalid request");
             const updatedProvider = await this.providerRepository.updateProviderAdminApprovingStatus(new Types.ObjectId(providerId), true);
             if (!updatedProvider) throw new Error("Provider not found");
+            await OTPService.sendApprovalEmail(updatedProvider.email);
             return { success: true, message: "Provider approved successfully.", updatedProvider };
         } catch (error) {
             throw new Error("Unexpected error occurred, please try again.");
