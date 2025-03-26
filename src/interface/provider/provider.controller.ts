@@ -10,20 +10,22 @@ import { ProviderServiceRepositoryImpl } from "../../infrastructure/database/pro
 import { ProviderFetchAllAppServicesUseCase } from "../../application/use-cases/provider/providerFetchAllAppServices.use-case";
 import { ServiceAvailabilityRepositoryImpl } from "../../infrastructure/database/serviceAvailability/serviceAvailability.repository.impl";
 import { ProviderAddServiceAvailabilityUseCase } from "../../application/use-cases/provider/providerAddServiceAvailabilityDetails.use-case";
-import { ProviderFetchAddressUseCase, ProviderFetchProfileDetailsUseCase } from "../../application/use-cases/provider/providerProfile.use-case";
+import { ProviderFetchAddressUseCase, ProviderFetchProfileDetailsUseCase, ProviderFetchServiceAvailabilityUseCase, ProviderFetchServiceDetailsUseCase } from "../../application/use-cases/provider/providerProfile.use-case";
 
 const providerRepositoryImpl = new ProviderRepositoryImpl();
 const addressRepositoryImpl = new AddressRepositoryImpl();
 const serviceRepositoryImpl = new ServiceRepositoryImpl();
 const serviceAvailabilityRepositoryImpl = new ServiceAvailabilityRepositoryImpl();
-
 const providerServiceRepositoryImpl = new ProviderServiceRepositoryImpl();
+
 const providerAddAddressUseCase = new ProviderAddAddressUseCase(providerRepositoryImpl, addressRepositoryImpl);
 const providerFetchAllServicesUseCase = new ProviderFetchAllAppServicesUseCase(serviceRepositoryImpl);
 const providerAddServiceDetailsUseCase = new ProviderAddServiceDetailsUseCase(providerRepositoryImpl, providerServiceRepositoryImpl, s3Client);
 const providerAddServiceAvailabilityUseCase = new ProviderAddServiceAvailabilityUseCase(providerRepositoryImpl, serviceAvailabilityRepositoryImpl);
 const providerFetchProfileDetailsUseCase = new ProviderFetchProfileDetailsUseCase(providerRepositoryImpl);
 const providerFetchAddressUseCase = new ProviderFetchAddressUseCase(addressRepositoryImpl);
+const providerFetchServiceDetailsUseCase = new ProviderFetchServiceDetailsUseCase(providerServiceRepositoryImpl);
+const providerFetchServiceAvailabilityUseCase = new ProviderFetchServiceAvailabilityUseCase(serviceAvailabilityRepositoryImpl);
 
 class ProviderController {
     constructor(
@@ -33,6 +35,8 @@ class ProviderController {
         private providerAddServiceAvailabilityUseCase: ProviderAddServiceAvailabilityUseCase,
         private providerFetchProfileDetailsUseCase: ProviderFetchProfileDetailsUseCase,
         private providerFetchAddressUseCase: ProviderFetchAddressUseCase,
+        private providerFetchServiceDetailsUseCase: ProviderFetchServiceDetailsUseCase,
+        private providerFetchServiceAvailabilityUseCase: ProviderFetchServiceAvailabilityUseCase,
     ) {
         this.addAddress = this.addAddress.bind(this);
         this.getAllServices = this.getAllServices.bind(this);
@@ -40,6 +44,8 @@ class ProviderController {
         this.addServiceAvailability = this.addServiceAvailability.bind(this);
         this.getProfileDetails = this.getProfileDetails.bind(this);
         this.getAddress = this.getAddress.bind(this);
+        this.getServiceDetails = this.getServiceDetails.bind(this);
+        this.getServiceAAvailability = this.getServiceAAvailability.bind(this);
     }
 
     async addAddress(req: Request, res: Response) {
@@ -109,7 +115,29 @@ class ProviderController {
             HandleError.handle(error,res);
         }
     }
+
+    async getServiceDetails(req: Request, res: Response) {
+        try{
+            const providerId = req.user.userOrProviderId;
+            if(!providerId) throw new Error("Invalid request.");
+            const result = await this.providerFetchServiceDetailsUseCase.execute(providerId);
+            res.status(200).json(result);
+        }catch(error){
+            HandleError.handle(error,res);
+        }
+    }
+
+    async getServiceAAvailability(req: Request, res: Response) {
+        try{
+            const providerId = req.user.userOrProviderId;
+            if(!providerId) throw new Error("Invalid request.");
+            const result = await this.providerFetchServiceAvailabilityUseCase.execute(providerId);
+            res.status(200).json(result);
+        }catch(error){
+            HandleError.handle(error,res);
+        }
+    }
 }
 
-const providerController = new ProviderController(providerAddAddressUseCase, providerFetchAllServicesUseCase, providerAddServiceDetailsUseCase, providerAddServiceAvailabilityUseCase, providerFetchProfileDetailsUseCase, providerFetchAddressUseCase);
+const providerController = new ProviderController(providerAddAddressUseCase, providerFetchAllServicesUseCase, providerAddServiceDetailsUseCase, providerAddServiceAvailabilityUseCase, providerFetchProfileDetailsUseCase, providerFetchAddressUseCase, providerFetchServiceDetailsUseCase, providerFetchServiceAvailabilityUseCase);
 export { providerController };

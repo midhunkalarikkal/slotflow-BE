@@ -11,6 +11,9 @@ import { ProviderServiceRepositoryImpl } from "../../../infrastructure/database/
 import { ServiceAvailabilityRepositoryImpl } from "../../../infrastructure/database/serviceAvailability/serviceAvailability.repository.impl";
 import { OTPService } from "../../../infrastructure/services/otp.service";
 
+
+type AdminFetchProviderServiceAvailabilityResPros = Pick<ServiceAvailability, "availability">;
+
 export class AdminProviderListUseCase {
     constructor(private providerRepository: ProviderRepositoryImpl) { }
 
@@ -106,7 +109,7 @@ export class AdminFetchProviderServiceUseCase {
 export class AdminfetchProviderServiceAvailabilityUseCase {
     constructor(private serviceAvailabilityRepository: ServiceAvailabilityRepositoryImpl){ }
 
-    async execute(providerId: string): Promise<{success: boolean, message: string, availability: Pick<ServiceAvailability, "availability"> | null}> {
+    async execute(providerId: string): Promise<{success: boolean, message: string, availability: AdminFetchProviderServiceAvailabilityResPros | null}> {
             if(!providerId) throw new Error("Invalid request.");
             const availability = await this.serviceAvailabilityRepository.findServiceAvailabilityByProviderId(new Types.ObjectId(providerId));
             if(availability == null) return { success: true, message: "Service availability fetched successfully.", availability : null}

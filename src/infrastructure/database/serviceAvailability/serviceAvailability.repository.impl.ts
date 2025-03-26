@@ -22,14 +22,12 @@ export class ServiceAvailabilityRepositoryImpl implements IServiceAvailabilityRe
             const newServiceAvailability = await ServiceAvailabilityModel.create(serviceAvailability);
             return this.mapToEntity(newServiceAvailability);
         } catch (error) {
-            console.log("error : ",error);
             throw new Error("Service Availability adding failed.");
         }
     }
 
     async findServiceAvailabilityByProviderId(providerId: Types.ObjectId): Promise<ServiceAvailability | null> {
         try{
-            if(!providerId) throw new Error("Invalid request.");
             const availability = await ServiceAvailabilityModel.findOne({providerId});
             return availability ? this.mapToEntity(availability) : null;
         }catch(error){

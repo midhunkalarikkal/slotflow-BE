@@ -15,5 +15,7 @@ router.post('/addProviderServiceAvailability', authMiddleware, providerControlle
 
 router.get('/getProfileDetails', authMiddleware, providerController.getProfileDetails);
 router.get('/getAddress', authMiddleware, providerController.getAddress);
+router.get('/getServiceDetails', authMiddleware, providerController.getServiceDetails);
+router.get('/getServiceAAvailability', authMiddleware, providerController.getServiceAAvailability)
 
 export default router;  
