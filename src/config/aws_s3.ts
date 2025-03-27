@@ -18,7 +18,7 @@ if (aws_s3Config.region && aws_s3Config.accessKeyId && aws_s3Config.secretAccess
 
 export { s3Client };
 
-export async function generateSignedUrl(key: string, expires: number = 300): Promise<string> {
+export async function generateSignedUrl(key: string, expires: number = 172800): Promise<string> {
   const command = new GetObjectCommand({
     Bucket: aws_s3Config.bucketName,
     Key: key

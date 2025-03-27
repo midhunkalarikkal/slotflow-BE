@@ -1,7 +1,7 @@
 import { Types } from "mongoose";
 import { IProvider, ProviderModel } from "./provider.model";
 import { Provider } from "../../../domain/entities/provider.entity";
-import { AdminApproveProviderResProps, AdminChangeProviderBlockStatusResProps, CreateProviderReqProps, FindAllProvidersResProps, IProviderRepository } from '../../../domain/repositories/IProvider.repository';
+import {  CreateProviderReqProps, FindAllProvidersResProps, IProviderRepository } from '../../../domain/repositories/IProvider.repository';
 
 
 export class ProviderRepositoryImpl implements IProviderRepository {
@@ -75,43 +75,6 @@ export class ProviderRepositoryImpl implements IProviderRepository {
         }
     }
 
-    async updateProviderAdminApprovingStatus(providerId: Types.ObjectId, isAdminVerified: boolean): Promise<AdminApproveProviderResProps | null> {
-        try {
-            if(!providerId || isAdminVerified === null) throw new Error("Invalid request.");
-            const updatedProvider = await ProviderModel.findByIdAndUpdate(
-                providerId,
-                { isAdminVerified: isAdminVerified },
-                { new: true, select: '_id username email isBlocked isAdminVerified' }
-            );
-            return updatedProvider ? this.mapToEntity(updatedProvider) : null;
-        } catch (error) {
-            throw new Error("Unexpected error, please try again.");
-        }
-    }
-
-    async updateProviderBlockStatus(providerId: Types.ObjectId, status: boolean): Promise<AdminChangeProviderBlockStatusResProps | null> {
-        try {
-            if(!providerId || status === null) throw new Error("Invalid request."); 
-            const updatedProvider = await ProviderModel.findByIdAndUpdate(
-                providerId,
-                { isBlocked: status },
-                { new: true, select: '_id username email isBlocked isAdminVerified' }
-            );
-            return updatedProvider || null;
-        } catch (error) {
-            throw new Error("Unexpected error, please try again.");
-        }
-    }
-
-    async checkProviderStatus(providerId: Types.ObjectId): Promise<Partial<Provider> | null> {
-        try{
-            const provider = await ProviderModel.findById(providerId);
-            return provider ? provider : null;
-        }catch(error){
-            throw new Error("Status checking error.");
-        }
-    }
-
     async findProviderById(providerId: Types.ObjectId): Promise<Provider | null> {
         try{
             const provider = await ProviderModel.findById(providerId)
@@ -120,6 +83,5 @@ export class ProviderRepositoryImpl implements IProviderRepository {
             throw new Error('Provider finding error.');
         }
     }
-
     
 }

@@ -15,7 +15,7 @@ export class CheckUserStatusUseCase {
                 return { status: 200, success: true, message: "Your account is active." };
             }
         } else if (role === "PROVIDER") {
-            const provider = await this.providerRepository.checkProviderStatus(new Types.ObjectId(id));
+            const provider = await this.providerRepository.findProviderById(new Types.ObjectId(id));
             if (provider?.isBlocked) {
                 return { status: 403, success: false, message: "Your account has been blocked." };
             } else {
