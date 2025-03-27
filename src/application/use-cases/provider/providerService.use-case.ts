@@ -5,6 +5,11 @@ import { aws_s3Config } from '../../../config/env';
 import { Validator } from '../../../infrastructure/validator/validator';
 import { ProviderRepositoryImpl } from '../../../infrastructure/database/provider/provider.repository.impl';
 import { ProviderServiceRepositoryImpl } from '../../../infrastructure/database/providerService/providerService.repository.impl';
+import { extractS3Key } from '../../../infrastructure/helpers/helper';
+import { generateSignedUrl } from '../../../config/aws_s3';
+import { ProviderService } from '../../../domain/entities/providerService.entity';
+
+type ProviderFetchServiceDetailsResProps = Pick<ProviderService, "_id" | "serviceCategory" | "serviceName" | "serviceDescription" | "servicePrice" | "providerAdhaar" | "providerExperience" | "providerCertificateUrl">;
 
 export class ProviderAddServiceDetailsUseCase {
     
@@ -58,5 +63,25 @@ export class ProviderAddServiceDetailsUseCase {
             console.log("error : ",error);
             throw new Error('Failed to save service details.')
         }
+    }
+}
+
+
+export class ProviderFetchServiceDetailsUseCase {
+    constructor(private provderServiceRepository: ProviderServiceRepositoryImpl) { }
+
+    async execute(providerId: string): Promise<{ success: boolean, message: string, service: ProviderFetchServiceDetailsResProps }> {
+        if (!providerId) throw new Error("Invalid request.");
+
+        const service = await this.provderServiceRepository.findProviderServiceByProviderId(new Types.ObjectId(providerId));
+        if (!service) throw new Error("Provider service fetching error.");
+
+        const s3Key = await extractS3Key(service.providerCertificateUrl);
+        const signedUrl = await generateSignedUrl(s3Key);
+        service.providerCertificateUrl = signedUrl;
+        
+        const { createdAt, updatedAt, ...rest } = service;
+        
+        return { success: true, message: "Provider service details fetched", service: rest };
     }
 }

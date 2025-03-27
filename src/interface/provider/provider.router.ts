@@ -1,22 +1,26 @@
 import multer from 'multer';
 import { Router } from 'express';
-import { providerController } from './provider.controller';
 import { authMiddleware } from '../middleware/auth.middleware';
+import { providerProfileController } from './providerProfile.controller';
+import { provideAddressController } from './providerAddress.controller';
+import { providerServiceController } from './providerService.controller';
+import { providerAppServiceController } from './providerAppService.controller';
+import { providerServiceAvailabilityController } from './providerServiceAvailability.controller'
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
 const router = Router();
 
-router.post('/addAddress',authMiddleware, providerController.addAddress);
-router.get('/fetchAllServices', authMiddleware, providerController.getAllServices);
-router.post('/addServiceDetails', authMiddleware,upload.single('certificate'), providerController.addServiceDetails);
-router.post('/addProviderServiceAvailability', authMiddleware, providerController.addServiceAvailability);
+router.post('/addAddress',authMiddleware, provideAddressController.addAddress);
+router.get('/fetchAllAppServices', authMiddleware, providerAppServiceController.getAllAppServices);
+router.post('/addServiceDetails', authMiddleware,upload.single('certificate'), providerServiceController.addServiceDetails);
+router.post('/addProviderServiceAvailability', authMiddleware, providerServiceAvailabilityController.addServiceAvailability);
 
-router.get('/getProfileDetails', authMiddleware, providerController.getProfileDetails);
-router.get('/getAddress', authMiddleware, providerController.getAddress);
-router.get('/getServiceDetails', authMiddleware, providerController.getServiceDetails);
-router.get('/getServiceAAvailability', authMiddleware, providerController.getServiceAAvailability);
-router.post('/updateProfileImage', authMiddleware,upload.single('profileImage'), providerController.updateProfileImage);
+router.get('/getProfileDetails', authMiddleware, providerProfileController.getProfileDetails);
+router.get('/getAddress', authMiddleware, provideAddressController.getAddress);
+router.get('/getServiceDetails', authMiddleware, providerServiceController.getServiceDetails);
+router.get('/getServiceAvailability', authMiddleware, providerServiceAvailabilityController.getServiceAvailability);
+router.post('/updateProfileImage', authMiddleware,upload.single('profileImage'), providerProfileController.updateProfileImage);
 
 export default router;  

@@ -2,7 +2,9 @@ import { Types } from "mongoose";
 import { Validator } from "../../../infrastructure/validator/validator";
 import { ProviderRepositoryImpl } from "../../../infrastructure/database/provider/provider.repository.impl";
 import { ServiceAvailabilityRepositoryImpl } from "../../../infrastructure/database/serviceAvailability/serviceAvailability.repository.impl";
-import { Availability, FontendAvailability } from "../../../domain/entities/serviceAvailability.entity";
+import { Availability, FontendAvailability, ServiceAvailability } from "../../../domain/entities/serviceAvailability.entity";
+
+type ProviderFetchServiceAvailabilityResProps = Pick<ServiceAvailability, "_id" | "availability">;
 
 export class ProviderAddServiceAvailabilityUseCase {
     constructor(
@@ -50,5 +52,18 @@ export class ProviderAddServiceAvailabilityUseCase {
         }
 
         return { success: true, message: "Service availability added successfuly." };
+    }
+}
+
+
+export class ProviderFetchServiceAvailabilityUseCase {
+    constructor(private serviceAvailabilityRepository: ServiceAvailabilityRepositoryImpl) { }
+
+    async execute(providerId: string): Promise<{ success: boolean, message: string, availability: ProviderFetchServiceAvailabilityResProps }> {
+        if (!providerId) throw new Error("Invalid request.");
+        const availability = await this.serviceAvailabilityRepository.findServiceAvailabilityByProviderId(new Types.ObjectId(providerId));
+        if (!availability) throw new Error("Provider service availability fetching error.");
+        const { providerId: pId, createdAt, updatedAt, ...rest } = availability;
+        return { success: true, message: "Provider service availability fetched.", availability: rest };
     }
 }

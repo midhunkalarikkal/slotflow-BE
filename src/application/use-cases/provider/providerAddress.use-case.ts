@@ -1,7 +1,10 @@
 import { Types } from "mongoose";
+import { Address } from "../../../domain/entities/address.entity";
 import { Validator } from "../../../infrastructure/validator/validator";
 import { AddressRepositoryImpl } from "../../../infrastructure/database/address/address.repository.impl";
 import { ProviderRepositoryImpl } from "../../../infrastructure/database/provider/provider.repository.impl";
+
+type ProviderFetchAddressResProps = Pick<Address, "_id" | "addressLine" | "phone" | "place" | "city" | "district" | "pincode" | "state" | "country" | "googleMapLink">;
 
 export class ProviderAddAddressUseCase {
     constructor(
@@ -35,5 +38,18 @@ export class ProviderAddAddressUseCase {
         }
 
         return {success: true, message: "Address added successfully" };
+    }
+}
+
+
+export class ProviderFetchAddressUseCase {
+    constructor(private addressRepository: AddressRepositoryImpl) { }
+
+    async execute(providerId: string): Promise<{ success: boolean, message: string, address: ProviderFetchAddressResProps }> {
+        if (!providerId) throw new Error("Invalid request.");
+        const address = await this.addressRepository.findAddressByUserId(new Types.ObjectId(providerId));
+        if (!address) throw new Error("Provider address fetching error.");
+        const { userId, createdAt, updatedAt, ...rest } = address;
+        return { success: true, message: "Provider address fetched.", address: rest };
     }
 }
