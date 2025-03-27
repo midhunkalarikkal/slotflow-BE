@@ -16,6 +16,7 @@ router.post('/addProviderServiceAvailability', authMiddleware, providerControlle
 router.get('/getProfileDetails', authMiddleware, providerController.getProfileDetails);
 router.get('/getAddress', authMiddleware, providerController.getAddress);
 router.get('/getServiceDetails', authMiddleware, providerController.getServiceDetails);
-router.get('/getServiceAAvailability', authMiddleware, providerController.getServiceAAvailability)
+router.get('/getServiceAAvailability', authMiddleware, providerController.getServiceAAvailability);
+router.post('/updateProfileImage', authMiddleware,upload.single('profileImage'), providerController.updateProfileImage);
 
 export default router;  

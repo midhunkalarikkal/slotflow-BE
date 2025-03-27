@@ -10,7 +10,7 @@ import { ProviderServiceRepositoryImpl } from "../../infrastructure/database/pro
 import { ProviderFetchAllAppServicesUseCase } from "../../application/use-cases/provider/providerFetchAllAppServices.use-case";
 import { ServiceAvailabilityRepositoryImpl } from "../../infrastructure/database/serviceAvailability/serviceAvailability.repository.impl";
 import { ProviderAddServiceAvailabilityUseCase } from "../../application/use-cases/provider/providerAddServiceAvailabilityDetails.use-case";
-import { ProviderFetchAddressUseCase, ProviderFetchProfileDetailsUseCase, ProviderFetchServiceAvailabilityUseCase, ProviderFetchServiceDetailsUseCase } from "../../application/use-cases/provider/providerProfile.use-case";
+import { ProviderFetchAddressUseCase, ProviderFetchProfileDetailsUseCase, ProviderFetchServiceAvailabilityUseCase, ProviderFetchServiceDetailsUseCase, ProviderUpdateProfileImageUseCase } from "../../application/use-cases/provider/providerProfile.use-case";
 
 const providerRepositoryImpl = new ProviderRepositoryImpl();
 const addressRepositoryImpl = new AddressRepositoryImpl();
@@ -26,6 +26,7 @@ const providerFetchProfileDetailsUseCase = new ProviderFetchProfileDetailsUseCas
 const providerFetchAddressUseCase = new ProviderFetchAddressUseCase(addressRepositoryImpl);
 const providerFetchServiceDetailsUseCase = new ProviderFetchServiceDetailsUseCase(providerServiceRepositoryImpl);
 const providerFetchServiceAvailabilityUseCase = new ProviderFetchServiceAvailabilityUseCase(serviceAvailabilityRepositoryImpl);
+const providerUpdateProfileImageUseCase = new ProviderUpdateProfileImageUseCase(providerRepositoryImpl,s3Client);
 
 class ProviderController {
     constructor(
@@ -37,6 +38,7 @@ class ProviderController {
         private providerFetchAddressUseCase: ProviderFetchAddressUseCase,
         private providerFetchServiceDetailsUseCase: ProviderFetchServiceDetailsUseCase,
         private providerFetchServiceAvailabilityUseCase: ProviderFetchServiceAvailabilityUseCase,
+        private providerUpdateProfileImageUseCase: ProviderUpdateProfileImageUseCase,
     ) {
         this.addAddress = this.addAddress.bind(this);
         this.getAllServices = this.getAllServices.bind(this);
@@ -46,6 +48,7 @@ class ProviderController {
         this.getAddress = this.getAddress.bind(this);
         this.getServiceDetails = this.getServiceDetails.bind(this);
         this.getServiceAAvailability = this.getServiceAAvailability.bind(this);
+        this.updateProfileImage = this.updateProfileImage.bind(this);
     }
 
     async addAddress(req: Request, res: Response) {
@@ -137,7 +140,19 @@ class ProviderController {
             HandleError.handle(error,res);
         }
     }
+
+    async updateProfileImage(req: Request, res: Response) {
+        try{
+            const providerId = req.user.userOrProviderId;
+            const file = req.file;
+            if(!providerId || !file) throw new Error("Invalid request.");
+            const result = await this.providerUpdateProfileImageUseCase.execute(providerId, file);
+            res.status(200).json(result);
+        }catch(error){
+            HandleError.handle(error,res);
+        }
+    }
 }
 
-const providerController = new ProviderController(providerAddAddressUseCase, providerFetchAllServicesUseCase, providerAddServiceDetailsUseCase, providerAddServiceAvailabilityUseCase, providerFetchProfileDetailsUseCase, providerFetchAddressUseCase, providerFetchServiceDetailsUseCase, providerFetchServiceAvailabilityUseCase);
+const providerController = new ProviderController(providerAddAddressUseCase, providerFetchAllServicesUseCase, providerAddServiceDetailsUseCase, providerAddServiceAvailabilityUseCase, providerFetchProfileDetailsUseCase, providerFetchAddressUseCase, providerFetchServiceDetailsUseCase, providerFetchServiceAvailabilityUseCase, providerUpdateProfileImageUseCase);
 export { providerController };
