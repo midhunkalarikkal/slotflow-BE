@@ -1,16 +1,17 @@
 import { Types } from "mongoose";
-import { Provider } from "../../../domain/entities/provider.entity";
-import { ProviderRepositoryImpl } from "../../../infrastructure/database/provider/provider.repository.impl";
-import { AddressRepositoryImpl } from "../../../infrastructure/database/address/address.repository.impl";
-import { Address } from "../../../domain/entities/address.entity";
-import { ProviderServiceRepositoryImpl } from "../../../infrastructure/database/providerService/providerService.repository.impl";
-import { ProviderService } from "../../../domain/entities/providerService.entity";
-import { generateSignedUrl } from "../../../config/aws_s3";
-import { ServiceAvailabilityRepositoryImpl } from "../../../infrastructure/database/serviceAvailability/serviceAvailability.repository.impl";
-import { ServiceAvailability } from "../../../domain/entities/serviceAvailability.entity";
-import { aws_s3Config } from "../../../config/env";
-import { Upload } from "@aws-sdk/lib-storage";
 import { S3Client } from "@aws-sdk/client-s3";
+import { Upload } from "@aws-sdk/lib-storage";
+import { aws_s3Config } from "../../../config/env";
+import { generateSignedUrl } from "../../../config/aws_s3";
+import { Address } from "../../../domain/entities/address.entity";
+import { Provider } from "../../../domain/entities/provider.entity";
+import { extractS3Key } from "../../../infrastructure/helpers/helper";
+import { ProviderService } from "../../../domain/entities/providerService.entity";
+import { ServiceAvailability } from "../../../domain/entities/serviceAvailability.entity";
+import { AddressRepositoryImpl } from "../../../infrastructure/database/address/address.repository.impl";
+import { ProviderRepositoryImpl } from "../../../infrastructure/database/provider/provider.repository.impl";
+import { ProviderServiceRepositoryImpl } from "../../../infrastructure/database/providerService/providerService.repository.impl";
+import { ServiceAvailabilityRepositoryImpl } from "../../../infrastructure/database/serviceAvailability/serviceAvailability.repository.impl";
 
 type ProviderFetchProfileDetailsResProps = Pick<Provider, "username" | "email" | "isAdminVerified" | "isBlocked" | "isEmailVerified" | "phone" | "profileImage" | "createdAt">;
 type ProviderFetchAddressResProps = Pick<Address, "_id" | "addressLine" | "phone" | "place" | "city" | "district" | "pincode" | "state" | "country" | "googleMapLink">;
@@ -50,12 +51,7 @@ export class ProviderFetchServiceDetailsUseCase {
         const service = await this.provderServiceRepository.findProviderServiceByProviderId(new Types.ObjectId(providerId));
         if (!service) throw new Error("Provider service fetching error.");
 
-        const providerCertifiacteUrl = service.providerCertificateUrl;
-        if (!providerCertifiacteUrl) throw new Error("Service details fetching error.");
-        const urlParts = providerCertifiacteUrl?.split('/');
-        if (!urlParts) throw new Error("UrlParts error.");
-        const s3Key = urlParts.slice(3).join('/');
-        if (!s3Key) throw new Error("Image retrieving.");
+        const s3Key = await extractS3Key(service.providerCertificateUrl);
         const signedUrl = await generateSignedUrl(s3Key);
         service.providerCertificateUrl = signedUrl;
         const { createdAt, updatedAt, ...rest } = service;
@@ -107,14 +103,10 @@ export class ProviderUpdateProfileImageUseCase {
             const updatedProvider = await this.providerRepository.updateProvider(provider);
             if (!updatedProvider) throw new Error("Profile image returning failed.");
 
-            const providerProfileImageUrl = updatedProvider.profileImage;
-            if (!providerProfileImageUrl) throw new Error("Profile image returning failed.");
-            const urlParts = providerProfileImageUrl?.split('/');
-            if (!urlParts) throw new Error("UrlParts error.");
-            const s3Key = urlParts.slice(3).join('/');
-            if (!s3Key) throw new Error("Image retrieving.");
+            const s3Key = await extractS3Key(updatedProvider.profileImage);
             const signedUrl = await generateSignedUrl(s3Key);
             return { success: true, message: "Profile Image updated successfully.", profileImage: signedUrl };
+
         } catch {
             throw new Error("Unexpected error occured while updating profile image.");
         }
