@@ -89,4 +89,12 @@ export class UserRepositoryImpl implements IUserRepository {
         }
     }
 
+    async findUserById(userId: Types.ObjectId): Promise<User | null> {
+        try{
+            const user = await UserModel.findById(userId);
+            return user ? this.mapToEntity(user) : null;
+        }catch(error){
+            throw new Error("User not found.");
+        }
+    }
 }

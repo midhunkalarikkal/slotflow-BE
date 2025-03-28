@@ -19,4 +19,6 @@ export interface IUserRepository {
   updateUserStatus(userId: Types.ObjectId, status: boolean): Promise<FindAllUsersProps | null>;
 
   checkUserStatus(userId: Types.ObjectId): Promise<Partial<User> | null>;
+
+  findUserById(userId: Types.ObjectId): Promise<User | null>;
 }

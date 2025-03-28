@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import express from 'express';
 import cookieParser from 'cookie-parser';
 import authRoutes from './interface/auth/auth.routes';
+import userRouter from './interface/user/user.routes';
 import adminRoutes from './interface/admin/admin.routes';
 import providerRouter from './interface/provider/provider.router';
 
@@ -26,5 +27,6 @@ app.use(cookieParser());
 app.use('/api/auth',authRoutes);
 app.use("/api/admin",adminRoutes);
 app.use('/api/provider',providerRouter);
+app.use('/api/user',userRouter);
 
 export default app;
