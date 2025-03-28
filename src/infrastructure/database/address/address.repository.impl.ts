@@ -33,9 +33,12 @@ export class AddressRepositoryImpl implements IAddressRepository {
 
     async findAddressByUserId(userId: Types.ObjectId): Promise<Address | null> {
         try{
+            console.log("Address fetching");
             const address = await AddressModel.findOne({ userId: userId });
+            console.log("address : ",address);
             return address ? this.mapToEntity(address) : null;
         }catch(error){
+            console.log("Address fetching implementation error", error);
             throw new Error("Address fetching error.");
         }
     }
