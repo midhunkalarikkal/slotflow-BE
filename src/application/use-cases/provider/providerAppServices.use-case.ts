@@ -4,8 +4,9 @@ import { ServiceRepositoryImpl } from '../../../infrastructure/database/appservi
 export class ProviderFetchAllAppServicesUseCase {
     constructor(private serviceRepository: ServiceRepositoryImpl) { }
 
-    async execute(): Promise<{ success: boolean; message: string; services?: Partial<Service>[] }> {
+    async execute(): Promise<{ success: boolean; message: string; services?: Partial<Service>[] | []}> {
         const services = await this.serviceRepository.findAllServices();
+        if(services === null) return { success: true, message: "No servicec found.", services: [] };
         if (!services) throw new Error("No services found.");
         const filteredServices = services.map(service => ({
             serviceName: service.serviceName,

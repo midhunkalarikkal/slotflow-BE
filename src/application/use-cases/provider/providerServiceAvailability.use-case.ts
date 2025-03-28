@@ -19,7 +19,6 @@ export class ProviderAddServiceAvailabilityUseCase {
         const provider = await this.providerRepository.findProviderById(new Types.ObjectId(providerId));
         if(!provider) throw new Error("Please logout and try again.");
 
-        console.log("Before validation")
         availability.map((data) => {
             Validator.validateDay(data.day);
             Validator.validateDuration(data.duration);
@@ -27,9 +26,6 @@ export class ProviderAddServiceAvailabilityUseCase {
             Validator.validateEndTime(data.endTime, data.startTime);
             Validator.validateModes(data.modes);
         })
-        console.log("after validation")
-        console.log("ProviderId : ",providerId);
-        console.log("Availability : ",availability);
 
         const newAvailability: Availability[] = availability.map((avail: FontendAvailability) => ({
             ...avail,
@@ -38,16 +34,13 @@ export class ProviderAddServiceAvailabilityUseCase {
             }))
         }));
 
-        console.log("new availability : ",newAvailability);
 
         const serviceAvailability = await this.serviceAvailabilityRepository.createServiceAvailability(convertedProviderId, newAvailability)
         if(!serviceAvailability) throw new Error("Service availability adding failed.");
 
         if (provider && serviceAvailability && serviceAvailability._id) {
-            console.log("Service availability :",serviceAvailability);
             provider.serviceAvailabilityId = serviceAvailability._id;
             const updatedProvider = await this.providerRepository.updateProvider(provider);
-            console.log("provider : ",provider);
             if (!updatedProvider) throw new Error("Failed to update provider with service availability ID.");
         }
 
@@ -59,9 +52,10 @@ export class ProviderAddServiceAvailabilityUseCase {
 export class ProviderFetchServiceAvailabilityUseCase {
     constructor(private serviceAvailabilityRepository: ServiceAvailabilityRepositoryImpl) { }
 
-    async execute(providerId: string): Promise<{ success: boolean, message: string, availability: ProviderFetchServiceAvailabilityResProps }> {
+    async execute(providerId: string): Promise<{ success: boolean, message: string, availability: ProviderFetchServiceAvailabilityResProps | null}> {
         if (!providerId) throw new Error("Invalid request.");
         const availability = await this.serviceAvailabilityRepository.findServiceAvailabilityByProviderId(new Types.ObjectId(providerId));
+        if(availability === null) return { success: true, message: "Provider service availability not yet added.", availability: null };
         if (!availability) throw new Error("Provider service availability fetching error.");
         const { providerId: pId, createdAt, updatedAt, ...rest } = availability;
         return { success: true, message: "Provider service availability fetched.", availability: rest };

@@ -70,18 +70,19 @@ export class ProviderAddServiceDetailsUseCase {
 export class ProviderFetchServiceDetailsUseCase {
     constructor(private provderServiceRepository: ProviderServiceRepositoryImpl) { }
 
-    async execute(providerId: string): Promise<{ success: boolean, message: string, service: ProviderFetchServiceDetailsResProps }> {
+    async execute(providerId: string): Promise<{ success: boolean, message: string, service: ProviderFetchServiceDetailsResProps | null}> {
         if (!providerId) throw new Error("Invalid request.");
 
         const service = await this.provderServiceRepository.findProviderServiceByProviderId(new Types.ObjectId(providerId));
+        if(service === null) return { success: true, message: "Provider service details not yet addedd", service: null };
         if (!service) throw new Error("Provider service fetching error.");
 
         const s3Key = await extractS3Key(service.providerCertificateUrl);
         const signedUrl = await generateSignedUrl(s3Key);
         service.providerCertificateUrl = signedUrl;
         
-        const { createdAt, updatedAt, ...rest } = service;
+        const { createdAt, updatedAt, ...data } = service;
         
-        return { success: true, message: "Provider service details fetched", service: rest };
+        return { success: true, message: "Provider service details fetched", service: data };
     }
 }

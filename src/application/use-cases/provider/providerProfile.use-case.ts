@@ -12,9 +12,10 @@ type ProviderFetchProfileDetailsResProps = Pick<Provider, "username" | "email" |
 export class ProviderFetchProfileDetailsUseCase {
     constructor(private providerRepositoryImpl: ProviderRepositoryImpl) { }
 
-    async execute(providerId: string): Promise<{ success: boolean, message: string, profileDetails: ProviderFetchProfileDetailsResProps }> {
+    async execute(providerId: string): Promise<{ success: boolean, message: string, profileDetails: ProviderFetchProfileDetailsResProps | null }> {
         if (!providerId) throw new Error("Invalid request.");
         const provider = await this.providerRepositoryImpl.findProviderById(new Types.ObjectId(providerId));
+        if(provider === null) return { success: true, message: "Provider prfile not addedd.", profileDetails: null };
         if (!provider) throw new Error("Provider profile fetching error.");
         const { _id, password, addressId, serviceId, subscription, updatedAt, profileImage,  ...data } = provider;
         return { success: true, message: "Provider prfile detailed fetched.", profileDetails: data };
