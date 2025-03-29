@@ -29,21 +29,12 @@ export class PlanRepositoryImpl implements IPlanRepository {
         }
     }
 
-    async updatePlan(planId: Types.ObjectId, updateData: Partial<Plan>): Promise<Partial<Plan> | null> {
+    async updatePlan(planId: Types.ObjectId, plan: Plan): Promise<Plan | null> {
         try{
-            const updatedPlan = await PlanModel.findByIdAndUpdate(planId,updateData,{ new: true });
-            return updatedPlan || null;
+            const updatedPlan = await PlanModel.findByIdAndUpdate(planId, plan, { new: true });
+            return updatedPlan ? this.mapToEntity(updatedPlan) : null;
         }catch{
             throw new Error("Fialed to updated plan.");
-        }
-    }
-
-    async changePlanStatus(planId: Types.ObjectId, status: boolean): Promise<Partial<Plan> | null> {
-        try{
-            const updatedPlan = await PlanModel.findByIdAndUpdate(planId, { isBlocked: status },{ new: true, select: '_id isBlocked'});
-            return updatedPlan || null;
-        }catch{
-            throw new Error("Failed to update plan status.");
         }
     }
 

@@ -9,10 +9,8 @@ export type findPlanByNameOrPriceProps = Pick<Plan, "planName" | "price" >;
 export interface IPlanRepository {
     createPlan(plan: CreatePlanProps): Promise<Plan | null>;
 
-    updatePlan(planId: Types.ObjectId, updateData: Partial<Plan>): Promise<Partial<Plan> | null>;
+    updatePlan(planId: Types.ObjectId, plna: Plan): Promise<Plan | null>;
     
-    changePlanStatus(planId: Types.ObjectId, status: boolean): Promise<Partial<Plan> | null>;
-
     findPlanById(planId: Types.ObjectId): Promise<Plan | null>;
 
     findAllPlans(): Promise<FindAllPlansProps[] | null>;
