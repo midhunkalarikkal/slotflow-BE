@@ -5,7 +5,8 @@ import { providerProfileController } from './providerProfile.controller';
 import { provideAddressController } from './providerAddress.controller';
 import { providerServiceController } from './providerService.controller';
 import { providerAppServiceController } from './providerAppService.controller';
-import { providerServiceAvailabilityController } from './providerServiceAvailability.controller'
+import { providerServiceAvailabilityController } from './providerServiceAvailability.controller';
+import { providerPlanController } from './providerPlan.controller';
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
@@ -22,5 +23,5 @@ router.get('/getAddress', authMiddleware, provideAddressController.getAddress);
 router.get('/getServiceDetails', authMiddleware, providerServiceController.getServiceDetails);
 router.get('/getServiceAvailability', authMiddleware, providerServiceAvailabilityController.getServiceAvailability);
 router.post('/updateProfileImage', authMiddleware,upload.single('profileImage'), providerProfileController.updateProfileImage);
-
+router.get('/getPlans', authMiddleware, providerPlanController.fetchAllPlans);
 export default router;  

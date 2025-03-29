@@ -1,7 +1,7 @@
 import { Types } from "mongoose";
 import { IPlan, PlanModel } from "./plan.model";
 import { Plan } from "../../../domain/entities/plan.entity";
-import { CreatePlanProps, FindAllPlansProps, findPlanByNameOrPriceProps, IPlanRepository } from "../../../domain/repositories/IPlan.repository";
+import { CreatePlanProps, findAllPlansForDisplayResProps, FindAllPlansProps, findPlanByNameOrPriceProps, IPlanRepository } from "../../../domain/repositories/IPlan.repository";
 
 export class PlanRepositoryImpl implements IPlanRepository {
     private mapToEntity(plan: IPlan): Plan {
@@ -68,6 +68,15 @@ export class PlanRepositoryImpl implements IPlanRepository {
         }catch(error){
             console.log("error : ",error);
             throw new Error("Plan searching error.");
+        }
+    }
+
+    async findAllPlansForDisplay(): Promise<findAllPlansForDisplayResProps[] | null> {
+        try{
+            const plans = await PlanModel.find({},{_id:1, planName: 1, price: 1, features: 1, description: 1});
+            return plans ? plans.map((plan) => this.mapToEntity(plan)) : null;
+        }catch(error){
+            throw new Error("Plans fetching error.");
         }
     }
 }
