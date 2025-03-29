@@ -1,5 +1,5 @@
 import { Types } from "mongoose";
-import { BillingCycle, Plan } from "../../../domain/entities/plan.entity";
+import { Plan } from "../../../domain/entities/plan.entity";
 import { FindAllPlansProps } from "../../../domain/repositories/IPlan.repository";
 import { PlanRepositoryImpl } from "../../../infrastructure/database/plan/plan.repository.impl";
 
@@ -19,12 +19,12 @@ export class AdminPlanListUseCase {
 export class AdminCreatePlanUseCase {
     constructor(private planRepository: PlanRepositoryImpl) { }
 
-    async execute(planName: string, description: string, price: number, features: [string], billingCycle: BillingCycle, maxBookingPerMonth: number, adVisibility: boolean): Promise<{ success: boolean, message: string, plan: AddPlanStatusResProps }> {
-        if (!planName || !description || price < 0 || !features || !billingCycle || maxBookingPerMonth < 0) throw new Error("Invalid plan data.");
+    async execute(planName: string, description: string, price: number, features: [string], maxBookingPerMonth: number, adVisibility: boolean): Promise<{ success: boolean, message: string, plan: AddPlanStatusResProps }> {
+        if (!planName || !description || price < 0 || !features || maxBookingPerMonth < 0) throw new Error("Invalid plan data.");
         const existingPlan = await this.planRepository.findPlanByNameOrPrice({planName, price});
         const responseText: string = existingPlan?.planName === planName ? "name" : "price"
         if(existingPlan) throw new Error(`Plan with same ${responseText} already exists.`);
-        const newPlan = await this.planRepository.createPlan({ planName, description, price, features, billingCycle, maxBookingPerMonth, adVisibility, isBlocked: false,});
+        const newPlan = await this.planRepository.createPlan({ planName, description, price, features, maxBookingPerMonth, adVisibility, isBlocked: false,});
         if(!newPlan) throw new Error("Plan adding failed, please try again.");
         const data = {
             _id: newPlan._id,

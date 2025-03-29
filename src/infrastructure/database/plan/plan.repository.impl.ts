@@ -11,7 +11,6 @@ export class PlanRepositoryImpl implements IPlanRepository {
             plan.description,
             plan.price,
             plan.features,
-            plan.billingCycle,
             plan.maxBookingPerMonth,
             plan.adVisibility,
             plan.isBlocked,

@@ -1,5 +1,4 @@
 import mongoose, { Document, Schema, Types } from "mongoose";
-import { BillingCycle } from "../../../domain/entities/plan.entity";
 
 export interface IPlan extends Document {
     _id: Types.ObjectId;
@@ -7,7 +6,6 @@ export interface IPlan extends Document {
     description: string
     price: number;
     features: string[];
-    billingCycle: BillingCycle;
     maxBookingPerMonth: number;
     adVisibility: boolean;
     isBlocked: boolean;
@@ -20,7 +18,6 @@ const PlanSchema = new Schema<IPlan>({
     description: { type: String, required: true },
     price: { type: Number, required: true, unique: true },
     features: { type: [String], required: true },
-    billingCycle: { type: String, enum: Object.values(BillingCycle), required: true },
     maxBookingPerMonth: { type: Number, required: true },
     adVisibility: { type: Boolean, default: false },
     isBlocked: { type: Boolean, default: false },      
