@@ -1,7 +1,7 @@
 import { Types } from "mongoose";
 import { IService, ServiceModel } from "./service.model";
 import { Service } from "../../../domain/entities/service.entity";
-import { ServicesProps, IServiceRepository } from "../../../domain/repositories/IService.repository";
+import { IServiceRepository, ServicesProps } from "../../../domain/repositories/IService.repository";
 
 export class ServiceRepositoryImpl implements IServiceRepository {
     private mapToEntity(service: IService): Service {
@@ -14,7 +14,7 @@ export class ServiceRepositoryImpl implements IServiceRepository {
         )
     }
 
-    async createService(service: String): Promise<ServicesProps | null> {
+    async createService(service: String): Promise<Service | null> {
         try {
             const createdService = await ServiceModel.create({ serviceName: service });
             return createdService ? this.mapToEntity(createdService) : null;
@@ -23,7 +23,7 @@ export class ServiceRepositoryImpl implements IServiceRepository {
         }
     }
     
-    async findByName(serviceName: string): Promise<ServicesProps | null> {
+    async findServiceByName(serviceName: string): Promise<Service | null> {
         try{
             if(!serviceName) throw new Error("Invalid request.");
             const existingService = await ServiceModel.findOne({ serviceName: serviceName });
@@ -42,12 +42,21 @@ export class ServiceRepositoryImpl implements IServiceRepository {
         }
     }
 
-    async updateServiceBlockStatus(serviceId: Types.ObjectId, status: boolean): Promise<ServicesProps | null> {
+    async findServiceById(serviceId: Types.ObjectId): Promise<Service | null> {
         try{
-            const updatedService = await ServiceModel.findByIdAndUpdate(serviceId, { isBlocked: status }, { new: true, select: '_id serviceName isBlocked' })
+            const service = await ServiceModel.findById(serviceId);
+            return service ? this.mapToEntity(service) : null;
+        }catch(error){
+            throw new Error("Service finding by id error.");
+        }
+    }
+
+    async updateService(serviceId: Types.ObjectId, service: Service): Promise<Service | null> {
+        try{
+            const updatedService = await ServiceModel.findOneAndUpdate(serviceId,service, { new: true });
             return updatedService ? this.mapToEntity(updatedService) : null;
         }catch(error){
-            throw new Error("Failed to update service status.");
+            throw new Error("Service updating error.");
         }
     }
 }
