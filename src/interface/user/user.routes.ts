@@ -13,4 +13,5 @@ router.get('/getProfileDetails', authMiddleware, userProfileController.getProfil
 router.post('/updateProfileImage', authMiddleware, upload.single("profileImage"), userProfileController.updateProfileImage);
 
 router.get('/getAddress', authMiddleware, userAddressController.getAddress);
+router.post('/addAddress', authMiddleware, userAddressController.addAddress);
 export default router;

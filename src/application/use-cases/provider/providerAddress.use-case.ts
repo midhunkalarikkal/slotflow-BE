@@ -34,7 +34,7 @@ export class ProviderAddAddressUseCase {
         if (provider && address && address._id) {
             provider.addressId = address._id;
             const updatedProvider = await this.providerRepository.updateProvider(provider);
-            if (!updatedProvider) throw new Error("Failed to update provider with address ID.");
+            if (!updatedProvider) throw new Error("Failed to update provider with address.");
         }
 
         return {success: true, message: "Address added successfully" };
