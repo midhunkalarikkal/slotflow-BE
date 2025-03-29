@@ -18,6 +18,8 @@ export class AdminCreatePlanUseCase {
 
     async execute(planName: string, description: string, price: number, features: [string], billingCycle: BillingCycle, maxBookingPerMonth: number, adVisibility: boolean): Promise<{ success: boolean, message: string, plan: Pick<Plan , "_id" | "planName" | "isBlocked" >}> {
         if (!planName || !description || price < 0 || !features || !billingCycle || maxBookingPerMonth < 0) throw new Error("Invalid plan data.");
+        const existingPan = await this.planRepository.findPlanByNameOrPrice({planName, price});
+        if(existingPan) throw new Error("Plan with same name already exists.");
         const newPlan = await this.planRepository.createPlan({ planName, description, price, features, billingCycle, maxBookingPerMonth, adVisibility, isBlocked: false,});
         if(!newPlan) throw new Error("Plan adding failed, please try again.");
         return { success: true, message: "Plan created successfully.", plan: { _id: newPlan._id, planName: newPlan.planName, isBlocked: newPlan.isBlocked, }};

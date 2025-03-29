@@ -3,6 +3,7 @@ import { Plan } from "../entities/plan.entity";
 
 export type CreatePlanProps = Pick<Plan,'planName' | 'description' | 'price' | 'features' | "billingCycle" | "maxBookingPerMonth" | "adVisibility" | "isBlocked">;
 export type FindAllPlansProps = Pick<Plan, "_id" | "planName" | "isBlocked">;
+export type findPlanByNameOrPriceProps = Pick<Plan, "planName" | "price" >;
 
 
 export interface IPlanRepository {
@@ -15,4 +16,7 @@ export interface IPlanRepository {
     findPlanById(planId: Types.ObjectId): Promise<Plan | null>;
 
     findAllPlans(): Promise<FindAllPlansProps[] | null>;
+
+    findPlanByNameOrPrice(plan: findPlanByNameOrPriceProps): Promise<Plan | null>;
+
 }

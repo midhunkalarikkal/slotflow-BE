@@ -1,7 +1,7 @@
 import { Types } from "mongoose";
 import { IPlan, PlanModel } from "./plan.model";
 import { Plan } from "../../../domain/entities/plan.entity";
-import { CreatePlanProps, FindAllPlansProps, IPlanRepository } from "../../../domain/repositories/IPlan.repository";
+import { CreatePlanProps, FindAllPlansProps, findPlanByNameOrPriceProps, IPlanRepository } from "../../../domain/repositories/IPlan.repository";
 
 export class PlanRepositoryImpl implements IPlanRepository {
     private mapToEntity(plan: IPlan): Plan {
@@ -22,17 +22,15 @@ export class PlanRepositoryImpl implements IPlanRepository {
 
     async createPlan(plan: CreatePlanProps): Promise<Plan | null> {
         try{
-            if(!plan) throw new Error("Invalid request.");
             const newPlan = await PlanModel.create(plan);
             return newPlan ? this.mapToEntity(newPlan) : null;
-        }catch{
+        }catch(error){
             throw new Error("Failed to create plan.")
         }
     }
 
     async updatePlan(planId: Types.ObjectId, updateData: Partial<Plan>): Promise<Partial<Plan> | null> {
         try{
-            if(!planId) throw new Error("Plan not found.");
             const updatedPlan = await PlanModel.findByIdAndUpdate(planId,updateData,{ new: true });
             return updatedPlan || null;
         }catch{
@@ -42,7 +40,6 @@ export class PlanRepositoryImpl implements IPlanRepository {
 
     async changePlanStatus(planId: Types.ObjectId, status: boolean): Promise<Partial<Plan> | null> {
         try{
-            if(!planId) throw new Error("No plan found.");
             const updatedPlan = await PlanModel.findByIdAndUpdate(planId, { isBlocked: status },{ new: true, select: '_id isBlocked'});
             return updatedPlan || null;
         }catch{
@@ -52,7 +49,6 @@ export class PlanRepositoryImpl implements IPlanRepository {
 
     async findPlanById(planId: Types.ObjectId): Promise<Plan | null> {
         try{
-            if(!planId) throw new Error("Plan not found.");
             const plan = await PlanModel.findById(planId);
             return plan || null;
         }catch{
@@ -66,6 +62,21 @@ export class PlanRepositoryImpl implements IPlanRepository {
             return plans ?  plans.map(plan => this.mapToEntity(plan)) : null;
         }catch{
             throw new Error("Failed to fetch all plans.");
+        }
+    }
+
+    async findPlanByNameOrPrice(plan: findPlanByNameOrPriceProps): Promise<Plan | null> {
+        try{
+            const existingPlan = await PlanModel.findOne({
+                $or: [
+                    {planName: plan.planName},
+                    {price: plan.price}
+                ]
+            });
+            return existingPlan ? this.mapToEntity(existingPlan) : null;
+        }catch(error){
+            console.log("error : ",error);
+            throw new Error("Plan searching error.");
         }
     }
 }
