@@ -13,7 +13,7 @@ export interface IProvider extends Document {
   addressId: Types.ObjectId;
   serviceId: Types.ObjectId;
   serviceAvailabilityId: Types.ObjectId;
-  subscription: [Types.ObjectId];
+  subscription: Types.ObjectId[];
   verificationToken: string;
   createdAt: Date;
   updatedAt: Date;
@@ -31,7 +31,7 @@ const ProviderSchema = new Schema<IProvider>({
   addressId: { type: Schema.Types.ObjectId, ref: "Address", default: null },
   serviceId: { type: Schema.Types.ObjectId, ref: "Service", default: null},
   serviceAvailabilityId: { type: Schema.Types.ObjectId, ref: "ServiceAvailability" },
-  subscription: { type: [Schema.Types.ObjectId], ref: "Subscription", default: null},
+  subscription: { type: [Schema.Types.ObjectId], ref: "Subscription", default: []},
   verificationToken: { type: String, default: null },
 }, {
   timestamps: true
