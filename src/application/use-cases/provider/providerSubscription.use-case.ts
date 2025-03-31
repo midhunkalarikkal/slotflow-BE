@@ -12,6 +12,7 @@ export class ProviderSubscribeToPlanUseCase {
     constructor(
         private planRepository: PlanRepositoryImpl,
         private providerRepository: ProviderRepositoryImpl,
+        private subscriptionRepository: SubscriptionRepositoryImpl,
     ) { }
 
     async execute(providerId: string, planId: string, duration: string): Promise<{ success: boolean, message: string, sessionId: string }> {
@@ -23,6 +24,20 @@ export class ProviderSubscribeToPlanUseCase {
 
         const plan = await this.planRepository.findPlanById(new Types.ObjectId(planId));
         if (!plan) throw new Error("Unexpected error, please try again after sometimes.");
+
+        const providerLastSubscriptionsId = provider.subscription.pop();
+        if(!providerLastSubscriptionsId) throw new Error("Subscription checking error.");
+
+        console.log("Provider last subscription id : ",providerLastSubscriptionsId);
+
+        const subscription = await this.subscriptionRepository.findSubscriptionById(providerLastSubscriptionsId);
+        if(subscription){
+            console.log("subscription : ",subscription);
+            console.log("subscription.endDate : ",subscription.endDate);
+            if(subscription.subscriptionStatus === "Active") throw new Error("Your subscription is on live.");
+            const isSubscriptionExpired = dayjs().isAfter(dayjs(subscription.endDate), "day");
+            if(!isSubscriptionExpired) throw new Error("Your subscription is on live.");
+        }
 
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ["card"],

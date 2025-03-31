@@ -11,7 +11,7 @@ const planRepositoryImpl = new PlanRepositoryImpl();
 const providerRepositoryImpl = new ProviderRepositoryImpl();
 const subscriptionRepositoryImpl = new SubscriptionRepositoryImpl();
 const paymentRepositoryImpl = new PaymentRepositoryImpl();
-const providerSubscribeToPlanUseCase = new ProviderSubscribeToPlanUseCase(planRepositoryImpl, providerRepositoryImpl);
+const providerSubscribeToPlanUseCase = new ProviderSubscribeToPlanUseCase(planRepositoryImpl, providerRepositoryImpl,subscriptionRepositoryImpl);
 const providerSaveSubscriptionUseCase = new ProviderSaveSubscriptionUseCase(providerRepositoryImpl, paymentRepositoryImpl, subscriptionRepositoryImpl);
 
 export class ProviderSubscriptionController {
