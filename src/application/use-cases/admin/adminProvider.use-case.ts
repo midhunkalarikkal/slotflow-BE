@@ -2,6 +2,7 @@ import { Types } from "mongoose";
 import { generateSignedUrl } from "../../../config/aws_s3";
 import { Address } from "../../../domain/entities/address.entity";
 import { Provider } from "../../../domain/entities/provider.entity";
+import { OTPService } from "../../../infrastructure/services/otp.service";
 import { ProviderService } from "../../../domain/entities/providerService.entity";
 import { FindAllProvidersResProps } from "../../../domain/repositories/IProvider.repository";
 import { ServiceAvailability } from "../../../domain/entities/serviceAvailability.entity";
@@ -9,12 +10,11 @@ import { AddressRepositoryImpl } from "../../../infrastructure/database/address/
 import { ProviderRepositoryImpl } from "../../../infrastructure/database/provider/provider.repository.impl";
 import { ProviderServiceRepositoryImpl } from "../../../infrastructure/database/providerService/providerService.repository.impl";
 import { ServiceAvailabilityRepositoryImpl } from "../../../infrastructure/database/serviceAvailability/serviceAvailability.repository.impl";
-import { OTPService } from "../../../infrastructure/services/otp.service";
 
 
 type AdminFetchProviderServiceAvailabilityResPros = Pick<ServiceAvailability, "availability">;
-type AdminApproveProviderResProps = Pick<Provider, "_id" | "username" | "email" | "isBlocked" | "isAdminVerified">
-type AdminChangeProviderBlockStatusResProps = Pick<Provider, "_id" | "username" | "email" | "isBlocked" | "isAdminVerified">
+type AdminApproveProviderResProps = Pick<Provider, "_id" | "username" | "email" | "isBlocked" | "isAdminVerified" | "trustedBySlotflow">
+type AdminChangeProviderBlockStatusResProps = Pick<Provider, "_id" | "username" | "email" | "isBlocked" | "isAdminVerified" | "trustedBySlotflow">
 
 export class AdminProviderListUseCase {
     constructor(private providerRepository: ProviderRepositoryImpl) { }
@@ -44,6 +44,7 @@ export class AdminApproveProviderUseCase {
             email: updatedProvider.email,
             isBlocked: updatedProvider.isBlocked,
             isAdminVerified: updatedProvider.isAdminVerified,
+            trustedBySlotflow: updatedProvider.trustedBySlotflow,
         };
         return { success: true, message: "Provider approved successfully.", updatedProvider: data };
     }
@@ -65,6 +66,7 @@ export class AdminChangeProviderStatusUseCase {
             email: updatedProvider.email,
             isBlocked: updatedProvider.isBlocked,
             isAdminVerified: updatedProvider.isAdminVerified,
+            trustedBySlotflow: updatedProvider.trustedBySlotflow,
         };
         return { success: true, message: `Provider ${status ? "blocked" : "Unblocked"} successfully.`, updatedProvider: data };
     }

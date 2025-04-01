@@ -15,6 +15,7 @@ export interface IProvider extends Document {
   serviceAvailabilityId: Types.ObjectId;
   subscription: Types.ObjectId[];
   verificationToken: string;
+  trustedBySlotflow: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -33,6 +34,7 @@ const ProviderSchema = new Schema<IProvider>({
   serviceAvailabilityId: { type: Schema.Types.ObjectId, ref: "ServiceAvailability" },
   subscription: { type: [Schema.Types.ObjectId], ref: "Subscription", default: []},
   verificationToken: { type: String, default: null },
+  trustedBySlotflow: { type: Boolean, default: false },
 }, {
   timestamps: true
 });

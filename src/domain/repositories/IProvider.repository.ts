@@ -2,7 +2,7 @@ import { Types } from "mongoose";
 import { Provider } from "../entities/provider.entity";
 
 export type CreateProviderReqProps = Pick<Provider, "username" | "email" | "password" | "verificationToken">;
-export type FindAllProvidersResProps = Pick<Provider, "_id" | "username" | "email" | "isBlocked" | "isAdminVerified">;
+export type FindAllProvidersResProps = Pick<Provider, "_id" | "username" | "email" | "isBlocked" | "isAdminVerified" | "trustedBySlotflow">;
 
 export interface IProviderRepository {
     createProvider(provider : CreateProviderReqProps) : Promise<Provider | null>;

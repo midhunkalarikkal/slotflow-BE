@@ -16,6 +16,7 @@ export class Provider {
         public serviceAvailabilityId: Types.ObjectId,
         public subscription: Types.ObjectId[],
         public verificationToken: string,
+        public trustedBySlotflow: boolean,
         public createdAt: Date,
         public updatedAt: Date,
     ){}
