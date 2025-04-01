@@ -5,8 +5,28 @@ import { PlanRepositoryImpl } from "../../../infrastructure/database/plan/plan.r
 import { PaymentRepositoryImpl } from "../../../infrastructure/database/payment/payment.repository.impl";
 import { ProviderRepositoryImpl } from "../../../infrastructure/database/provider/provider.repository.impl";
 import { SubscriptionRepositoryImpl } from "../../../infrastructure/database/subscription/subscription.repository.impl";
+import { FindSubscriptionsByProviderIdResProps } from "../../../domain/repositories/ISubscription.repository";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+
+export class ProviderFetchAllSubscriptionsUseCase {
+    constructor(
+        private providerRepository: ProviderRepositoryImpl,
+        private subscriptionRepository: SubscriptionRepositoryImpl,
+    ) { }
+
+    async execute(providerId: string): Promise<{success: boolean, message: string, subscriptions: FindSubscriptionsByProviderIdResProps[]}> {
+        const provider = await this.providerRepository.findProviderById(new Types.ObjectId(providerId));
+        if(!provider) throw new Error("Invalid request.");
+
+        const providerSubscriptions = await this.subscriptionRepository.findSubscriptionsByProviderId(new Types.ObjectId(providerId));
+        if(!providerSubscriptions) throw new Error("Subscriptions fetching error.");
+
+        console.log("provider subscriptions : ",providerSubscriptions)
+
+        return { success: true, message: "Fetched all subscriptions.", subscriptions: providerSubscriptions};
+    }
+}
 
 export class ProviderSubscribeToPlanUseCase {
     constructor(
@@ -26,14 +46,9 @@ export class ProviderSubscribeToPlanUseCase {
         if (!plan) throw new Error("Unexpected error, please try again after sometimes.");
 
         const providerLastSubscriptionsId = provider.subscription.pop();
-        if(!providerLastSubscriptionsId) throw new Error("Subscription checking error.");
 
-        console.log("Provider last subscription id : ",providerLastSubscriptionsId);
-
-        const subscription = await this.subscriptionRepository.findSubscriptionById(providerLastSubscriptionsId);
+        const subscription = await this.subscriptionRepository.findSubscriptionById(providerLastSubscriptionsId!);
         if(subscription){
-            console.log("subscription : ",subscription);
-            console.log("subscription.endDate : ",subscription.endDate);
             if(subscription.subscriptionStatus === "Active") throw new Error("Your subscription is on live.");
             const isSubscriptionExpired = dayjs().isAfter(dayjs(subscription.endDate), "day");
             if(!isSubscriptionExpired) throw new Error("Your subscription is on live.");
@@ -126,7 +141,7 @@ export class ProviderSaveSubscriptionUseCase {
                 subscriptionPlanId: new Types.ObjectId(subscriptionPlanId),
                 subscriptionDurationInDays: dayjs().add(planDuration, "month").diff(dayjs(), "day"),
                 startDate: new Date(),
-                endDate: dayjs().add(Number(planDuration), "month").toDate(),
+                endDate: dayjs().add(Number(planDuration * 30), "day").toDate(),
                 subscriptionStatus: "Active",
                 paymentId: payment._id,
             }, { session: mongoSession });

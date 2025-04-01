@@ -27,6 +27,7 @@ router.post('/updateProfileImage', authMiddleware,upload.single('profileImage'),
 
 router.get('/getPlans', authMiddleware, providerPlanController.fetchAllPlans);
 
+router.get('/getSubscriptions', authMiddleware, providerSubscriptionController.fetchProviderSubscriptions);
 router.post('/create-checkout-session', authMiddleware, providerSubscriptionController.subscribe);
 router.post('/saveSubscription', authMiddleware, providerSubscriptionController.saveSubscription);
 export default router;  
