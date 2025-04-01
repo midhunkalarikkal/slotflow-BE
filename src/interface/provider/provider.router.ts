@@ -8,6 +8,7 @@ import { providerProfileController } from './providerProfile.controller';
 import { providerAppServiceController } from './providerAppService.controller';
 import { providerSubscriptionController } from './providerSubscription.controller';
 import { providerServiceAvailabilityController } from './providerServiceAvailability.controller';
+import { providerPaymentController } from './providerPayment.controller';
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
@@ -31,5 +32,7 @@ router.get('/getSubscriptions', authMiddleware, providerSubscriptionController.f
 router.post('/create-checkout-session', authMiddleware, providerSubscriptionController.subscribe);
 router.post('/saveSubscription', authMiddleware, providerSubscriptionController.saveSubscription);
 router.post('/subscribeToTrialPlan', authMiddleware, providerSubscriptionController.subsribetoTrialPlan);
+
+router.get('/getPayments', authMiddleware, providerPaymentController.getPayments);
 
 export default router;  

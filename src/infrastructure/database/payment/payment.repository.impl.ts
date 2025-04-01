@@ -1,5 +1,6 @@
+import { Types } from "mongoose";
 import { Payment } from "../../../domain/entities/payment.entity";
-import { CreatePaymentForSubscriptionProps, IPaymentRepository } from "../../../domain/repositories/IPayment.repository";
+import { CreatePaymentForSubscriptionProps, FindAllPaymentsResProps, IPaymentRepository } from "../../../domain/repositories/IPayment.repository";
 import { IPayment, PaymentModel } from "./payment.model";
 
 export class PaymentRepositoryImpl implements IPaymentRepository {
@@ -28,6 +29,16 @@ export class PaymentRepositoryImpl implements IPaymentRepository {
         } catch (error) {
             console.error("error : ",error);
             throw new Error("Payment creation error.");
+        }
+    }
+    
+    async findAllPaymentsByProviderId(providerId: Types.ObjectId): Promise<FindAllPaymentsResProps[] | null> {
+        try{
+            const payments = await PaymentModel.find({providerId: providerId}).sort({createdAt : 1});
+            return payments || null;
+        }catch (error) {
+            console.log("error : ",error);
+            throw new Error("Finding payments error.");
         }
     }
 }
