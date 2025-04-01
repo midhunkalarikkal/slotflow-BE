@@ -31,4 +31,5 @@ router.get('/getSubscriptions', authMiddleware, providerSubscriptionController.f
 router.post('/create-checkout-session', authMiddleware, providerSubscriptionController.subscribe);
 router.post('/saveSubscription', authMiddleware, providerSubscriptionController.saveSubscription);
 router.post('/subscribeToTrialPlan', authMiddleware, providerSubscriptionController.subsribetoTrialPlan);
+
 export default router;  

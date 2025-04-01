@@ -1,25 +1,26 @@
 import { Request, Response } from "express";
 import { HandleError } from "../../infrastructure/error/error";
 
-import { ProviderFetchAllSubscriptionsUseCase, ProviderSaveSubscriptionUseCase, ProviderSubscribeToPlanUseCase } from "../../application/use-cases/provider/providerSubscription.use-case";
 import { PlanRepositoryImpl } from "../../infrastructure/database/plan/plan.repository.impl";
+import { PaymentRepositoryImpl } from "../../infrastructure/database/payment/payment.repository.impl";
 import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/provider.repository.impl";
 import { SubscriptionRepositoryImpl } from "../../infrastructure/database/subscription/subscription.repository.impl";
-import { PaymentRepositoryImpl } from "../../infrastructure/database/payment/payment.repository.impl";
-import { ProviderTrialSubscriptionUseCase } from "../../application/use-cases/provider/provider.TrailSubscription";
+import { ProviderFetchAllSubscriptionsUseCase } from "../../application/use-cases/provider/providerSubscription.use-case";
+import { ProviderTrialSubscriptionUseCase } from "../../application/use-cases/provider/providerTrailSubscription.use-case";
+import { ProviderSaveSubscriptionUseCase, ProviderStripeSubscriptionUseCase } from "../../application/use-cases/provider/providerStripeSubscription.use-case";
 
 const planRepositoryImpl = new PlanRepositoryImpl();
+const paymentRepositoryImpl = new PaymentRepositoryImpl();
 const providerRepositoryImpl = new ProviderRepositoryImpl();
 const subscriptionRepositoryImpl = new SubscriptionRepositoryImpl();
-const paymentRepositoryImpl = new PaymentRepositoryImpl();
-const providerSubscribeToPlanUseCase = new ProviderSubscribeToPlanUseCase(planRepositoryImpl, providerRepositoryImpl,subscriptionRepositoryImpl);
+const providerStripeSubscriptionUseCase = new ProviderStripeSubscriptionUseCase(planRepositoryImpl, providerRepositoryImpl,subscriptionRepositoryImpl);
 const providerSaveSubscriptionUseCase = new ProviderSaveSubscriptionUseCase(providerRepositoryImpl, paymentRepositoryImpl, subscriptionRepositoryImpl);
 const providerFetchAllSubscriptionsUseCase = new ProviderFetchAllSubscriptionsUseCase(providerRepositoryImpl, subscriptionRepositoryImpl);
 const providerTrialSubscriptionUseCase = new ProviderTrialSubscriptionUseCase(providerRepositoryImpl, subscriptionRepositoryImpl, planRepositoryImpl)
 
 export class ProviderSubscriptionController {
     constructor(
-        private providerSubscribeToPlanUseCase: ProviderSubscribeToPlanUseCase,
+        private providerStripeSubscriptionUseCase: ProviderStripeSubscriptionUseCase,
         private providerSaveSubscriptionUseCase: ProviderSaveSubscriptionUseCase,
         private providerFetchAllSubscriptionsUseCase: ProviderFetchAllSubscriptionsUseCase,
         private providerTrialSubscriptionUseCase: ProviderTrialSubscriptionUseCase,
@@ -36,7 +37,7 @@ export class ProviderSubscriptionController {
             const providerId = req.user.userOrProviderId;
             const { planId, planDuration } = req.body;
             if(!providerId || !planId || !planDuration) throw new Error("Invalid request.");
-            const result = await this.providerSubscribeToPlanUseCase.execute(providerId, planId, planDuration);
+            const result = await this.providerStripeSubscriptionUseCase.execute(providerId, planId, planDuration);
             res.status(200).json(result);
         }catch(error){
             HandleError.handle(error,res);
@@ -78,5 +79,5 @@ export class ProviderSubscriptionController {
     }
 };
 
-const providerSubscriptionController = new ProviderSubscriptionController( providerSubscribeToPlanUseCase, providerSaveSubscriptionUseCase, providerFetchAllSubscriptionsUseCase, providerTrialSubscriptionUseCase );
+const providerSubscriptionController = new ProviderSubscriptionController( providerStripeSubscriptionUseCase, providerSaveSubscriptionUseCase, providerFetchAllSubscriptionsUseCase, providerTrialSubscriptionUseCase );
 export { providerSubscriptionController };
