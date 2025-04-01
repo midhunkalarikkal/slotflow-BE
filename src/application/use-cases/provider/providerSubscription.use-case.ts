@@ -139,7 +139,6 @@ export class ProviderSaveSubscriptionUseCase {
             const subscription = await this.subscriptionRepository.createSubscription({
                 providerId: new Types.ObjectId(pId),
                 subscriptionPlanId: new Types.ObjectId(subscriptionPlanId),
-                subscriptionDurationInDays: dayjs().add(planDuration, "month").diff(dayjs(), "day"),
                 startDate: new Date(),
                 endDate: dayjs().add(Number(planDuration * 30), "day").toDate(),
                 subscriptionStatus: "Active",

@@ -9,7 +9,6 @@ export class SubscriptionRepositoryImpl implements ISubscriptionRepository {
             subscription._id,
             subscription.providerId,
             subscription.subscriptionPlanId,
-            subscription.subscriptionDurationInDays,
             subscription.startDate,
             subscription.endDate,
             subscription.subscriptionStatus,

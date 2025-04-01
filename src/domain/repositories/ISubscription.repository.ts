@@ -1,10 +1,10 @@
 import { Types } from "mongoose";
-import { Subscription } from "../entities/subscription.entity";
 import { Plan } from "../entities/plan.entity";
+import { Subscription } from "../entities/subscription.entity";
 
-export type CreateSubscriptionPayloadProps = Pick<Subscription, "providerId" | "subscriptionPlanId" | "startDate" | "endDate" | "subscriptionStatus" | "paymentId" | "subscriptionDurationInDays">;
+export type CreateSubscriptionPayloadProps = Pick<Subscription, "providerId" | "subscriptionPlanId" | "startDate" | "endDate" | "subscriptionStatus" | "paymentId" >;
 
-type SubscripionsResProps = Pick<Subscription, | "startDate" | "endDate" | "subscriptionStatus" | "subscriptionDurationInDays">;
+type SubscripionsResProps = Pick<Subscription, | "startDate" | "endDate" | "subscriptionStatus">;
 export interface FindSubscriptionsByProviderIdResProps extends SubscripionsResProps , Partial<Plan>{
 }
 

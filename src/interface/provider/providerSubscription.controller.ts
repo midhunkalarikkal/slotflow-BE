@@ -6,6 +6,7 @@ import { PlanRepositoryImpl } from "../../infrastructure/database/plan/plan.repo
 import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/provider.repository.impl";
 import { SubscriptionRepositoryImpl } from "../../infrastructure/database/subscription/subscription.repository.impl";
 import { PaymentRepositoryImpl } from "../../infrastructure/database/payment/payment.repository.impl";
+import { ProviderTrialSubscriptionUseCase } from "../../application/use-cases/provider/provider.TrailSubscription";
 
 const planRepositoryImpl = new PlanRepositoryImpl();
 const providerRepositoryImpl = new ProviderRepositoryImpl();
@@ -14,17 +15,20 @@ const paymentRepositoryImpl = new PaymentRepositoryImpl();
 const providerSubscribeToPlanUseCase = new ProviderSubscribeToPlanUseCase(planRepositoryImpl, providerRepositoryImpl,subscriptionRepositoryImpl);
 const providerSaveSubscriptionUseCase = new ProviderSaveSubscriptionUseCase(providerRepositoryImpl, paymentRepositoryImpl, subscriptionRepositoryImpl);
 const providerFetchAllSubscriptionsUseCase = new ProviderFetchAllSubscriptionsUseCase(providerRepositoryImpl, subscriptionRepositoryImpl);
+const providerTrialSubscriptionUseCase = new ProviderTrialSubscriptionUseCase(providerRepositoryImpl, subscriptionRepositoryImpl, planRepositoryImpl)
 
 export class ProviderSubscriptionController {
     constructor(
         private providerSubscribeToPlanUseCase: ProviderSubscribeToPlanUseCase,
         private providerSaveSubscriptionUseCase: ProviderSaveSubscriptionUseCase,
         private providerFetchAllSubscriptionsUseCase: ProviderFetchAllSubscriptionsUseCase,
+        private providerTrialSubscriptionUseCase: ProviderTrialSubscriptionUseCase,
     )
     {
         this.subscribe = this.subscribe.bind(this);
         this.saveSubscription = this.saveSubscription.bind(this);
         this.fetchProviderSubscriptions = this.fetchProviderSubscriptions.bind(this);
+        this.subsribetoTrialPlan = this.subsribetoTrialPlan.bind(this);
     }
 
     async subscribe(req: Request, res: Response) {
@@ -61,7 +65,18 @@ export class ProviderSubscriptionController {
             HandleError.handle(error, res);
         }
     }
+
+    async subsribetoTrialPlan(req: Request, res: Response) {
+        try{
+            const providerId = req.user.userOrProviderId;
+            if(!providerId) throw new Error("Invalid request.");
+            const result = await this.providerTrialSubscriptionUseCase.execute(providerId);
+            res.status(200).json(result);
+        }catch (error) {
+            HandleError.handle(error, res);
+        }
+    }
 };
 
-const providerSubscriptionController = new ProviderSubscriptionController( providerSubscribeToPlanUseCase, providerSaveSubscriptionUseCase, providerFetchAllSubscriptionsUseCase );
+const providerSubscriptionController = new ProviderSubscriptionController( providerSubscribeToPlanUseCase, providerSaveSubscriptionUseCase, providerFetchAllSubscriptionsUseCase, providerTrialSubscriptionUseCase );
 export { providerSubscriptionController };
