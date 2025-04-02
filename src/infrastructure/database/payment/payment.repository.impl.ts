@@ -27,17 +27,15 @@ export class PaymentRepositoryImpl implements IPaymentRepository {
             const newPayment = await PaymentModel.create([payment],options);
             return newPayment ? this.mapToEntity(newPayment[0]) : null;
         } catch (error) {
-            console.error("error : ",error);
             throw new Error("Payment creation error.");
         }
     }
     
-    async findAllPaymentsByProviderId(providerId: Types.ObjectId): Promise<FindAllPaymentsResProps[] | null> {
+    async findAllPaymentsByProviderId(providerId: Types.ObjectId): Promise<Array<FindAllPaymentsResProps> | null> {
         try{
             const payments = await PaymentModel.find({providerId: providerId}).sort({createdAt : 1});
             return payments || null;
         }catch (error) {
-            console.log("error : ",error);
             throw new Error("Finding payments error.");
         }
     }

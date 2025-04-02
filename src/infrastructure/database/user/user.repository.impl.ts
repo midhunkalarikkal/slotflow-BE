@@ -58,7 +58,7 @@ export class UserRepositoryImpl implements IUserRepository {
         }
     }
 
-    async findAllUsers(): Promise<FindAllUsersProps[] | null> {
+    async findAllUsers(): Promise<Array<FindAllUsersProps> | null> {
         try {
             const users =  await UserModel.find({}, { _id: 1, username: 1, email: 1, isBlocked: 1, isEmailVerified: 1 });
             return users ? users.map((user) => this.mapToEntity(user)) : null;

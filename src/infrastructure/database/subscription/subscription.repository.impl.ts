@@ -39,7 +39,7 @@ export class SubscriptionRepositoryImpl implements ISubscriptionRepository {
         }
     }
 
-    async findSubscriptionsByProviderId(providerId: Types.ObjectId): Promise<FindSubscriptionsByProviderIdResProps[] | null> {
+    async findSubscriptionsByProviderId(providerId: Types.ObjectId): Promise<Array<FindSubscriptionsByProviderIdResProps> | null> {
         try {
             const subscriptions = await SubscriptionModel.find({ providerId: providerId }, { _id: 0, subscriptionDurationInDays: 1, startDate: 1, endDate: 1, subscriptionStatus: 1 }).populate({
                 path: "subscriptionPlanId",

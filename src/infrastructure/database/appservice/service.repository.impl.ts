@@ -25,7 +25,6 @@ export class ServiceRepositoryImpl implements IServiceRepository {
     
     async findServiceByName(serviceName: string): Promise<Service | null> {
         try{
-            if(!serviceName) throw new Error("Invalid request.");
             const existingService = await ServiceModel.findOne({ serviceName: serviceName });
             return existingService ? this.mapToEntity(existingService) : null;
         }catch (error){
@@ -33,7 +32,7 @@ export class ServiceRepositoryImpl implements IServiceRepository {
         }
     }
 
-    async findAllServices(): Promise<ServicesProps[] | null> {
+    async findAllServices(): Promise<Array<ServicesProps> | null> {
         try {
             const services = await ServiceModel.find({}, { _id: 1, serviceName: 1, isBlocked: 1 });
             return services ? services.map((service) => this.mapToEntity(service)) : null;

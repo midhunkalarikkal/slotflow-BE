@@ -46,7 +46,7 @@ export class PlanRepositoryImpl implements IPlanRepository {
         }
     }
 
-    async findAllPlans(): Promise<FindAllPlansProps[] | null> {
+    async findAllPlans(): Promise<Array<FindAllPlansProps> | null> {
         try{
             const plans = await PlanModel.find({},{_id:1, planName: 1, isBlocked: 1});
             return plans ?  plans.map(plan => this.mapToEntity(plan)) : null;
@@ -70,7 +70,7 @@ export class PlanRepositoryImpl implements IPlanRepository {
         }
     }
 
-    async findAllPlansForDisplay(): Promise<findAllPlansForDisplayResProps[] | null> {
+    async findAllPlansForDisplay(): Promise<Array<findAllPlansForDisplayResProps> | null> {
         try{
             const plans = await PlanModel.find({},{_id:1, planName: 1, price: 1, features: 1, description: 1});
             return plans ? plans.map((plan) => this.mapToEntity(plan)) : null;
