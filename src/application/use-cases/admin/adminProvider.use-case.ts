@@ -10,6 +10,8 @@ import { AddressRepositoryImpl } from "../../../infrastructure/database/address/
 import { ProviderRepositoryImpl } from "../../../infrastructure/database/provider/provider.repository.impl";
 import { ProviderServiceRepositoryImpl } from "../../../infrastructure/database/providerService/providerService.repository.impl";
 import { ServiceAvailabilityRepositoryImpl } from "../../../infrastructure/database/serviceAvailability/serviceAvailability.repository.impl";
+import { SubscriptionRepositoryImpl } from "../../../infrastructure/database/subscription/subscription.repository.impl";
+import { FindSubscriptionsByProviderIdResProps } from "../../../domain/repositories/ISubscription.repository";
 
 
 type AdminFetchProviderServiceAvailabilityResPros = Pick<ServiceAvailability, "availability">;
@@ -150,5 +152,24 @@ export class AdminfetchProviderServiceAvailabilityUseCase {
         if (availability == null) return { success: true, message: "Service availability fetched successfully.", availability: null }
         const { _id, providerId: spId, createdAt, updatedAt, ...rest } = availability;
         return { success: true, message: "Service availability fetched successfully.", availability: rest }
+    }
+}
+
+export class AdminFetchProviderSubscriptionsUseCase {
+    constructor(
+        private providerRepository: ProviderRepositoryImpl,
+        private subscriptionRepository: SubscriptionRepositoryImpl,
+    ) { }
+
+    async execute(providerId: string): Promise<{ success: boolean, message: string, subscriptions: FindSubscriptionsByProviderIdResProps[] }> {
+        if(!providerId) throw new Error("Invalid request.");
+
+        const provider = await this.providerRepository.findProviderById(new Types.ObjectId(providerId));
+        if(!provider) throw new Error("No user found.");
+
+        const subscriptions = await this.subscriptionRepository.findSubscriptionsByProviderId(new Types.ObjectId(providerId));
+        if(!subscriptions) throw new Error("Subscriptions fetching error.");
+
+        return { success: true, message: "Subscriptions fetched successfully.", subscriptions };
     }
 }
