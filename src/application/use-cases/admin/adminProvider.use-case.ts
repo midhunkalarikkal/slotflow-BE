@@ -12,6 +12,8 @@ import { ProviderServiceRepositoryImpl } from "../../../infrastructure/database/
 import { ServiceAvailabilityRepositoryImpl } from "../../../infrastructure/database/serviceAvailability/serviceAvailability.repository.impl";
 import { SubscriptionRepositoryImpl } from "../../../infrastructure/database/subscription/subscription.repository.impl";
 import { FindSubscriptionsByProviderIdResProps } from "../../../domain/repositories/ISubscription.repository";
+import { PaymentRepositoryImpl } from "../../../infrastructure/database/payment/payment.repository.impl";
+import { FindAllPaymentsResProps } from "../../../domain/repositories/IPayment.repository";
 
 
 type AdminFetchProviderServiceAvailabilityResPros = Pick<ServiceAvailability, "availability">;
@@ -172,4 +174,24 @@ export class AdminFetchProviderSubscriptionsUseCase {
 
         return { success: true, message: "Subscriptions fetched successfully.", subscriptions };
     }
+}
+
+export class AdminFetchProviderPaymentsUseCase {
+    constructor(
+        private providerRepository: ProviderRepositoryImpl,
+        private paymentRepository: PaymentRepositoryImpl,
+    ) { }
+
+    async execute(providerId: string): Promise<{ success: boolean, message: string, payments: FindAllPaymentsResProps[] }> {
+        if(!providerId) throw new Error("Invalid request.");
+
+        const provider = await this.providerRepository.findProviderById(new Types.ObjectId(providerId));
+        if(!provider) throw new Error("No user found.");
+
+        const payments = await this.paymentRepository.findAllPaymentsByProviderId(new Types.ObjectId(providerId));
+        if(!payments) throw new Error("Payments fetching error.");
+        
+        return { success: true, message: "Payments fetched successfully.", payments };
+    }
+
 }

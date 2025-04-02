@@ -4,14 +4,16 @@ import { AddressRepositoryImpl } from "../../infrastructure/database/address/add
 import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/provider.repository.impl";
 import { ProviderServiceRepositoryImpl } from "../../infrastructure/database/providerService/providerService.repository.impl";
 import { ServiceAvailabilityRepositoryImpl } from "../../infrastructure/database/serviceAvailability/serviceAvailability.repository.impl";
-import { AdminApproveProviderUseCase, AdminChangeProviderStatusUseCase, AdminChangeProviderTrustTagUseCase, AdminFetchProviderAddressUseCase, AdminFetchProviderDetailsUseCase, AdminfetchProviderServiceAvailabilityUseCase, AdminFetchProviderServiceUseCase, AdminFetchProviderSubscriptionsUseCase, AdminProviderListUseCase } from "../../application/use-cases/admin/adminProvider.use-case";
+import { AdminApproveProviderUseCase, AdminChangeProviderStatusUseCase, AdminChangeProviderTrustTagUseCase, AdminFetchProviderAddressUseCase, AdminFetchProviderDetailsUseCase, AdminFetchProviderPaymentsUseCase, AdminfetchProviderServiceAvailabilityUseCase, AdminFetchProviderServiceUseCase, AdminFetchProviderSubscriptionsUseCase, AdminProviderListUseCase } from "../../application/use-cases/admin/adminProvider.use-case";
 import { SubscriptionRepositoryImpl } from "../../infrastructure/database/subscription/subscription.repository.impl";
+import { PaymentRepositoryImpl } from "../../infrastructure/database/payment/payment.repository.impl";
 
 const providerRepositoryImpl = new ProviderRepositoryImpl();
 const addressRepositoryImpl = new AddressRepositoryImpl();
 const providerServiceRepositoryImpl = new ProviderServiceRepositoryImpl();
 const serviceAvailabilityImpl = new ServiceAvailabilityRepositoryImpl();
 const subscriptionRepositoryImpl = new SubscriptionRepositoryImpl();
+const paymentRepositoryImpl = new PaymentRepositoryImpl();
 const adminProviderListUseCase = new AdminProviderListUseCase(providerRepositoryImpl);
 const adminApproveProviderUseCase = new AdminApproveProviderUseCase(providerRepositoryImpl);
 const adminChangeProviderStatusUseCase = new AdminChangeProviderStatusUseCase(providerRepositoryImpl);
@@ -20,7 +22,8 @@ const adminFetchProviderDetailsUseCase = new AdminFetchProviderDetailsUseCase(pr
 const adminFetchProviderAddressUseCase = new AdminFetchProviderAddressUseCase(addressRepositoryImpl);
 const adminFetchProviderServiceUseCase = new AdminFetchProviderServiceUseCase(providerServiceRepositoryImpl);
 const adminFetchProviderServiceAvailabilityUseCase = new AdminfetchProviderServiceAvailabilityUseCase(serviceAvailabilityImpl);
-const adminFetchProviderSubscriptionsUseCase = new AdminFetchProviderSubscriptionsUseCase(providerRepositoryImpl,subscriptionRepositoryImpl)
+const adminFetchProviderSubscriptionsUseCase = new AdminFetchProviderSubscriptionsUseCase(providerRepositoryImpl,subscriptionRepositoryImpl);
+const adminFetchProviderPaymentsUseCase = new AdminFetchProviderPaymentsUseCase(providerRepositoryImpl,paymentRepositoryImpl)
 
 class AdminProviderController {
     constructor(
@@ -32,7 +35,8 @@ class AdminProviderController {
         private adminFetchProviderAddressUseCase : AdminFetchProviderAddressUseCase,
         private adminFetchProviderServiceUseCase : AdminFetchProviderServiceUseCase,
         private adminFetchProviderServiceAvailabilityUseCase : AdminfetchProviderServiceAvailabilityUseCase,
-        private adminFetchProviderSubscriptionsUseCase: AdminFetchProviderSubscriptionsUseCase,
+        private adminFetchProviderSubscriptionsUseCase : AdminFetchProviderSubscriptionsUseCase,
+        private adminFetchProviderPaymentsUseCase : AdminFetchProviderPaymentsUseCase,
     ){
         this.getAllProviders = this.getAllProviders.bind(this);
         this.approveProvider = this.approveProvider.bind(this);
@@ -43,6 +47,7 @@ class AdminProviderController {
         this.fetchProviderServiceAvailability = this.fetchProviderServiceAvailability.bind(this);
         this.changeProviderTrustedTag = this.changeProviderTrustedTag.bind(this);
         this.fetchProviderSubscriptions = this.fetchProviderSubscriptions.bind(this);
+        this.fetchProviderPayments = this.fetchProviderPayments.bind(this);
     }
 
     async getAllProviders(req: Request, res: Response) {
@@ -141,9 +146,20 @@ class AdminProviderController {
             HandleError.handle(error,res);
         }
     }
+
+    async fetchProviderPayments(req: Request, res: Response) {
+        try{
+            const { providerId } = req.params;
+            if(!providerId) throw new Error("Invalid request.");
+            const result = await this.adminFetchProviderPaymentsUseCase.execute(providerId);
+            res.status(200).json(result);
+        }catch (error) {
+            HandleError.handle(error,res);
+        }
+    }
    
 }
 
-const adminProviderController = new AdminProviderController(adminProviderListUseCase, adminApproveProviderUseCase, adminChangeProviderStatusUseCase, adminChangeProviderTrustTagUseCase,adminFetchProviderDetailsUseCase, adminFetchProviderAddressUseCase, adminFetchProviderServiceUseCase, adminFetchProviderServiceAvailabilityUseCase, adminFetchProviderSubscriptionsUseCase);
+const adminProviderController = new AdminProviderController(adminProviderListUseCase, adminApproveProviderUseCase, adminChangeProviderStatusUseCase, adminChangeProviderTrustTagUseCase,adminFetchProviderDetailsUseCase, adminFetchProviderAddressUseCase, adminFetchProviderServiceUseCase, adminFetchProviderServiceAvailabilityUseCase, adminFetchProviderSubscriptionsUseCase, adminFetchProviderPaymentsUseCase);
 export { adminProviderController };
 

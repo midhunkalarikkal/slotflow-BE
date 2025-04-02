@@ -16,6 +16,7 @@ router.get('/fetchProviderAddress/:providerId', authMiddleware, adminProviderCon
 router.get('/fetchProviderService/:providerId', authMiddleware, adminProviderController.fetchProviderService);
 router.get('/fetchProviderServiceAvailability/:providerId', authMiddleware, adminProviderController.fetchProviderServiceAvailability);
 router.get('/fetchProviderSubscriptions/:providerId', authMiddleware, adminProviderController.fetchProviderSubscriptions);
+router.get('/fetchProviderPayments/:providerId', authMiddleware,adminProviderController.fetchProviderPayments);
 
 router.get('/users',authMiddleware, adminUserController.getAllUsers);
 router.put('/changeUserStatus',authMiddleware,adminUserController.changeUserStatus);
