@@ -17,7 +17,6 @@ export class AdminUserListUseCase {
 
     async execute(): Promise<AdminUsersListResProps> {
         const users = await this.userRepository.findAllUsers();
-        if (!users) throw new Error("Fetching error, please try again.");
         return { success: true, message: "Fetched users.", users };
     }
 }

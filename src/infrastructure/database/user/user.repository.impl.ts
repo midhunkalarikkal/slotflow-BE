@@ -22,10 +22,10 @@ export class UserRepositoryImpl implements IUserRepository {
         );
     }
 
-    async createUser(user: CreateUserProps): Promise<User | null> {
+    async createUser(user: CreateUserProps): Promise<User> {
         try {
             const createdUser = await UserModel.create(user);
-            return createdUser ? this.mapToEntity(createdUser) : null;
+            return this.mapToEntity(createdUser);
         } catch (error) {
             throw new Error("Unable to register, please try again after a few minutes.");
         }
@@ -58,10 +58,10 @@ export class UserRepositoryImpl implements IUserRepository {
         }
     }
 
-    async findAllUsers(): Promise<Array<FindAllUsersProps> | null> {
+    async findAllUsers(): Promise<Array<FindAllUsersProps>> {
         try {
             const users =  await UserModel.find({}, { _id: 1, username: 1, email: 1, isBlocked: 1, isEmailVerified: 1 });
-            return users ? users.map((user) => this.mapToEntity(user)) : null;
+            return users.map((user) => this.mapToEntity(user));
         } catch (error) {
             throw new Error("Failed to fetch users from database.")
         }

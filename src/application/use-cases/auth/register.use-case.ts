@@ -51,21 +51,19 @@ export class RegisterUseCase {
       }
     } else {
       if (role === "USER") {
-       const newUser = await this.userRepository.createUser({
+       await this.userRepository.createUser({
           username: username,
           email: email,
           password: hashedPassword,
           verificationToken: verificationToken,
         });
-        if(!newUser) throw new Error("Registration failed, please try again");
       } else if (role === "PROVIDER") {
-        const newProvider = await this.providerRepository.createProvider({
+        await this.providerRepository.createProvider({
           username: username,
           email: email,
           password: hashedPassword,
           verificationToken: verificationToken
         });
-        if(!newProvider) throw new Error("Registration failed, please try again.");
       }
     }
     
