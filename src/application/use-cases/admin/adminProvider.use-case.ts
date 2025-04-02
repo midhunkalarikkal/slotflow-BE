@@ -57,6 +57,7 @@ export class AdminChangeProviderStatusUseCase {
         if (!providerId || status === null) throw new Error("Invalid request");
         const provider = await this.providerRepository.findProviderById(new Types.ObjectId(providerId));
         if (!provider) throw new Error("User not found.");
+        console.log("Status : ",status);
         provider.isBlocked = status;
         const updatedProvider = await this.providerRepository.updateProvider(provider);
         if (!updatedProvider) throw new Error("Provider not found");
@@ -68,7 +69,30 @@ export class AdminChangeProviderStatusUseCase {
             isAdminVerified: updatedProvider.isAdminVerified,
             trustedBySlotflow: updatedProvider.trustedBySlotflow,
         };
+        console.log("updatedProvider : ",updatedProvider)
         return { success: true, message: `Provider ${status ? "blocked" : "Unblocked"} successfully.`, updatedProvider: data };
+    }
+}
+
+export class AdminChangeProviderTrustTagUseCase {
+    constructor(private providerRepository: ProviderRepositoryImpl) { }
+
+    async execute(providerId: string, trustedBySlotflow: boolean): Promise<{ success: boolean, message: string, updatedProvider: AdminChangeProviderBlockStatusResProps }> {
+        if (!providerId || trustedBySlotflow === null) throw new Error("Invalid request");
+        const provider = await this.providerRepository.findProviderById(new Types.ObjectId(providerId));
+        if (!provider) throw new Error("User not found.");
+        provider.trustedBySlotflow = trustedBySlotflow;
+        const updatedProvider = await this.providerRepository.updateProvider(provider);
+        if (!updatedProvider) throw new Error("Provider not found");
+        const data = {
+            _id: updatedProvider._id,
+            username: updatedProvider.username,
+            email: updatedProvider.email,
+            isBlocked: updatedProvider.isBlocked,
+            isAdminVerified: updatedProvider.isAdminVerified,
+            trustedBySlotflow: updatedProvider.trustedBySlotflow,
+        };
+        return { success: true, message: `Provider trust tag ${trustedBySlotflow ? "Given" : "Removed"} successfully.`, updatedProvider: data };
     }
 }
 

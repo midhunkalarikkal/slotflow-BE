@@ -21,6 +21,7 @@ export class ProviderRepositoryImpl implements IProviderRepository {
             provider.serviceAvailabilityId,
             provider.subscription,
             provider.verificationToken,
+            provider.trustedBySlotflow,
             provider.createdAt,
             provider.updatedAt,
         )
@@ -68,7 +69,7 @@ export class ProviderRepositoryImpl implements IProviderRepository {
 
     async findAllProviders(): Promise<FindAllProvidersResProps[] | null> {
         try {
-            const providers = await ProviderModel.find({}, { _id: 1, username: 1, email: 1, isBlocked: 1, isAdminVerified: 1 });
+            const providers = await ProviderModel.find({}, { _id: 1, username: 1, email: 1, isBlocked: 1, isAdminVerified: 1, trustedBySlotflow: 1 });
             return providers ? providers.map((provider) => this.mapToEntity(provider)) : null;
         } catch (error) {
             throw new Error("Failed to fetch providers from database.");

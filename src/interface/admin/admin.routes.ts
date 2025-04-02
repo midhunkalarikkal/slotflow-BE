@@ -8,8 +8,9 @@ import { adminProviderController } from "./adminProvider.controller";
 const router = Router();
 
 router.get('/providers',authMiddleware, adminProviderController.getAllProviders);
-router.put('/provider/approve/:providerId',authMiddleware,adminProviderController.approveProvider);
-router.put('/provider/changeStatus/:providerId',authMiddleware,adminProviderController.changeProviderStatus);
+router.put('/approveProvider',authMiddleware,adminProviderController.approveProvider);
+router.put('/changeProviderStatus',authMiddleware,adminProviderController.changeProviderStatus);
+router.post('/changeProvidertrustedTag', authMiddleware, adminProviderController.changeProviderTrustedTag);
 router.get('/fetchProviderDetails/:providerId', authMiddleware, adminProviderController.fetchProviderDetails);
 router.get('/fetchProviderAddress/:providerId', authMiddleware, adminProviderController.fetchProviderAddress);
 router.get('/fetchProviderService/:providerId', authMiddleware, adminProviderController.fetchProviderService);

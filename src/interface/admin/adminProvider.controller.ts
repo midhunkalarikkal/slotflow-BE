@@ -4,7 +4,7 @@ import { AddressRepositoryImpl } from "../../infrastructure/database/address/add
 import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/provider.repository.impl";
 import { ProviderServiceRepositoryImpl } from "../../infrastructure/database/providerService/providerService.repository.impl";
 import { ServiceAvailabilityRepositoryImpl } from "../../infrastructure/database/serviceAvailability/serviceAvailability.repository.impl";
-import { AdminApproveProviderUseCase, AdminChangeProviderStatusUseCase, AdminFetchProviderAddressUseCase, AdminFetchProviderDetailsUseCase, AdminfetchProviderServiceAvailabilityUseCase, AdminFetchProviderServiceUseCase, AdminProviderListUseCase } from "../../application/use-cases/admin/adminProvider.use-case";
+import { AdminApproveProviderUseCase, AdminChangeProviderStatusUseCase, AdminChangeProviderTrustTagUseCase, AdminFetchProviderAddressUseCase, AdminFetchProviderDetailsUseCase, AdminfetchProviderServiceAvailabilityUseCase, AdminFetchProviderServiceUseCase, AdminProviderListUseCase } from "../../application/use-cases/admin/adminProvider.use-case";
 
 const providerRepositoryImpl = new ProviderRepositoryImpl();
 const addressRepositoryImpl = new AddressRepositoryImpl();
@@ -13,6 +13,7 @@ const serviceAvailabilityImpl = new ServiceAvailabilityRepositoryImpl();
 const adminProviderListUseCase = new AdminProviderListUseCase(providerRepositoryImpl);
 const adminApproveProviderUseCase = new AdminApproveProviderUseCase(providerRepositoryImpl);
 const adminChangeProviderStatusUseCase = new AdminChangeProviderStatusUseCase(providerRepositoryImpl);
+const adminChangeProviderTrustTagUseCase = new AdminChangeProviderTrustTagUseCase(providerRepositoryImpl);
 const adminFetchProviderDetailsUseCase = new AdminFetchProviderDetailsUseCase(providerRepositoryImpl);
 const adminFetchProviderAddressUseCase = new AdminFetchProviderAddressUseCase(addressRepositoryImpl);
 const adminFetchProviderServiceUseCase = new AdminFetchProviderServiceUseCase(providerServiceRepositoryImpl);
@@ -23,6 +24,7 @@ class AdminProviderController {
         private adminProviderListUseCase : AdminProviderListUseCase,
         private adminApproveProviderUseCase : AdminApproveProviderUseCase,
         private adminChangeProviderStatusUseCase : AdminChangeProviderStatusUseCase,
+        private adminChangeProviderTrustTagUseCase : AdminChangeProviderTrustTagUseCase,
         private adminFetchProviderDetailsUseCase : AdminFetchProviderDetailsUseCase,
         private adminFetchProviderAddressUseCase : AdminFetchProviderAddressUseCase,
         private adminFetchProviderServiceUseCase : AdminFetchProviderServiceUseCase,
@@ -35,6 +37,7 @@ class AdminProviderController {
         this.fetchProviderAddress = this.fetchProviderAddress.bind(this);
         this.fetchProviderService = this.fetchProviderService.bind(this);
         this.fetchProviderServiceAvailability = this.fetchProviderServiceAvailability.bind(this);
+        this.changeProviderTrustedTag = this.changeProviderTrustedTag.bind(this);
     }
 
     async getAllProviders(req: Request, res: Response) {
@@ -48,7 +51,7 @@ class AdminProviderController {
 
     async approveProvider(req: Request, res: Response) {
         try{
-            const { providerId } = req.params;
+            const { providerId } = req.body;
             if(!providerId) throw new Error("Invalid request.");
             const result = await this.adminApproveProviderUseCase.execute(providerId);
             res.status(200).json(result);
@@ -59,14 +62,23 @@ class AdminProviderController {
 
     async changeProviderStatus(req: Request, res: Response) {
         try{
-            const { providerId } = req.params;
-            const { status } = req.query;
-            if(!providerId || !status) throw new Error("Invalid request.");
-            const statusValue = status === 'true';
-            const result = await this.adminChangeProviderStatusUseCase.execute(providerId, statusValue);
+            const { providerId, status } = req.body;
+            if(!providerId || status === null) throw new Error("Invalid request.");
+            const result = await this.adminChangeProviderStatusUseCase.execute(providerId, status);
             res.status(200).json(result);
         }catch(error){
             HandleError.handle(error, res);
+        }
+    }
+
+    async changeProviderTrustedTag(req: Request, res: Response) {
+        try{
+            const { providerId, trustedBySlotflow } = req.body;
+            if(!providerId || trustedBySlotflow === null || undefined) throw new Error("Invalid request.");
+            const result = await this.adminChangeProviderTrustTagUseCase.execute(providerId, trustedBySlotflow);
+            res.status(200).json(result);
+        }catch (error) {
+            HandleError.handle(error,res);
         }
     }
 
@@ -116,6 +128,6 @@ class AdminProviderController {
    
 }
 
-const adminProviderController = new AdminProviderController(adminProviderListUseCase, adminApproveProviderUseCase, adminChangeProviderStatusUseCase, adminFetchProviderDetailsUseCase, adminFetchProviderAddressUseCase, adminFetchProviderServiceUseCase, adminFetchProviderServiceAvailabilityUseCase);
+const adminProviderController = new AdminProviderController(adminProviderListUseCase, adminApproveProviderUseCase, adminChangeProviderStatusUseCase, adminChangeProviderTrustTagUseCase,adminFetchProviderDetailsUseCase, adminFetchProviderAddressUseCase, adminFetchProviderServiceUseCase, adminFetchProviderServiceAvailabilityUseCase);
 export { adminProviderController };
 
