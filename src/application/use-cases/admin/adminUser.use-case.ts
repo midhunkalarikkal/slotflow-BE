@@ -27,8 +27,18 @@ export class AdminChangeUserStatusUseCase {
 
     async execute(userId: string, status: boolean): Promise<AdminChangeUserStatusResProps> {
         if (!userId || status === null) throw new Error("Invalid request");
-        const updatedUser = await this.userRepository.updateUserStatus(new Types.ObjectId(userId), status);
+        const user = await this.userRepository.findUserById(new Types.ObjectId(userId));
+        if(!user) throw new Error("No user found.");
+        user.isBlocked = status;
+        const updatedUser = await this.userRepository.updateUser(user);
         if (!updatedUser) throw new Error("User not found");
-        return { success: true, message: `User ${status ? "blocked" : "Unblocked"} successfully.`, updatedUser };
+        const data = {
+            _id: updatedUser._id,
+            username: updatedUser.username,
+            email: updatedUser.email,
+            isBlocked: updatedUser.isBlocked,
+            isEmailVerified: updatedUser.isEmailVerified
+        }
+        return { success: true, message: `User ${status ? "blocked" : "Unblocked"} successfully.`, updatedUser: data };
     }
 }

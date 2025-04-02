@@ -8,7 +8,7 @@ export class CheckUserStatusUseCase {
     async execute(id: string, role: string) : Promise<{ status: number, success: boolean, message: string }> {
 
         if (role === "USER") {
-            const user = await this.userRepository.checkUserStatus(new Types.ObjectId(id));
+            const user = await this.userRepository.findUserById(new Types.ObjectId(id));
             if (user?.isBlocked) {
                 return { status: 403, success: false, message: "Your account has been blocked." };
             } else {

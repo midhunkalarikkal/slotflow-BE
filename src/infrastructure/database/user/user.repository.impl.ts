@@ -67,28 +67,6 @@ export class UserRepositoryImpl implements IUserRepository {
         }
     }    
 
-    async updateUserStatus(userId: Types.ObjectId, status: boolean): Promise<FindAllUsersProps | null> {
-        try {
-            const updatedUser = await UserModel.findByIdAndUpdate(
-                userId,
-                { isBlocked: status },
-                { new: true, select: '_id username email isBlocked isEmailVerified' }
-            );
-            return updatedUser || null;
-        } catch (error) {
-            throw new Error("Unexpected error, please try again.");
-        }
-    }
-
-    async checkUserStatus(userId: Types.ObjectId): Promise<Partial<User> | null> {
-        try{
-            const user = await UserModel.findById(userId,{_id: 1, isBlocked: 1});
-            return user ? user : null;
-        }catch(error){
-            throw new Error("Status checking error.");
-        }
-    }
-
     async findUserById(userId: Types.ObjectId): Promise<User | null> {
         try{
             const user = await UserModel.findById(userId);
