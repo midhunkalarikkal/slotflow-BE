@@ -1,12 +1,13 @@
 import { Request, Response } from "express";
 import { HandleError } from "../../infrastructure/error/error";
 import { AddressRepositoryImpl } from "../../infrastructure/database/address/address.repository.impl";
+import { PaymentRepositoryImpl } from "../../infrastructure/database/payment/payment.repository.impl";
 import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/provider.repository.impl";
+import { SubscriptionRepositoryImpl } from "../../infrastructure/database/subscription/subscription.repository.impl";
 import { ProviderServiceRepositoryImpl } from "../../infrastructure/database/providerService/providerService.repository.impl";
 import { ServiceAvailabilityRepositoryImpl } from "../../infrastructure/database/serviceAvailability/serviceAvailability.repository.impl";
-import { AdminApproveProviderUseCase, AdminChangeProviderStatusUseCase, AdminChangeProviderTrustTagUseCase, AdminFetchProviderAddressUseCase, AdminFetchProviderDetailsUseCase, AdminFetchProviderPaymentsUseCase, AdminfetchProviderServiceAvailabilityUseCase, AdminFetchProviderServiceUseCase, AdminFetchProviderSubscriptionsUseCase, AdminProviderListUseCase } from "../../application/use-cases/admin/adminProvider.use-case";
-import { SubscriptionRepositoryImpl } from "../../infrastructure/database/subscription/subscription.repository.impl";
-import { PaymentRepositoryImpl } from "../../infrastructure/database/payment/payment.repository.impl";
+import { AdminApproveProviderUseCase, AdminChangeProviderStatusUseCase, AdminChangeProviderTrustTagUseCase, AdminProviderListUseCase } from "../../application/use-cases/admin/adminProvider/adminProvider.use-case";
+import { AdminFetchProviderAddressUseCase, AdminFetchProviderDetailsUseCase, AdminFetchProviderPaymentsUseCase, AdminfetchProviderServiceAvailabilityUseCase, AdminFetchProviderServiceUseCase, AdminFetchProviderSubscriptionsUseCase } from "../../application/use-cases/admin/adminProvider/adminProviderProfile.use-case";
 
 const providerRepositoryImpl = new ProviderRepositoryImpl();
 const addressRepositoryImpl = new AddressRepositoryImpl();

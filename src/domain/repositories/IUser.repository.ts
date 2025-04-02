@@ -14,7 +14,7 @@ export interface IUserRepository {
   
   findUserByEmail(email: string): Promise<User | null>;
 
-  findAllUsers(): Promise<FindAllUsersProps[] | null>;
+  findAllUsers(): Promise<Array<FindAllUsersProps> | null>;
 
   updateUserStatus(userId: Types.ObjectId, status: boolean): Promise<FindAllUsersProps | null>;
 

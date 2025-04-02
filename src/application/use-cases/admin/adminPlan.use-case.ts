@@ -1,15 +1,26 @@
 import { Types } from "mongoose";
 import { Plan } from "../../../domain/entities/plan.entity";
-import { FindAllPlansProps } from "../../../domain/repositories/IPlan.repository";
+import { CommonResponse } from "../../../shared/interface/commonInterface";
 import { PlanRepositoryImpl } from "../../../infrastructure/database/plan/plan.repository.impl";
 
-type changePlanStatusResProps = Pick<Plan, "_id" | "planName" | "isBlocked">;
-type AddPlanStatusResProps = Pick<Plan, "_id" | "planName" | "isBlocked">;
+
+interface AdminPlanListResProps extends CommonResponse {
+    plans: Array<Pick<Plan, "_id" | "planName" | "isBlocked">>;
+}
+
+interface AdminCreatePlanResProps extends CommonResponse {
+    plan: Pick<Plan, "_id" | "planName" | "isBlocked">;
+}
+
+interface AdminChangePlanStatusResProps extends CommonResponse {
+    updatedPlan: Pick<Plan, "_id" | "planName" | "isBlocked">;
+}
+
 
 export class AdminPlanListUseCase {
     constructor(private planRepository: PlanRepositoryImpl) { }
 
-    async execute(): Promise<{ success: boolean, message: string, plans: FindAllPlansProps[] }> {
+    async execute(): Promise<AdminPlanListResProps> {
         const plans = await this.planRepository.findAllPlans();
         if (!plans) throw new Error("Plans fetching error");
         return { success: true, message: "Plans fetched", plans };
@@ -19,7 +30,7 @@ export class AdminPlanListUseCase {
 export class AdminCreatePlanUseCase {
     constructor(private planRepository: PlanRepositoryImpl) { }
 
-    async execute(planName: string, description: string, price: number, features: [string], maxBookingPerMonth: number, adVisibility: boolean): Promise<{ success: boolean, message: string, plan: AddPlanStatusResProps }> {
+    async execute(planName: string, description: string, price: number, features: string[], maxBookingPerMonth: number, adVisibility: boolean): Promise<AdminCreatePlanResProps> {
         if (!planName || !description || price < 0 || !features || maxBookingPerMonth < 0) throw new Error("Invalid plan data.");
         const existingPlan = await this.planRepository.findPlanByNameOrPrice({planName, price});
         const responseText: string = existingPlan?.planName === planName ? "name" : "price"
@@ -39,7 +50,7 @@ export class AdminCreatePlanUseCase {
 export class AdminChangePlanStatusUseCase {
     constructor(private planRepository: PlanRepositoryImpl) { }
 
-    async execute(planId: string, status: boolean): Promise<{ success: boolean, message: string, updatedPlan : changePlanStatusResProps}> {
+    async execute(planId: string, status: boolean): Promise<AdminChangePlanStatusResProps> {
         if(!planId || status === null) throw new Error("Invalid request");
         const existingPlan = await this.planRepository.findPlanById(new Types.ObjectId(planId));
         if(!existingPlan) throw new Error("Plan does not exists.");

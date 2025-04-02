@@ -6,7 +6,7 @@ export type ServicesProps = Pick<Service, "_id" | "serviceName" | "isBlocked">
 export interface IServiceRepository {
     createService(service: String): Promise<Service | null>;
 
-    findAllServices(): Promise<ServicesProps[] | null>;
+    findAllServices(): Promise<Array<ServicesProps> | null>;
     
     findServiceByName(serviceName: string): Promise<Service | null>;
 

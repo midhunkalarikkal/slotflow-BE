@@ -13,7 +13,7 @@ export interface IProviderRepository {
     
     findProviderByEmail(email : string) : Promise<Provider | null>;
     
-    findAllProviders(): Promise<FindAllProvidersResProps[] | null>;
+    findAllProviders(): Promise<Array<FindAllProvidersResProps> | null>;
     
     findProviderById(providerId: Types.ObjectId): Promise<Provider | null>;
 }

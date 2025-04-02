@@ -1,7 +1,7 @@
-import { Availability, ServiceAvailability } from '../../../domain/entities/serviceAvailability.entity';
-import { IServiceAvailability, ServiceAvailabilityModel } from './serviceAvailability.model';
-import { IServiceAvailabilityRepository } from '../../../domain/repositories/IServiceAvailability.repository';
 import { Types } from 'mongoose';
+import { IServiceAvailability, ServiceAvailabilityModel } from './serviceAvailability.model';
+import { Availability, ServiceAvailability } from '../../../domain/entities/serviceAvailability.entity';
+import { IServiceAvailabilityRepository } from '../../../domain/repositories/IServiceAvailability.repository';
 
 export class ServiceAvailabilityRepositoryImpl implements IServiceAvailabilityRepository {
     private mapToEntity(serviceAvailability: IServiceAvailability): ServiceAvailability {
@@ -14,7 +14,7 @@ export class ServiceAvailabilityRepositoryImpl implements IServiceAvailabilityRe
         )
     }
 
-    async createServiceAvailability(providerId: Types.ObjectId, availability: Availability[]): Promise<ServiceAvailability> {
+    async createServiceAvailability(providerId: Types.ObjectId, availability: Array<Availability>): Promise<ServiceAvailability> {
         try {
             const serviceAvailability = {
                 providerId,availability

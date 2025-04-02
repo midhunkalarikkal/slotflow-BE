@@ -14,10 +14,10 @@ export interface IPlanRepository {
     
     findPlanById(planId: Types.ObjectId): Promise<Plan | null>;
 
-    findAllPlans(): Promise<FindAllPlansProps[] | null>;
+    findAllPlans(): Promise<Array<FindAllPlansProps> | null>;
 
     findPlanByNameOrPrice(plan: findPlanByNameOrPriceProps): Promise<Plan | null>;
 
-    findAllPlansForDisplay(): Promise<findAllPlansForDisplayResProps[] | null>;
+    findAllPlansForDisplay(): Promise<Array<findAllPlansForDisplayResProps> | null>;
 
 }
