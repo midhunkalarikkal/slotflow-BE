@@ -1,10 +1,15 @@
 import { Types } from "mongoose";
 import { Address } from "../../../domain/entities/address.entity";
 import { Validator } from "../../../infrastructure/validator/validator";
+import { CommonResponse } from "../../../shared/interface/commonInterface";
 import { UserRepositoryImpl } from "../../../infrastructure/database/user/user.repository.impl";
 import { AddressRepositoryImpl } from "../../../infrastructure/database/address/address.repository.impl";
 
-type UserFetchAddressResProps = Pick<Address, "addressLine" | "phone" | "place" | "city" | "district" | "pincode" | "state" | "country" | "googleMapLink">;
+
+interface UserFetchAddressResProps extends CommonResponse {
+    address: Pick<Address, "addressLine" | "phone" | "place" | "city" | "district" | "pincode" | "state" | "country" | "googleMapLink"> | {};
+}
+
 
 export class UserFetchAddressUseCase {
     constructor(
@@ -12,12 +17,12 @@ export class UserFetchAddressUseCase {
         private addressRepository: AddressRepositoryImpl,
     ) { }
 
-    async execute(userId: string): Promise<{ success: boolean, message: string, address: UserFetchAddressResProps | null }> {
+    async execute(userId: string): Promise<UserFetchAddressResProps> {
         if (!userId) throw new Error("Invalid request.");
         const user = await this.userRepository.findUserById(new Types.ObjectId(userId));
         if (!user) throw new Error("No user found.");
         const address = await this.addressRepository.findAddressByUserId(new Types.ObjectId(userId));
-        if (address === null) return { success: true, message: "User Address not yet addedd.", address: null }
+        if (address === null) return { success: true, message: "User Address not yet addedd.", address: {} }
         if (!address) throw new Error("Address fetching error.");
         const { _id, userId: uId, createdAt, updatedAt, ...data } = address;
         return { success: true, message: "User address fetched.", address: data }
@@ -30,7 +35,7 @@ export class UserAddAddressUseCase {
         private addressRepository: AddressRepositoryImpl,
     ) { }
 
-    async execute(userId: string, addressLine: string, phone: string, place: string, city: string, district: string, pincode: string, state: string, country: string, googleMapLink: string): Promise<{ success: boolean, message: string }> {
+    async execute(userId: string, addressLine: string, phone: string, place: string, city: string, district: string, pincode: string, state: string, country: string, googleMapLink: string): Promise<CommonResponse> {
         if (!userId || !addressLine || !phone || !place || !city || !district || !pincode || !state || !country || !googleMapLink) throw new Error("Invalid request.");
         Validator.validateAddressLine(addressLine);
         Validator.validatePhone(phone);

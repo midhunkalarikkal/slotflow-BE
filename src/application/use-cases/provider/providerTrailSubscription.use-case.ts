@@ -1,5 +1,6 @@
 import dayjs from "dayjs";
 import { Types } from "mongoose";
+import { CommonResponse } from "../../../shared/interface/commonInterface";
 import { PlanRepositoryImpl } from "../../../infrastructure/database/plan/plan.repository.impl";
 import { ProviderRepositoryImpl } from "../../../infrastructure/database/provider/provider.repository.impl";
 import { SubscriptionRepositoryImpl } from "../../../infrastructure/database/subscription/subscription.repository.impl";
@@ -11,7 +12,7 @@ export class ProviderTrialSubscriptionUseCase {
         private planRepository: PlanRepositoryImpl,
     ) { }
 
-    async execute(providerId: string): Promise<{ success: boolean, message: string }> {
+    async execute(providerId: string): Promise<CommonResponse> {
         if (!providerId) throw new Error("Invalid request.");
         const provider = await this.providerRepository.findProviderById(new Types.ObjectId(providerId));
         if (!provider) throw new Error("User not found.");

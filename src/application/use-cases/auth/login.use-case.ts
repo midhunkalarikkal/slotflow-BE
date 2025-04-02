@@ -4,14 +4,31 @@ import { User } from "../../../domain/entities/user.entity";
 import { JWTService } from "../../../infrastructure/security/jwt";
 import { Provider } from "../../../domain/entities/provider.entity";
 import { Validator } from "../../../infrastructure/validator/validator";
+import { CommonResponse } from "../../../shared/interface/commonInterface";
 import { PasswordHasher } from "../../../infrastructure/security/password-hashing";
 import { UserRepositoryImpl } from "../../../infrastructure/database/user/user.repository.impl";
 import { ProviderRepositoryImpl } from "../../../infrastructure/database/provider/provider.repository.impl";
 
+
+interface LoginResProps extends CommonResponse {
+    authUser: { 
+        username: string, 
+        profileImage: string | null, 
+        role: string, 
+        token: string, 
+        isLoggedIn: boolean, 
+        address?: boolean, 
+        serviceDetails?: boolean, 
+        serviceAvailability?: boolean, 
+        approved?: boolean 
+    }
+}
+
+
 export class LoginUseCase {
     constructor(private userRepository: UserRepositoryImpl, private providerRepository: ProviderRepositoryImpl) { }
 
-    async execute(email: string, password: string, role: string): Promise<{ success: boolean; message: string, authUser: { username: string, profileImage: string | null, role: string, token: string, isLoggedIn: boolean, address?: boolean, serviceDetails?: boolean, serviceAvailability?: boolean, approved?: boolean } }> {
+    async execute(email: string, password: string, role: string): Promise<LoginResProps> {
 
         if (!email || !password || !role) throw new Error("Invalid request.");
         Validator.validateEmail(email);

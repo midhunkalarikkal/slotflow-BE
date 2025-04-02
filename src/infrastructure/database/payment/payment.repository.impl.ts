@@ -31,10 +31,10 @@ export class PaymentRepositoryImpl implements IPaymentRepository {
         }
     }
     
-    async findAllPaymentsByProviderId(providerId: Types.ObjectId): Promise<Array<FindAllPaymentsResProps> | null> {
+    async findAllPaymentsByProviderId(providerId: Types.ObjectId): Promise<Array<FindAllPaymentsResProps>> {
         try{
             const payments = await PaymentModel.find({providerId: providerId}).sort({createdAt : 1});
-            return payments || null;
+            return payments;
         }catch (error) {
             throw new Error("Finding payments error.");
         }

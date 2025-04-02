@@ -52,12 +52,12 @@ export class ProviderAddServiceAvailabilityUseCase {
 export class ProviderFetchServiceAvailabilityUseCase {
     constructor(private serviceAvailabilityRepository: ServiceAvailabilityRepositoryImpl) { }
 
-    async execute(providerId: string): Promise<{ success: boolean, message: string, availability: ProviderFetchServiceAvailabilityResProps | null}> {
+    async execute(providerId: string): Promise<{ success: boolean, message: string, availability: ProviderFetchServiceAvailabilityResProps | {}}> {
         if (!providerId) throw new Error("Invalid request.");
         const availability = await this.serviceAvailabilityRepository.findServiceAvailabilityByProviderId(new Types.ObjectId(providerId));
-        if(availability === null) return { success: true, message: "Provider service availability not yet added.", availability: null };
+        if(availability === null) return { success: true, message: "Provider service availability not yet added.", availability: {} };
         if (!availability) throw new Error("Provider service availability fetching error.");
         const { providerId: pId, createdAt, updatedAt, ...rest } = availability;
-        return { success: true, message: "Provider service availability fetched.", availability: rest };
+        return { success: true, message: "Provider service availability fetched.", availability: {} };
     }
 }

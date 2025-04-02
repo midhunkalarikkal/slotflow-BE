@@ -8,16 +8,16 @@ export type findAllPlansForDisplayResProps = Pick<Plan, "_id" | "planName" | "pr
 
 
 export interface IPlanRepository {
-    createPlan(plan: CreatePlanProps): Promise<Plan | null>;
+    createPlan(plan: CreatePlanProps): Promise<Plan>;
 
     updatePlan(planId: Types.ObjectId, plna: Plan): Promise<Plan | null>;
     
     findPlanById(planId: Types.ObjectId): Promise<Plan | null>;
 
-    findAllPlans(): Promise<Array<FindAllPlansProps> | null>;
+    findAllPlans(): Promise<Array<FindAllPlansProps>>;
 
     findPlanByNameOrPrice(plan: findPlanByNameOrPriceProps): Promise<Plan | null>;
 
-    findAllPlansForDisplay(): Promise<Array<findAllPlansForDisplayResProps> | null>;
+    findAllPlansForDisplay(): Promise<Array<findAllPlansForDisplayResProps>>;
 
 }

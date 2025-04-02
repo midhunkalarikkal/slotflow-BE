@@ -4,15 +4,24 @@ import { JWTService } from '../../../infrastructure/security/jwt';
 import { Provider } from '../../../domain/entities/provider.entity';
 import { Validator } from '../../../infrastructure/validator/validator';
 import { OTPService } from '../../../infrastructure/services/otp.service';
+import { CommonResponse } from '../../../shared/interface/commonInterface';
 import { PasswordHasher } from '../../../infrastructure/security/password-hashing';
 import { UserRepositoryImpl } from '../../../infrastructure/database/user/user.repository.impl';
 import { ProviderRepositoryImpl } from '../../../infrastructure/database/provider/provider.repository.impl';
+
+interface RegisterResProps extends CommonResponse {
+  authUser: {
+    verificationToken: string, 
+    role: string, 
+    token: string
+  }
+}
 
 export class RegisterUseCase {
 
   constructor(private userRepository: UserRepositoryImpl, private providerRepository: ProviderRepositoryImpl) { }
 
-  async execute(username: string, email: string, password: string, role: string): Promise<{ success: boolean; message: string, authUser: {verificationToken: string, role: string, token: string} }> {
+  async execute(username: string, email: string, password: string, role: string): Promise<RegisterResProps> {
 
     if(!username || !email || !password || !role) throw new Error("Invalid request");
     Validator.validateUsername(username);

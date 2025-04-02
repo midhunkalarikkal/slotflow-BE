@@ -1,6 +1,7 @@
 import { User } from "../../../domain/entities/user.entity";
 import { Provider } from "../../../domain/entities/provider.entity";
 import { Validator } from "../../../infrastructure/validator/validator";
+import { CommonResponse } from "../../../shared/interface/commonInterface";
 import { PasswordHasher } from "../../../infrastructure/security/password-hashing";
 import { UserRepositoryImpl } from "../../../infrastructure/database/user/user.repository.impl";
 import { ProviderRepositoryImpl } from "../../../infrastructure/database/provider/provider.repository.impl";
@@ -8,7 +9,7 @@ import { ProviderRepositoryImpl } from "../../../infrastructure/database/provide
 export class UpdatePasswordUseCase {
     constructor(private userRepository: UserRepositoryImpl, private providerRepository: ProviderRepositoryImpl){}
 
-    async execute(role: string, verificationToken: string, password: string): Promise<{success: boolean, message: string}>{
+    async execute(role: string, verificationToken: string, password: string): Promise<CommonResponse>{
         
         if(!role || !verificationToken || !password)throw new Error("Invalid Request");
 

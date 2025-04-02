@@ -19,10 +19,10 @@ export class PlanRepositoryImpl implements IPlanRepository {
         )
     }
 
-    async createPlan(plan: CreatePlanProps): Promise<Plan | null> {
+    async createPlan(plan: CreatePlanProps): Promise<Plan> {
         try{
             const newPlan = await PlanModel.create(plan);
-            return newPlan ? this.mapToEntity(newPlan) : null;
+            return this.mapToEntity(newPlan);
         }catch(error){
             throw new Error("Failed to create plan.")
         }
@@ -46,10 +46,10 @@ export class PlanRepositoryImpl implements IPlanRepository {
         }
     }
 
-    async findAllPlans(): Promise<Array<FindAllPlansProps> | null> {
+    async findAllPlans(): Promise<Array<FindAllPlansProps>> {
         try{
             const plans = await PlanModel.find({},{_id:1, planName: 1, isBlocked: 1});
-            return plans ?  plans.map(plan => this.mapToEntity(plan)) : null;
+            return plans.map(plan => this.mapToEntity(plan));
         }catch{
             throw new Error("Failed to fetch all plans.");
         }
@@ -70,10 +70,10 @@ export class PlanRepositoryImpl implements IPlanRepository {
         }
     }
 
-    async findAllPlansForDisplay(): Promise<Array<findAllPlansForDisplayResProps> | null> {
+    async findAllPlansForDisplay(): Promise<Array<findAllPlansForDisplayResProps>> {
         try{
             const plans = await PlanModel.find({},{_id:1, planName: 1, price: 1, features: 1, description: 1});
-            return plans ? plans.map((plan) => this.mapToEntity(plan)) : null;
+            return plans.map((plan) => this.mapToEntity(plan));
         }catch(error){
             throw new Error("Plans fetching error.");
         }

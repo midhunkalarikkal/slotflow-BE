@@ -1,10 +1,15 @@
 import { Types } from "mongoose";
 import { Address } from "../../../domain/entities/address.entity";
 import { Validator } from "../../../infrastructure/validator/validator";
+import { CommonResponse } from "../../../shared/interface/commonInterface";
 import { AddressRepositoryImpl } from "../../../infrastructure/database/address/address.repository.impl";
 import { ProviderRepositoryImpl } from "../../../infrastructure/database/provider/provider.repository.impl";
 
-type ProviderFetchAddressResProps = Pick<Address, "_id" | "addressLine" | "phone" | "place" | "city" | "district" | "pincode" | "state" | "country" | "googleMapLink">;
+
+interface ProviderFetchAddressResProps extends CommonResponse {
+    address: Pick<Address, "_id" | "addressLine" | "phone" | "place" | "city" | "district" | "pincode" | "state" | "country" | "googleMapLink"> | {};
+}
+
 
 export class ProviderAddAddressUseCase {
     constructor(
@@ -12,7 +17,7 @@ export class ProviderAddAddressUseCase {
         private addressRepository: AddressRepositoryImpl,
     ){}
 
-    async execute(providerId: string, addressLine: string, phone: string, place: string, city: string, district: string, pincode: string, state: string,  country: string, googleMapLink: string): Promise<{success: boolean, message: string }> {
+    async execute(providerId: string, addressLine: string, phone: string, place: string, city: string, district: string, pincode: string, state: string,  country: string, googleMapLink: string): Promise<CommonResponse> {
         
         if(!providerId || !addressLine || !phone || !place || !city || !district || !pincode || !state || !country || !googleMapLink) throw new Error("Invalid request.");
         Validator.validateAddressLine(addressLine);
@@ -45,10 +50,10 @@ export class ProviderAddAddressUseCase {
 export class ProviderFetchAddressUseCase {
     constructor(private addressRepository: AddressRepositoryImpl) { }
 
-    async execute(providerId: string): Promise<{ success: boolean, message: string, address: ProviderFetchAddressResProps | null}> {
+    async execute(providerId: string): Promise<ProviderFetchAddressResProps> {
         if (!providerId) throw new Error("Invalid request.");
         const address = await this.addressRepository.findAddressByUserId(new Types.ObjectId(providerId));
-        if(address === null) return { success: true, message: "Provider address not yet addedd.", address: null };
+        if(address === null) return { success: true, message: "Provider address not yet addedd.", address: {} };
         if (!address) throw new Error("Provider address fetching error.");
         const { userId, createdAt, updatedAt, ...data } = address;
         return { success: true, message: "Provider address fetched.", address: data };

@@ -1,11 +1,16 @@
 import { Types } from "mongoose";
-import { ProviderRepositoryImpl } from "../../../infrastructure/database/provider/provider.repository.impl";
+import { CommonResponse } from "../../../shared/interface/commonInterface";
 import { UserRepositoryImpl } from "../../../infrastructure/database/user/user.repository.impl";
+import { ProviderRepositoryImpl } from "../../../infrastructure/database/provider/provider.repository.impl";
+
+interface CheckUserStatusResProps extends CommonResponse {
+    status: number
+}
 
 export class CheckUserStatusUseCase {
     constructor(private userRepository: UserRepositoryImpl, private providerRepository: ProviderRepositoryImpl){}
 
-    async execute(id: string, role: string) : Promise<{ status: number, success: boolean, message: string }> {
+    async execute(id: string, role: string) : Promise<CheckUserStatusResProps> {
 
         if (role === "USER") {
             const user = await this.userRepository.findUserById(new Types.ObjectId(id));

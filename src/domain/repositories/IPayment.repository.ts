@@ -8,7 +8,7 @@ export interface IPaymentRepository {
 
     createPaymentForSubscription(payment: CreatePaymentForSubscriptionProps, options?: { session?: any }): Promise<Payment | null>;
 
-    findAllPaymentsByProviderId(providerId: Types.ObjectId): Promise<Array<FindAllPaymentsResProps> | null>
+    findAllPaymentsByProviderId(providerId: Types.ObjectId): Promise<Array<FindAllPaymentsResProps>>
 
 }
 

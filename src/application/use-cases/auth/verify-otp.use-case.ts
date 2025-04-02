@@ -1,12 +1,13 @@
 import { Validator } from '../../../infrastructure/validator/validator';
 import { OTPService } from '../../../infrastructure/services/otp.service';
+import { CommonResponse } from '../../../shared/interface/commonInterface';
 import { UserRepositoryImpl } from '../../../infrastructure/database/user/user.repository.impl';
 import { ProviderRepositoryImpl } from '../../../infrastructure/database/provider/provider.repository.impl';
 
 export class VerifyOTPUseCase {
   constructor(private userRepository: UserRepositoryImpl, private providerRepository: ProviderRepositoryImpl) { }
 
-  async execute(otp: string, verificationToken: string, role: string): Promise<{ success: boolean; message: string }> {
+  async execute(otp: string, verificationToken: string, role: string): Promise<CommonResponse> {
 
     if(!otp || !verificationToken || !role) throw new Error("Invalid request.");
     Validator.validateOtp(otp);

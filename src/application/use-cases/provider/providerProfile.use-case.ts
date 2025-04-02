@@ -5,17 +5,24 @@ import { aws_s3Config } from "../../../config/env";
 import { generateSignedUrl } from "../../../config/aws_s3";
 import { Provider } from "../../../domain/entities/provider.entity";
 import { extractS3Key } from "../../../infrastructure/helpers/helper";
+import { CommonResponse } from "../../../shared/interface/commonInterface";
 import { ProviderRepositoryImpl } from "../../../infrastructure/database/provider/provider.repository.impl";
 
-type ProviderFetchProfileDetailsResProps = Pick<Provider, "username" | "email" | "isAdminVerified" | "isBlocked" | "isEmailVerified" | "phone" | "createdAt">;
+
+interface ProviderFetchProfileDetailsResProps extends CommonResponse {
+    profileDetails: Pick<Provider, "username" | "email" | "isAdminVerified" | "isBlocked" | "isEmailVerified" | "phone" | "createdAt"> | {};
+}
+
+interface ProviderUpdateprofileImageResProps extends CommonResponse, Pick<Provider, "profileImage"> { }
+
 
 export class ProviderFetchProfileDetailsUseCase {
     constructor(private providerRepositoryImpl: ProviderRepositoryImpl) { }
 
-    async execute(providerId: string): Promise<{ success: boolean, message: string, profileDetails: ProviderFetchProfileDetailsResProps | null }> {
+    async execute(providerId: string): Promise<ProviderFetchProfileDetailsResProps> {
         if (!providerId) throw new Error("Invalid request.");
         const provider = await this.providerRepositoryImpl.findProviderById(new Types.ObjectId(providerId));
-        if(provider === null) return { success: true, message: "Provider prfile not addedd.", profileDetails: null };
+        if(provider === null) return { success: true, message: "Provider prfile not addedd.", profileDetails: {} };
         if (!provider) throw new Error("Provider profile fetching error.");
         const { _id, password, addressId, serviceId, subscription, updatedAt, profileImage,  ...data } = provider;
         return { success: true, message: "Provider prfile detailed fetched.", profileDetails: data };
@@ -29,7 +36,7 @@ export class ProviderUpdateProfileImageUseCase {
         private s3: S3Client,
     ) { }
 
-    async execute(providerId: string, file: Express.Multer.File): Promise<{ success: boolean, message: string, profileImage: string }> {
+    async execute(providerId: string, file: Express.Multer.File): Promise<ProviderUpdateprofileImageResProps> {
         if (!providerId || !file) throw new Error("Invalid request.");
 
         const provider = await this.providerRepository.findProviderById(new Types.ObjectId(providerId));

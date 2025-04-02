@@ -1,15 +1,22 @@
 import { Types } from "mongoose";
-import { FindAllPaymentsResProps } from "../../../domain/repositories/IPayment.repository";
+import { Payment } from "../../../domain/entities/payment.entity";
+import { CommonResponse } from "../../../shared/interface/commonInterface";
 import { PaymentRepositoryImpl } from "../../../infrastructure/database/payment/payment.repository.impl";
 import { ProviderRepositoryImpl } from "../../../infrastructure/database/provider/provider.repository.impl";
+
+
+interface ProviderFetchAllPaymentsResProps extends CommonResponse {
+    payments: Array<Pick<Payment, "paymentStatus" | "paymentMethod" | "paymentGateway" | "paymentFor" | "discountAmount" | "totalAmount" | "createdAt" | "_id">> | [];
+}
+
 
 export class ProviderFetchAllPaymentsUseCase {
     constructor(
         private providerRepository: ProviderRepositoryImpl,
         private paymentRepository: PaymentRepositoryImpl,
-    ) {}
+    ) { }
 
-    async execute(providerId: string): Promise<{ success: boolean, message: string, payments: FindAllPaymentsResProps[]}> {
+    async execute(providerId: string): Promise<ProviderFetchAllPaymentsResProps> {
         if(!providerId) throw new Error("Invalid request.");
 
         const provider = await this.providerRepository.findProviderById(new Types.ObjectId(providerId));

@@ -2,14 +2,19 @@ import { Types } from 'mongoose';
 import { S3Client } from '@aws-sdk/client-s3';
 import { Upload } from "@aws-sdk/lib-storage";
 import { aws_s3Config } from '../../../config/env';
+import { generateSignedUrl } from '../../../config/aws_s3';
+import { extractS3Key } from '../../../infrastructure/helpers/helper';
 import { Validator } from '../../../infrastructure/validator/validator';
+import { CommonResponse } from '../../../shared/interface/commonInterface';
+import { ProviderService } from '../../../domain/entities/providerService.entity';
 import { ProviderRepositoryImpl } from '../../../infrastructure/database/provider/provider.repository.impl';
 import { ProviderServiceRepositoryImpl } from '../../../infrastructure/database/providerService/providerService.repository.impl';
-import { extractS3Key } from '../../../infrastructure/helpers/helper';
-import { generateSignedUrl } from '../../../config/aws_s3';
-import { ProviderService } from '../../../domain/entities/providerService.entity';
 
-type ProviderFetchServiceDetailsResProps = Pick<ProviderService, "_id" | "serviceCategory" | "serviceName" | "serviceDescription" | "servicePrice" | "providerAdhaar" | "providerExperience" | "providerCertificateUrl">;
+
+interface ProviderFetchServiceDetailsResProps extends CommonResponse {
+    service: Pick<ProviderService, "_id" | "serviceCategory" | "serviceName" | "serviceDescription" | "servicePrice" | "providerAdhaar" | "providerExperience" | "providerCertificateUrl"> | {};
+}
+
 
 export class ProviderAddServiceDetailsUseCase {
     
@@ -19,7 +24,7 @@ export class ProviderAddServiceDetailsUseCase {
         private s3: S3Client
     ){}
 
-    async execute(providerId: string, serviceCategory: string, serviceName: string, serviceDescription: string, servicePrice: number, providerAdhaar: string, providerExperience: string, file: Express.Multer.File): Promise<{success:boolean, message: string }> {
+    async execute(providerId: string, serviceCategory: string, serviceName: string, serviceDescription: string, servicePrice: number, providerAdhaar: string, providerExperience: string, file: Express.Multer.File): Promise<CommonResponse> {
 
         if(!providerId || !serviceCategory || !serviceName || !serviceDescription || !servicePrice || !providerAdhaar || !providerExperience || !file) throw new Error("Invalid Request.");
         Validator.validateServiceName(serviceName);
@@ -60,7 +65,6 @@ export class ProviderAddServiceDetailsUseCase {
             return { success: true, message: 'Service details saved.' };
 
         } catch(error){
-            console.log("error : ",error);
             throw new Error('Failed to save service details.')
         }
     }
@@ -70,11 +74,11 @@ export class ProviderAddServiceDetailsUseCase {
 export class ProviderFetchServiceDetailsUseCase {
     constructor(private provderServiceRepository: ProviderServiceRepositoryImpl) { }
 
-    async execute(providerId: string): Promise<{ success: boolean, message: string, service: ProviderFetchServiceDetailsResProps | null}> {
+    async execute(providerId: string): Promise<ProviderFetchServiceDetailsResProps> {
         if (!providerId) throw new Error("Invalid request.");
 
         const service = await this.provderServiceRepository.findProviderServiceByProviderId(new Types.ObjectId(providerId));
-        if(service === null) return { success: true, message: "Provider service details not yet addedd", service: null };
+        if(service === null) return { success: true, message: "Provider service details not yet addedd", service: {} };
         if (!service) throw new Error("Provider service fetching error.");
 
         const s3Key = await extractS3Key(service.providerCertificateUrl);

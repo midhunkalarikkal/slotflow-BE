@@ -2,17 +2,24 @@ import { Types } from "mongoose";
 import { S3Client } from "@aws-sdk/client-s3";
 import { Upload } from "@aws-sdk/lib-storage";
 import { aws_s3Config } from "../../../config/env";
-import { User } from "../../../domain/entities/user.entity";
 import { generateSignedUrl } from "../../../config/aws_s3";
+import { User } from "../../../domain/entities/user.entity";
 import { extractS3Key } from "../../../infrastructure/helpers/helper";
+import { CommonResponse } from "../../../shared/interface/commonInterface";
 import { UserRepositoryImpl } from "../../../infrastructure/database/user/user.repository.impl";
 
-type UserFetchProfileDetailsResProps = Pick<User, "username" | "email" | "isBlocked" | "isEmailVerified" | "phone" | "createdAt">;
+
+interface UserFetchProfileDetails extends CommonResponse {
+    profileDetails: Pick<User, "username" | "email" | "isBlocked" | "isEmailVerified" | "phone" | "createdAt"> | {};
+}
+
+interface UserUpdateProfileImageResProps extends CommonResponse , Pick<User, "profileImage"> { };
+
 
 export class UserFetchProfileDetailsUseCase {
     constructor(private userRepository: UserRepositoryImpl) { }
 
-    async execute(userId: string): Promise<{ success: boolean, message: string, profileDetails: UserFetchProfileDetailsResProps }> {
+    async execute(userId: string): Promise<UserFetchProfileDetails> {
         if (!userId) throw new Error("Invalid request.");
         const user = await this.userRepository.findUserById(new Types.ObjectId(userId));
         if (!user) throw new Error("User not found.");
@@ -27,7 +34,7 @@ export class UserUpdateProfileImageUseCase {
         private s3: S3Client,
     ) { }
 
-    async execute(userId: string, file: Express.Multer.File): Promise<{ success: boolean, message: string, profileImage: string }> {
+    async execute(userId: string, file: Express.Multer.File): Promise<UserUpdateProfileImageResProps> {
         if (!userId || !file) throw new Error("Invalid request.");
         const user = await this.userRepository.findUserById(new Types.ObjectId(userId));
         if (!user) throw new Error("User not found.");

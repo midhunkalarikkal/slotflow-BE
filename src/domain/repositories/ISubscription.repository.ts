@@ -10,9 +10,9 @@ export interface FindSubscriptionsByProviderIdResProps extends SubscripionsResPr
 
 export interface ISubscriptionRepository {
 
-    createSubscription(subscription: CreateSubscriptionPayloadProps, options: { session: any }): Promise<Subscription | null>;
+    createSubscription(subscription: CreateSubscriptionPayloadProps, options: { session: any }): Promise<Subscription>;
 
     findSubscriptionById(subscriptionId: Types.ObjectId): Promise<Subscription | null>;
 
-    findSubscriptionsByProviderId(providerId: Types.ObjectId): Promise<Array<FindSubscriptionsByProviderIdResProps> | null>;
+    findSubscriptionsByProviderId(providerId: Types.ObjectId): Promise<Array<FindSubscriptionsByProviderIdResProps>>;
 }

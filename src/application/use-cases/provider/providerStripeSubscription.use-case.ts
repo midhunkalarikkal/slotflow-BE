@@ -114,7 +114,7 @@ export class ProviderSaveSubscriptionUseCase {
                 paymentId: payment._id,
             }, { session: mongoSession });
 
-            if (!subscription) throw new Error("Unexpected error, subscription saving error.");
+            if (!subscription) throw new Error("Subscription saving error.");
 
             provider.subscription.push(subscription._id);
 
