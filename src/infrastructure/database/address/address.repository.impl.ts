@@ -1,8 +1,7 @@
 import { Types } from "mongoose";
 import { AddressModel, IAddress } from "./address.model";
 import { Address } from "../../../domain/entities/address.entity";
-import { IAddressRepository } from "../../../domain/repositories/IAddress.repository";
-import { CreateAddressReqProps } from "../../../shared/interface/addressInterface";
+import { CreateAddressReqProps, IAddressRepository } from "../../../domain/repositories/IAddress.repository";
 
 export class AddressRepositoryImpl implements IAddressRepository {
     private mapToEntity(address: IAddress): Address {
