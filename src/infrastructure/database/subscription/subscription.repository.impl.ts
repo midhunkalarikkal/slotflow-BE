@@ -1,7 +1,7 @@
 import { Types } from "mongoose";
 import { ISubscription, SubscriptionModel } from "./subscription.model";
 import { Subscription } from "../../../domain/entities/subscription.entity";
-import { CreateSubscriptionPayloadProps, FindSubscriptionsByProviderIdResProps, ISubscriptionRepository } from "../../../domain/repositories/ISubscription.repository";
+import { CreateSubscriptionPayloadProps, FindAllSubscriptionsResProps, FindSubscriptionsByProviderIdResProps, ISubscriptionRepository } from "../../../domain/repositories/ISubscription.repository";
 
 export class SubscriptionRepositoryImpl implements ISubscriptionRepository {
     private mapToEntity(subscription: ISubscription): Subscription {
@@ -45,6 +45,18 @@ export class SubscriptionRepositoryImpl implements ISubscriptionRepository {
             return subscriptions;
         } catch (error) {
             throw new Error("Subscriptions fetching error.");
+        }
+    }
+
+    async findAllSubscriptions(): Promise<Array<FindAllSubscriptionsResProps> | []> {
+        try{
+            const subscriptions = await SubscriptionModel.find({}, {updatedAt: 0, paymentId: 0}).populate({
+                path: "subscriptionPlanId",
+                select: "planName price -_id"
+            }).lean();
+            return subscriptions;
+        }catch (error) {
+            throw new Error("Subcriptions fetching error.");
         }
     }
 }

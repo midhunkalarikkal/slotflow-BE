@@ -58,6 +58,6 @@ export class ProviderFetchServiceAvailabilityUseCase {
         if(availability === null) return { success: true, message: "Provider service availability not yet added.", availability: {} };
         if (!availability) throw new Error("Provider service availability fetching error.");
         const { providerId: pId, createdAt, updatedAt, ...rest } = availability;
-        return { success: true, message: "Provider service availability fetched.", availability: {} };
+        return { success: true, message: "Provider service availability fetched.", availability: rest };
     }
 }

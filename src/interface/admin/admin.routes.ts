@@ -4,6 +4,7 @@ import { adminPlanController } from "./adminPlan.Controller";
 import { authMiddleware } from "../middleware/auth.middleware";
 import { adminServiceController } from "./adminService.Controller";
 import { adminProviderController } from "./adminProvider.controller";
+import { adminSubscriptionController } from "./adminSubscription.Controller";
 
 const router = Router();
 
@@ -27,6 +28,8 @@ router.put('/changeServiceStatus/:serviceId',authMiddleware, adminServiceControl
 
 router.get('/plans', authMiddleware,adminPlanController.getAllPLans);
 router.post('/addNewPlan', authMiddleware, adminPlanController.addNewPlan);
-router.put('/changePlanStatus/:planId', authMiddleware, adminPlanController.changePlanStatus)
+router.put('/changePlanStatus/:planId', authMiddleware, adminPlanController.changePlanStatus);
+
+router.get('/getSubscriptions', authMiddleware, adminSubscriptionController.fetchAllSubscriptions);
 
 export default router;
