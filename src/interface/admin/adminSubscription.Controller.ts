@@ -1,19 +1,22 @@
 import { Request, Response } from "express";
 import { HandleError } from "../../infrastructure/error/error";
-import { AdminFetchAllSubscriptionsUseCase } from "../../application/use-cases/admin/adminSubscription.use-case";
+import { AdminFetchAllSubscriptionsUseCase, AdminFetchSubscriptionDetailsUseCase } from "../../application/use-cases/admin/adminSubscription.use-case";
 import { SubscriptionRepositoryImpl } from "../../infrastructure/database/subscription/subscription.repository.impl";
 
 const subscriptionRepositoryImpl = new SubscriptionRepositoryImpl();
 const adminFetchAllSubscriptionsUseCase = new AdminFetchAllSubscriptionsUseCase(subscriptionRepositoryImpl);
+const adminFetchSubscriptionDetailsUseCase = new AdminFetchSubscriptionDetailsUseCase(subscriptionRepositoryImpl);
 
 export class AdminSubscriptionController {
     constructor(
         private adminFetchAllSubscriptionsUseCase: AdminFetchAllSubscriptionsUseCase,
+        private adminFetchSubscriptionDetailsUseCase: AdminFetchSubscriptionDetailsUseCase,
     ) { 
-        this.fetchAllSubscriptions = this.fetchAllSubscriptions.bind(this);
+        this.getAllSubscriptions = this.getAllSubscriptions.bind(this);
+        this.getSubscriptionDetails = this.getSubscriptionDetails.bind(this);
     }
 
-    async fetchAllSubscriptions(req:Request, res: Response) {
+    async getAllSubscriptions(req:Request, res: Response) {
         try{
             const result = await this.adminFetchAllSubscriptionsUseCase.execute();
             res.status(200).json(result);
@@ -21,7 +24,20 @@ export class AdminSubscriptionController {
             HandleError.handle(error,res);
         }
     }
+
+    async getSubscriptionDetails(req: Request, res: Response) {
+        try{
+            console.log("calling");
+            const { subscriptionId } = req.params;
+            if(!subscriptionId) throw new Error("Invalid request.");
+            const result = await this.adminFetchSubscriptionDetailsUseCase.execute(subscriptionId);
+            console.log("Result : ",result);
+            res.status(200).json(result);
+        }catch (error) {
+            HandleError.handle(error, res);
+        }
+    }
 }
 
-const adminSubscriptionController = new AdminSubscriptionController( adminFetchAllSubscriptionsUseCase );
+const adminSubscriptionController = new AdminSubscriptionController( adminFetchAllSubscriptionsUseCase, adminFetchSubscriptionDetailsUseCase );
 export { adminSubscriptionController }

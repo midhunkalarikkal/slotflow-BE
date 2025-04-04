@@ -30,6 +30,7 @@ router.get('/plans', authMiddleware,adminPlanController.getAllPLans);
 router.post('/addNewPlan', authMiddleware, adminPlanController.addNewPlan);
 router.put('/changePlanStatus/:planId', authMiddleware, adminPlanController.changePlanStatus);
 
-router.get('/getSubscriptions', authMiddleware, adminSubscriptionController.fetchAllSubscriptions);
+router.get('/getSubscriptions', authMiddleware, adminSubscriptionController.getAllSubscriptions);
+router.get('/getSubscription/:subscriptionId', authMiddleware, adminSubscriptionController.getSubscriptionDetails);
 
 export default router;
