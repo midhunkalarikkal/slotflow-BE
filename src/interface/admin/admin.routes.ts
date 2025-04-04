@@ -5,6 +5,7 @@ import { authMiddleware } from "../middleware/auth.middleware";
 import { adminServiceController } from "./adminService.Controller";
 import { adminProviderController } from "./adminProvider.controller";
 import { adminSubscriptionController } from "./adminSubscription.Controller";
+import { adminPaymentController } from "./adminPayment.Controller";
 
 const router = Router();
 
@@ -33,4 +34,6 @@ router.put('/changePlanStatus/:planId', authMiddleware, adminPlanController.chan
 router.get('/getSubscriptions', authMiddleware, adminSubscriptionController.getAllSubscriptions);
 router.get('/getSubscription/:subscriptionId', authMiddleware, adminSubscriptionController.getSubscriptionDetails);
 
+
+router.get('/getPayments', authMiddleware, adminPaymentController.getAllPayments);
 export default router;

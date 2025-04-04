@@ -1,6 +1,6 @@
 import { Types } from "mongoose";
 import { Payment } from "../../../domain/entities/payment.entity";
-import { CreatePaymentForSubscriptionProps, FindAllPaymentsResProps, IPaymentRepository } from "../../../domain/repositories/IPayment.repository";
+import { CreatePaymentForSubscriptionProps, FindAllPayments, FindAllPaymentsByProviderIdResProps, IPaymentRepository } from "../../../domain/repositories/IPayment.repository";
 import { IPayment, PaymentModel } from "./payment.model";
 
 export class PaymentRepositoryImpl implements IPaymentRepository {
@@ -31,12 +31,23 @@ export class PaymentRepositoryImpl implements IPaymentRepository {
         }
     }
     
-    async findAllPaymentsByProviderId(providerId: Types.ObjectId): Promise<Array<FindAllPaymentsResProps>> {
+    async findAllPaymentsByProviderId(providerId: Types.ObjectId): Promise<Array<FindAllPaymentsByProviderIdResProps> | []> {
         try{
-            const payments = await PaymentModel.find({providerId: providerId}).sort({createdAt : 1});
+            const payments = await PaymentModel.find({providerId: providerId}).sort({createdAt : 1})
+            .select("_id paymentStatus paymentMethod paymentGateway paymentFor discountAmount totalAmount createdAt")
             return payments;
         }catch (error) {
             throw new Error("Finding payments error.");
+        }
+    }
+
+    async findAllPayments(): Promise<Array<FindAllPayments> | []> {
+        try{
+            const payments = await PaymentModel.find({}).sort({ createdAt: 1 })
+            .select("-_id createdAt totalAmount paymentFor paymentGateway paymentStatus paymentMethod");
+            return payments;
+        }catch (error) {
+            throw new Error("Payments fetching error.");
         }
     }
 }
