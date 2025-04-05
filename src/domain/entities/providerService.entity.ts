@@ -4,7 +4,7 @@ export class ProviderService {
     constructor(
         public _id: Types.ObjectId,
         public providerId: Types.ObjectId,
-        public serviceCategory: string,
+        public serviceCategory: Types.ObjectId,
         public serviceName: string,
         public serviceDescription: string,
         public servicePrice: number,

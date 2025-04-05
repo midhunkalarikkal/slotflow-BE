@@ -3,6 +3,7 @@ import { S3Client } from '@aws-sdk/client-s3';
 import { Upload } from "@aws-sdk/lib-storage";
 import { aws_s3Config } from '../../../config/env';
 import { generateSignedUrl } from '../../../config/aws_s3';
+import { Service } from '../../../domain/entities/service.entity';
 import { extractS3Key } from '../../../infrastructure/helpers/helper';
 import { Validator } from '../../../infrastructure/validator/validator';
 import { CommonResponse } from '../../../shared/interface/commonInterface';
@@ -11,8 +12,12 @@ import { ProviderRepositoryImpl } from '../../../infrastructure/database/provide
 import { ProviderServiceRepositoryImpl } from '../../../infrastructure/database/providerService/providerService.repository.impl';
 
 
-interface ProviderFetchServiceDetailsResProps extends CommonResponse {
-    service: Pick<ProviderService, "_id" | "serviceCategory" | "serviceName" | "serviceDescription" | "servicePrice" | "providerAdhaar" | "providerExperience" | "providerCertificateUrl"> | {};
+type FindProviderServiceProps = Pick<ProviderService, "_id" | "serviceName" | "serviceDescription" | "servicePrice" | "providerAdhaar" | "providerExperience" | "providerCertificateUrl" | "updatedAt" | "createdAt">;
+interface FindProviderServiceResProps extends FindProviderServiceProps {
+    serviceCategory: Pick<Service, "serviceName">
+}
+interface AdminFetchProviderServiceResProps extends CommonResponse {
+    service: FindProviderServiceResProps | {};
 }
 
 
@@ -52,9 +57,8 @@ export class ProviderAddServiceDetailsUseCase {
             const s3UploadResponse = await upload.done();
             if(!s3UploadResponse)throw new Error("Image uploading error, please try again");
 
-            const providerService = await this.providerServiceRepository.createProviderService({providerId: new Types.ObjectId(providerId), serviceCategory, serviceName, serviceDescription, servicePrice, providerAdhaar, providerExperience, providerCertificateUrl: s3UploadResponse.Location!})
+            const providerService = await this.providerServiceRepository.createProviderService({providerId: new Types.ObjectId(providerId), serviceCategory: new Types.ObjectId(serviceCategory), serviceName, serviceDescription, servicePrice, providerAdhaar, providerExperience, providerCertificateUrl: s3UploadResponse.Location!})
             if(!providerService) throw new Error("Service details adding error.");
-
 
             if (provider && providerService && providerService._id) {
                 provider.serviceId = providerService._id;
@@ -74,12 +78,18 @@ export class ProviderAddServiceDetailsUseCase {
 export class ProviderFetchServiceDetailsUseCase {
     constructor(private provderServiceRepository: ProviderServiceRepositoryImpl) { }
 
-    async execute(providerId: string): Promise<ProviderFetchServiceDetailsResProps> {
+    async execute(providerId: string): Promise<AdminFetchProviderServiceResProps> {
         if (!providerId) throw new Error("Invalid request.");
 
         const service = await this.provderServiceRepository.findProviderServiceByProviderId(new Types.ObjectId(providerId));
         if(service === null) return { success: true, message: "Provider service details not yet addedd", service: {} };
-        if (!service) throw new Error("Provider service fetching error.");
+        function isServiceData(obj: any): obj is FindProviderServiceResProps {
+            return obj && typeof obj === 'object' && '_id' in obj;
+        }
+        
+        if (!isServiceData(service)) {
+            return { success: true, message: "Service fetched successfully.", service: {} };
+        }
 
         const s3Key = await extractS3Key(service.providerCertificateUrl);
         const signedUrl = await generateSignedUrl(s3Key);

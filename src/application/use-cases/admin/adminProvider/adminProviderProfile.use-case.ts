@@ -1,6 +1,7 @@
 import { Types } from "mongoose";
 import { generateSignedUrl } from "../../../../config/aws_s3";
 import { Address } from "../../../../domain/entities/address.entity";
+import { Service } from "../../../../domain/entities/service.entity";
 import { Payment } from "../../../../domain/entities/payment.entity";
 import { Provider } from "../../../../domain/entities/provider.entity";
 import { CommonResponse } from "../../../../shared/interface/commonInterface";
@@ -23,8 +24,12 @@ interface AdminFetchProviderAddressResProps extends CommonResponse {
     address: Pick<Address, "userId" | "addressLine" | "phone" | "place" | "city" | "district" | "pincode" | "state" | "country" | "googleMapLink"> | {};
 }
 
+type FindProviderServiceProps = Omit<ProviderService, "serviceCategory">;
+interface FindProviderServiceResProps extends FindProviderServiceProps {
+    serviceCategory: Pick<Service, "serviceName">
+}
 interface AdminFetchProviderServiceResProps extends CommonResponse {
-    service: Pick<ProviderService, "providerId" | "serviceCategory" | "serviceName" |"serviceDescription" | "servicePrice" | "providerAdhaar" | "providerExperience" | "providerCertificateUrl"> | {};
+    service: FindProviderServiceResProps | {};
 }
 
 interface AdminFetchProviderServiceAvailabilityResProps extends CommonResponse {
@@ -85,15 +90,23 @@ export class AdminFetchProviderServiceUseCase {
     ) { }
 
     async execute(providerId: string): Promise<AdminFetchProviderServiceResProps> {
+        console.log("Fetching service details");
         if (!providerId) throw new Error("Invalid request.");
 
         const provider = await this.providerRepository.findProviderById(new Types.ObjectId(providerId));
         if(!provider) throw new Error("No user found.");
 
         const serviceData = await this.providerServiceRepository.findProviderServiceByProviderId(new Types.ObjectId(providerId));
-        if (serviceData == null) return { success: true, message: "Service fetched successfully.", service: {} };
+        function isServiceData(obj: any): obj is FindProviderServiceResProps {
+            return obj && typeof obj === 'object' && '_id' in obj;
+        }
+        
+        if (!isServiceData(serviceData)) {
+            return { success: true, message: "Service fetched successfully.", service: {} };
+        }
 
         const { _id, createdAt, updatedAt, ...service } = serviceData;
+
         const providerCertifiacteUrl = service.providerCertificateUrl;
         if (!providerCertifiacteUrl) throw new Error("Service details fetching error.");
 

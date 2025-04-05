@@ -3,7 +3,7 @@ import mongoose, { Document, Schema, Types } from "mongoose";
 export interface IProviderService extends Document {
     _id: Types.ObjectId;
     providerId: Types.ObjectId;
-    serviceCategory: string;
+    serviceCategory: Types.ObjectId;
     serviceName: string;
     serviceDescription: string;
     servicePrice: number;
@@ -21,7 +21,8 @@ const ProviderServiceSchema = new Schema<IProviderService>({
         required: true,
     },
     serviceCategory: {
-        type: String,
+        type: Schema.Types.ObjectId,
+        ref: "Service",
         required: true,
     },
     serviceName: {

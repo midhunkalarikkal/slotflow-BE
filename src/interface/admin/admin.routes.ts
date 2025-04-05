@@ -3,9 +3,9 @@ import { adminUserController } from "./adminUser.Controller";
 import { adminPlanController } from "./adminPlan.Controller";
 import { authMiddleware } from "../middleware/auth.middleware";
 import { adminServiceController } from "./adminService.Controller";
+import { adminPaymentController } from "./adminPayment.Controller";
 import { adminProviderController } from "./adminProvider.controller";
 import { adminSubscriptionController } from "./adminSubscription.Controller";
-import { adminPaymentController } from "./adminPayment.Controller";
 
 const router = Router();
 
