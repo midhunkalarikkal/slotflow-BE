@@ -1,7 +1,7 @@
 import { Types } from "mongoose";
 import { IProviderService, ProviderServiceModel } from "./providerService.model";
 import { ProviderService } from "../../../domain/entities/providerService.entity";
-import { CreateProviderServiceReqProps, FindProviderServiceResProps, IProviderServiceRepository } from "../../../domain/repositories/IProviderService.repository";
+import { CreateProviderServiceReqProps, FindProviderServiceResProps, FindProvidersUsingServiceCategoryIdsResProps, IProviderServiceRepository } from "../../../domain/repositories/IProviderService.repository";
 
 export class ProviderServiceRepositoryImpl implements IProviderServiceRepository {
     private mapToEntity(providerService: IProviderService): ProviderService {
@@ -21,27 +21,80 @@ export class ProviderServiceRepositoryImpl implements IProviderServiceRepository
     }
 
     async createProviderService(providerService: CreateProviderServiceReqProps): Promise<ProviderService | null> {
-        try{
-            if(!providerService) throw new Error("Invalid request.");
+        try {
+            if (!providerService) throw new Error("Invalid request.");
             const newProviderService = await ProviderServiceModel.create(providerService);
             return newProviderService ? this.mapToEntity(newProviderService) : null;
-        }catch(error){
+        } catch (error) {
             throw new Error("Service details adding error.");
         }
     }
 
     async findProviderServiceByProviderId(providerId: Types.ObjectId): Promise<FindProviderServiceResProps | {}> {
-        try{
-            if(!providerId) throw new Error("Invalid request.");
+        try {
+            if (!providerId) throw new Error("Invalid request.");
             const service = await ProviderServiceModel.findOne({ providerId })
-            .populate({
-                path: "serviceCategory",
-                select: "-_id serviceName"
-            }).lean();
+                .populate({
+                    path: "serviceCategory",
+                    select: "-_id serviceName"
+                }).lean();
             return service || {};
-        }catch(error){
+        } catch (error) {
             throw new Error("Service fetching error.");
         }
     }
-    
+
+    async findProvidersUsingServiceCategoryIds(serviceCategoryIds: Types.ObjectId[]): Promise<Array<FindProvidersUsingServiceCategoryIdsResProps> | []> {
+        try {
+            console.log("serviceCategoryIds : ", serviceCategoryIds);
+            const providers = await ProviderServiceModel.aggregate([
+                {
+                    $match: {
+                        serviceCategory: { $in: serviceCategoryIds }
+                    }
+                },
+                {
+                    $lookup: {
+                        from: "providers",
+                        localField: "providerId",
+                        foreignField: "_id",
+                        as: "provider"
+                    }
+                },
+                {
+                    $unwind: "$provider"
+                },
+                {
+                    $lookup: {
+                      from: "services",
+                      localField: "serviceCategory",
+                      foreignField: "_id",
+                      as: "category"
+                    }
+                  },
+                  { $unwind: "$category" },
+                {
+                    $project: {
+                        service: {
+                            serviceCategory: "$serviceCategory",
+                            serviceName: "$serviceName",
+                            servicePrice: "$servicePrice",
+                            categoryName: "$category.serviceName"
+                        },
+                        provider: {
+                            _id: '$provider._id',
+                            username: '$provider.username',
+                            profileImage: '$provider.profileImage',
+                            trustedBySlotflow: '$provider.trustedBySlotflow'
+                        }
+                    }
+                }
+            ]);
+            console.log("Providers : ", providers);
+            return providers;
+        } catch (error) {
+            throw new Error("Provider Ids fetching error");
+        }
+    }
+
 }

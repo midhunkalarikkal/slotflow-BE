@@ -9,10 +9,27 @@ export interface FindProviderServiceResProps extends FindProviderServiceProps {
     serviceCategory: Pick<Service, "serviceName">
 }
 
+export  interface FindProvidersUsingServiceCategoryIdsResProps {
+    _id: Types.ObjectId,
+    provider : {
+        _id: Types.ObjectId,
+        username: string,
+        profileImage: string | null,
+        trustedBySlotflow: boolean,
+    },
+    service: {
+        serviceCategory: Types.ObjectId,
+        serviceName: string,
+        serviceProvce: number,
+        categoryName: string
+    }
+  }
+
 export interface IProviderServiceRepository {
 
     createProviderService(providerService: CreateProviderServiceReqProps): Promise<ProviderService | null>;
 
     findProviderServiceByProviderId(providerId: Types.ObjectId): Promise<FindProviderServiceResProps | {}>;
 
+    findProvidersUsingServiceCategoryIds(serviceCategoryIds: Types.ObjectId[]): Promise<Array<FindProvidersUsingServiceCategoryIdsResProps> | []>
 }
