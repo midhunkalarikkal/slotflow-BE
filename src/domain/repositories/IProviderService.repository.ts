@@ -20,7 +20,7 @@ export  interface FindProvidersUsingServiceCategoryIdsResProps {
     service: {
         serviceCategory: Types.ObjectId,
         serviceName: string,
-        serviceProvce: number,
+        servicePrice: number,
         categoryName: string
     }
   }
