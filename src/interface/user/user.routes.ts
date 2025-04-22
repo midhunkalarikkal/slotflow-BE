@@ -20,5 +20,6 @@ router.get('/getServiceProviders/:selectedServices', authMiddleware, userProvide
 router.get('/getServiceProviderProfileDetails/:providerId', authMiddleware, userProviderController.fetchServiceProviderProfileDetails);
 router.get('/getServiceProviderAddress/:providerId', authMiddleware, userProviderController.fetchServiceProviderAddress);
 router.get('/getServiceProviderServiceDetails/:providerId', authMiddleware, userProviderController.fetchServiceProviderServiceDetails);
+router.get('/getServiceProviderServiceAvailability/:providerId', authMiddleware, userProviderController.fetchServiceProviderServiceAvailability);
 
 export default router;

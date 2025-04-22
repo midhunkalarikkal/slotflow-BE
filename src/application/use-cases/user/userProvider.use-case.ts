@@ -11,6 +11,8 @@ import { AddressRepositoryImpl } from "../../../infrastructure/database/address/
 import { Address } from "../../../domain/entities/address.entity";
 import { ProviderService } from "../../../domain/entities/providerService.entity";
 import { Service } from "../../../domain/entities/service.entity";
+import { ServiceAvailabilityRepositoryImpl } from "../../../infrastructure/database/serviceAvailability/serviceAvailability.repository.impl";
+import { ServiceAvailability } from "../../../domain/entities/serviceAvailability.entity";
 
 interface UserFetchServiceProvidersResProps extends CommonResponse {
   providers: Array<FindProvidersUsingServiceCategoryIdsResProps>
@@ -30,6 +32,10 @@ interface FindProviderServiceResProps extends FindProviderServiceProps {
 }
 interface UserFetchProviderServiceResProps extends CommonResponse {
   service: FindProviderServiceResProps | {};
+}
+
+interface UserFetchProviderServiceAvailabilityResProps extends CommonResponse {
+    availability: Pick<ServiceAvailability, "availability"> | {};
 }
 
 export class UserFetchServiceProvidersUseCase {
@@ -141,4 +147,24 @@ export class UserFetchServiceProviderServiceDetailsUseCase {
 
     return { success: true, message: "Service provider address fetched", service : { serviceName, serviceDescription, servicePrice, providerExperience, serviceCategory } }
   }
+}
+
+export class UserFetchServiceProviderServiceAvailabilityUseCase {
+    constructor(
+        private userRepository: UserRepositoryImpl,
+        private serviceAvailabilityRepository: ServiceAvailabilityRepositoryImpl,
+    ) { }
+
+    async execute(userId: string,providerId: string): Promise<UserFetchProviderServiceAvailabilityResProps> {
+        if (!userId || !providerId) throw new Error("Invalid request.");
+
+        const user = await this.userRepository.findUserById(new Types.ObjectId(userId));
+    if (!user) throw new Error("No user found");
+
+        const availability = await this.serviceAvailabilityRepository.findServiceAvailabilityByProviderId(new Types.ObjectId(providerId));
+        if (availability == null) return { success: true, message: "Service availability fetched successfully.", availability: {} };
+
+        const { _id, providerId: spId, createdAt, updatedAt, ...rest } = availability;
+        return { success: true, message: "Service availability fetched successfully.", availability: rest };
+    }
 }
