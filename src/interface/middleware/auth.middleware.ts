@@ -6,8 +6,6 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction):
   const token = req.cookies.token;
   const currentTime = Date.now();
 
-    console.log("token : ",token);
-
   if (!token) {
     res.status(401).json({ success: false, message: "Unauthorized, no token." });
     return;

@@ -1,18 +1,24 @@
 import { Request, Response } from "express";
 import { HandleError } from "../../infrastructure/error/error";
 import { UserRepositoryImpl } from "../../infrastructure/database/user/user.repository.impl";
-import { UserFetchServiceProviderUseCase } from "../../application/use-cases/user/userProvider.use-case";
+import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/provider.repository.impl";
 import { ProviderServiceRepositoryImpl } from "../../infrastructure/database/providerService/providerService.repository.impl";
+import { UserFetchServiceProviderProfileDetailsUseCase, UserFetchServiceProvidersUseCase } from "../../application/use-cases/user/userProvider.use-case";
 
 const userRepositoryImpl = new UserRepositoryImpl();
 const providerServiceRepositoryImpl = new ProviderServiceRepositoryImpl();
-const userFetchServiceProviderUseCase = new UserFetchServiceProviderUseCase( userRepositoryImpl, providerServiceRepositoryImpl );
+const providerRepositoryImpl = new ProviderRepositoryImpl();
+const userFetchServiceProvidersUseCase = new UserFetchServiceProvidersUseCase( userRepositoryImpl, providerServiceRepositoryImpl );
+const userFetchServiceProviderProfileDetailsUseCase = new UserFetchServiceProviderProfileDetailsUseCase( userRepositoryImpl, providerRepositoryImpl );
 
 export class UserProviderController {
     constructor(
-        private userFetchServiceProviderUseCase: UserFetchServiceProviderUseCase,
+        private userFetchServiceProvidersUseCase: UserFetchServiceProvidersUseCase,
+        private userFetchServiceProviderProfileDetailsUseCase: UserFetchServiceProviderProfileDetailsUseCase,
     ){
         this.fetchServiceProviders = this.fetchServiceProviders.bind(this);
+        this.fetchServiceProviderProfileDetails = this.fetchServiceProviderProfileDetails.bind(this);
+        this.fetchServiceProviderAddress = this.fetchServiceProviderAddress.bind(this);
     }
     
     async fetchServiceProviders(req: Request, res: Response) {
@@ -22,13 +28,39 @@ export class UserProviderController {
             console.log("req.params.selectedServices : ",req.params.selectedServices);
             if(!userId || !selectedServices) throw new Error("Invalid request.");
             const serviceIds = selectedServices.split(",");
-            const result = await this.userFetchServiceProviderUseCase.execute( userId, serviceIds );
+            const result = await this.userFetchServiceProvidersUseCase.execute( userId, serviceIds );
             res.status(200).json(result);
         }catch (error) {
             HandleError.handle(error,res);
         }
     }
+
+    async fetchServiceProviderProfileDetails(req: Request, res: Response) {
+        try {
+            const userId = req.user.userOrProviderId;
+            const { providerId } = req.params;
+            if(!userId || !providerId) throw new Error("Invalid request");
+            const result = await this.userFetchServiceProviderProfileDetailsUseCase.execute(userId, providerId);
+            console.log("result : ",result);
+            res.status(200).json(result);
+        }catch (error) {
+            HandleError.handle(error, res);
+        }
+    }
+
+    async fetchServiceProviderAddress(req: Request, res: Response) {
+        try {
+            const userId = req.user.userOrProviderId;
+            const { providerId } = req.params;
+            if(!userId || !providerId) throw new Error("Invalid request");
+            const result = await this.userFetchServiceProviderAddressUseCase.execute(userId, providerId);
+            console.log("result : ",result);
+            res.status(200).json(result);
+        }catch (error) {
+            HandleError.handle(error, res);
+        }
+    }
 }
 
-const userProviderController = new UserProviderController( userFetchServiceProviderUseCase );
+const userProviderController = new UserProviderController( userFetchServiceProvidersUseCase, userFetchServiceProviderProfileDetailsUseCase );
 export { userProviderController };

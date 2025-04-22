@@ -5,12 +5,18 @@ import { ProviderServiceRepositoryImpl } from "../../../infrastructure/database/
 import { FindProvidersUsingServiceCategoryIdsResProps } from "../../../domain/repositories/IProviderService.repository";
 import { extractS3Key } from "../../../infrastructure/helpers/helper";
 import { generateSignedUrl } from "../../../config/aws_s3";
+import { ProviderRepositoryImpl } from "../../../infrastructure/database/provider/provider.repository.impl";
+import { Provider } from "../../../domain/entities/provider.entity";
 
 interface UserFetchServiceProvidersResProps extends CommonResponse {
     providers: Array<FindProvidersUsingServiceCategoryIdsResProps>
 }
 
-export class UserFetchServiceProviderUseCase {
+interface UserFetchServiceProviderDetailsResProps extends CommonResponse {
+  provider: Pick<Provider, "_id" | "username" | "email" | "profileImage" | "trustedBySlotflow" | "phone">
+}
+
+export class UserFetchServiceProvidersUseCase {
     constructor(
         private userRepository: UserRepositoryImpl,
         private providerServiceRepository: ProviderServiceRepositoryImpl,
@@ -42,4 +48,31 @@ export class UserFetchServiceProviderUseCase {
 
         return { success: true, message: "Providers fetched successfully.", providers: updatedproviders };
     }
+}
+
+export class UserFetchServiceProviderProfileDetailsUseCase {
+  constructor(
+    private userRepository: UserRepositoryImpl,
+    private providerRepository: ProviderRepositoryImpl,
+  ) { }
+
+  async execute(userId: string, providerId: string) : Promise<UserFetchServiceProviderDetailsResProps> {
+    if(!userId || !providerId) throw new Error("Invalid request");
+
+    const user = await this.userRepository.findUserById(new Types.ObjectId(userId));
+    if(!user) throw new Error("No user found");
+
+    const provider = await this.providerRepository.findProviderById(new Types.ObjectId(providerId));
+    if(!provider) throw new Error("Nor provider found");
+
+    if(provider.profileImage) {
+        const s3Key = await extractS3Key(provider.profileImage);
+        const signedUrl = await generateSignedUrl(s3Key);
+        provider.profileImage = signedUrl;
+    }
+
+    let { _id, username, email, phone, profileImage, trustedBySlotflow } = provider;
+
+    return { success : true, message: "Service provider details fetched", provider : { _id, username, email, phone, profileImage, trustedBySlotflow } }
+  }
 }

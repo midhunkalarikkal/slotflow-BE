@@ -17,5 +17,7 @@ router.get('/getAddress', authMiddleware, userAddressController.getAddress);
 router.post('/addAddress', authMiddleware, userAddressController.addAddress);
 
 router.get('/getServiceProviders/:selectedServices', authMiddleware, userProviderController.fetchServiceProviders);
+router.get('/getServiceProviderProfileDetails/:providerId', authMiddleware, userProviderController.fetchServiceProviderProfileDetails);
+router.get('/getServiceProviderAddress/:providerId', authMiddleware, userProviderController.fetchServiceProviderAddress);
 
 export default router;
