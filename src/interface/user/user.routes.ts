@@ -4,6 +4,7 @@ import { authMiddleware } from "../middleware/auth.middleware";
 import { userProfileController } from "./userProfile.controller";
 import { userAddressController } from './userAddress.controller';
 import { userProviderController } from "./userProvider.controller";
+import { userBookingController, UserBookingController } from "./userBooking.controller";
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
@@ -21,5 +22,7 @@ router.get('/getServiceProviderProfileDetails/:providerId', authMiddleware, user
 router.get('/getServiceProviderAddress/:providerId', authMiddleware, userProviderController.fetchServiceProviderAddress);
 router.get('/getServiceProviderServiceDetails/:providerId', authMiddleware, userProviderController.fetchServiceProviderServiceDetails);
 router.get('/getServiceProviderServiceAvailability/:providerId', authMiddleware, userProviderController.fetchServiceProviderServiceAvailability);
+
+router.post('/createBookingCheckoutSession', authMiddleware, userBookingController.bookingViaStripe);
 
 export default router;
