@@ -3,26 +3,30 @@ import { HandleError } from "../../infrastructure/error/error";
 import { UserRepositoryImpl } from "../../infrastructure/database/user/user.repository.impl";
 import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/provider.repository.impl";
 import { ProviderServiceRepositoryImpl } from "../../infrastructure/database/providerService/providerService.repository.impl";
-import { UserFetchServiceProviderAddressUseCase, UserFetchServiceProviderProfileDetailsUseCase, UserFetchServiceProvidersUseCase } from "../../application/use-cases/user/userProvider.use-case";
+import { UserFetchServiceProviderAddressUseCase, UserFetchServiceProviderProfileDetailsUseCase, UserFetchServiceProviderServiceDetailsUseCase, UserFetchServiceProvidersUseCase } from "../../application/use-cases/user/userProvider.use-case";
 import { AddressRepositoryImpl } from "../../infrastructure/database/address/address.repository.impl";
 
 const userRepositoryImpl = new UserRepositoryImpl();
 const providerServiceRepositoryImpl = new ProviderServiceRepositoryImpl();
 const providerRepositoryImpl = new ProviderRepositoryImpl();
 const addressRepositoryImpl = new AddressRepositoryImpl();
+const providerServiceRepository = new ProviderServiceRepositoryImpl();
 const userFetchServiceProvidersUseCase = new UserFetchServiceProvidersUseCase( userRepositoryImpl, providerServiceRepositoryImpl );
 const userFetchServiceProviderProfileDetailsUseCase = new UserFetchServiceProviderProfileDetailsUseCase( userRepositoryImpl, providerRepositoryImpl );
 const userFetchServiceProviderAddressUseCase = new UserFetchServiceProviderAddressUseCase(userRepositoryImpl, addressRepositoryImpl);
+const userFetchServiceProviderServiceDetailsUseCase = new UserFetchServiceProviderServiceDetailsUseCase(userRepositoryImpl, providerServiceRepository);
 
 export class UserProviderController {
     constructor(
         private userFetchServiceProvidersUseCase: UserFetchServiceProvidersUseCase,
         private userFetchServiceProviderProfileDetailsUseCase: UserFetchServiceProviderProfileDetailsUseCase,
         private userFetchServiceProviderAddressUseCase: UserFetchServiceProviderAddressUseCase,
+        private userFetchServiceProviderServiceDetailsUseCase: UserFetchServiceProviderServiceDetailsUseCase,
     ){
         this.fetchServiceProviders = this.fetchServiceProviders.bind(this);
         this.fetchServiceProviderProfileDetails = this.fetchServiceProviderProfileDetails.bind(this);
         this.fetchServiceProviderAddress = this.fetchServiceProviderAddress.bind(this);
+        this.fetchServiceProviderServiceDetails = this.fetchServiceProviderServiceDetails.bind(this);
     }
     
     async fetchServiceProviders(req: Request, res: Response) {
@@ -45,7 +49,6 @@ export class UserProviderController {
             const { providerId } = req.params;
             if(!userId || !providerId) throw new Error("Invalid request");
             const result = await this.userFetchServiceProviderProfileDetailsUseCase.execute(userId, providerId);
-            console.log("result : ",result);
             res.status(200).json(result);
         }catch (error) {
             HandleError.handle(error, res);
@@ -58,6 +61,18 @@ export class UserProviderController {
             const { providerId } = req.params;
             if(!userId || !providerId) throw new Error("Invalid request");
             const result = await this.userFetchServiceProviderAddressUseCase.execute(userId, providerId);
+            res.status(200).json(result);
+        }catch (error) {
+            HandleError.handle(error, res);
+        }
+    }
+
+    async fetchServiceProviderServiceDetails(req: Request, res: Response) {
+        try {
+            const userId = req.user.userOrProviderId;
+            const { providerId } = req.params;
+            if(!userId || !providerId) throw new Error("Invalid request");
+            const result = await this.userFetchServiceProviderServiceDetailsUseCase.execute(userId, providerId);
             console.log("result : ",result);
             res.status(200).json(result);
         }catch (error) {
@@ -66,5 +81,5 @@ export class UserProviderController {
     }
 }
 
-const userProviderController = new UserProviderController( userFetchServiceProvidersUseCase, userFetchServiceProviderProfileDetailsUseCase, userFetchServiceProviderAddressUseCase );
+const userProviderController = new UserProviderController( userFetchServiceProvidersUseCase, userFetchServiceProviderProfileDetailsUseCase, userFetchServiceProviderAddressUseCase, userFetchServiceProviderServiceDetailsUseCase );
 export { userProviderController };

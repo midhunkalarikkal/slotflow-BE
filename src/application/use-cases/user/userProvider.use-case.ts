@@ -9,9 +9,11 @@ import { ProviderRepositoryImpl } from "../../../infrastructure/database/provide
 import { Provider } from "../../../domain/entities/provider.entity";
 import { AddressRepositoryImpl } from "../../../infrastructure/database/address/address.repository.impl";
 import { Address } from "../../../domain/entities/address.entity";
+import { ProviderService } from "../../../domain/entities/providerService.entity";
+import { Service } from "../../../domain/entities/service.entity";
 
 interface UserFetchServiceProvidersResProps extends CommonResponse {
-    providers: Array<FindProvidersUsingServiceCategoryIdsResProps>
+  providers: Array<FindProvidersUsingServiceCategoryIdsResProps>
 }
 
 interface UserFetchServiceProviderDetailsResProps extends CommonResponse {
@@ -22,38 +24,46 @@ interface UserFetchServiceProviderAddressResProps extends CommonResponse {
   address: Pick<Address, "userId" | "addressLine" | "phone" | "place" | "city" | "district" | "pincode" | "state" | "country" | "googleMapLink">
 }
 
+type FindProviderServiceProps = Omit<ProviderService, "serviceCategory">;
+interface FindProviderServiceResProps extends FindProviderServiceProps {
+  serviceCategory: Pick<Service, "serviceName">
+}
+interface UserFetchProviderServiceResProps extends CommonResponse {
+  service: FindProviderServiceResProps | {};
+}
+
 export class UserFetchServiceProvidersUseCase {
-    constructor(
-        private userRepository: UserRepositoryImpl,
-        private providerServiceRepository: ProviderServiceRepositoryImpl,
-    ) { }
+  constructor(
+    private userRepository: UserRepositoryImpl,
+    private providerServiceRepository: ProviderServiceRepositoryImpl,
+  ) { }
 
-    async execute(userId: string, serviceIds: string[]): Promise<UserFetchServiceProvidersResProps> {
-        if(!userId || !serviceIds) throw new Error("Invalid request.");
+  async execute(userId: string, serviceIds: string[]): Promise<UserFetchServiceProvidersResProps> {
+    if (!userId || !serviceIds) throw new Error("Invalid request.");
 
-        const user = await this.userRepository.findUserById(new Types.ObjectId(userId));
-        if(!user) throw new Error("No user found");
+    const user = await this.userRepository.findUserById(new Types.ObjectId(userId));
+    if (!user) throw new Error("No user found");
 
-        const convertedServiceIds = serviceIds.map((id) => new Types.ObjectId(id));
-        const providers = await this.providerServiceRepository.findProvidersUsingServiceCategoryIds(convertedServiceIds);
-        if(!providers) throw new Error("Providers fetching error.");
+    const convertedServiceIds = serviceIds.map((id) => new Types.ObjectId(id));
+    const providers = await this.providerServiceRepository.findProvidersUsingServiceCategoryIds(convertedServiceIds);
+    if (!providers) throw new Error("Providers fetching error.");
 
-        const updatedproviders: FindProvidersUsingServiceCategoryIdsResProps[] = await Promise.all(
-            providers.map(async (provider) => {
-              let profileImageUrl = provider.provider.profileImage;
-          
-              if (profileImageUrl) {
-                const s3Key = await extractS3Key(profileImageUrl);
-                const signedUrl = await generateSignedUrl(s3Key);
-                provider.provider.profileImage = signedUrl;
-              }
-          
-              return provider;
-            })
-          )
+    const updatedproviders: FindProvidersUsingServiceCategoryIdsResProps[] = await Promise.all(
+      providers.map(async (provider) => {
+        let profileImageUrl = provider.provider.profileImage;
 
-        return { success: true, message: "Providers fetched successfully.", providers: updatedproviders };
-    }
+        if (profileImageUrl) {
+          const s3Key = await extractS3Key(profileImageUrl);
+          const signedUrl = await generateSignedUrl(s3Key);
+          provider.provider.profileImage = signedUrl;
+        }
+
+        return provider;
+      })
+    )
+
+    return { success: true, message: "Providers fetched successfully.", providers: updatedproviders };
+  }
 }
 
 export class UserFetchServiceProviderProfileDetailsUseCase {
@@ -62,24 +72,24 @@ export class UserFetchServiceProviderProfileDetailsUseCase {
     private providerRepository: ProviderRepositoryImpl,
   ) { }
 
-  async execute(userId: string, providerId: string) : Promise<UserFetchServiceProviderDetailsResProps> {
-    if(!userId || !providerId) throw new Error("Invalid request");
+  async execute(userId: string, providerId: string): Promise<UserFetchServiceProviderDetailsResProps> {
+    if (!userId || !providerId) throw new Error("Invalid request");
 
     const user = await this.userRepository.findUserById(new Types.ObjectId(userId));
-    if(!user) throw new Error("No user found");
+    if (!user) throw new Error("No user found");
 
     const provider = await this.providerRepository.findProviderById(new Types.ObjectId(providerId));
-    if(!provider) throw new Error("Nor provider found");
+    if (!provider) throw new Error("No provider found");
 
-    if(provider.profileImage) {
-        const s3Key = await extractS3Key(provider.profileImage);
-        const signedUrl = await generateSignedUrl(s3Key);
-        provider.profileImage = signedUrl;
+    if (provider.profileImage) {
+      const s3Key = await extractS3Key(provider.profileImage);
+      const signedUrl = await generateSignedUrl(s3Key);
+      provider.profileImage = signedUrl;
     }
 
     let { _id, username, email, phone, profileImage, trustedBySlotflow } = provider;
 
-    return { success : true, message: "Service provider details fetched", provider : { _id, username, email, phone, profileImage, trustedBySlotflow } }
+    return { success: true, message: "Service provider details fetched", provider: { _id, username, email, phone, profileImage, trustedBySlotflow } }
   }
 }
 
@@ -89,17 +99,46 @@ export class UserFetchServiceProviderAddressUseCase {
     private addressRepository: AddressRepositoryImpl,
   ) { }
 
-  async execute(userId: string, providerId: string) : Promise<UserFetchServiceProviderAddressResProps> {
-    if(!userId || !providerId) throw new Error("Invalid request");
+  async execute(userId: string, providerId: string): Promise<UserFetchServiceProviderAddressResProps> {
+    if (!userId || !providerId) throw new Error("Invalid request");
 
     const user = await this.userRepository.findUserById(new Types.ObjectId(userId));
-    if(!user) throw new Error("No user found");
+    if (!user) throw new Error("No user found");
 
     const address = await this.addressRepository.findAddressByUserId(new Types.ObjectId(providerId));
-    if(!address) throw new Error("Nor address found");
+    if (!address) throw new Error("No address found");
 
-    let { createdAt, updatedAt , _id, ...data} = address;
+    let { createdAt, updatedAt, _id, ...data } = address;
 
-    return { success : true, message: "Service provider address fetched", address : data }
+    return { success: true, message: "Service provider address fetched", address: data }
+  }
+}
+
+export class UserFetchServiceProviderServiceDetailsUseCase {
+  constructor(
+    private userRepository: UserRepositoryImpl,
+    private providerServiceRepository: ProviderServiceRepositoryImpl,
+  ) { }
+
+  async execute(userId: string, providerId: string): Promise<UserFetchProviderServiceResProps> {
+    if (!userId || !providerId) throw new Error("Invalid request");
+
+    const user = await this.userRepository.findUserById(new Types.ObjectId(userId));
+    if (!user) throw new Error("No user found");
+
+    const serviceData = await this.providerServiceRepository.findProviderServiceByProviderId(new Types.ObjectId(providerId));
+    console.log("service Data : ",serviceData);
+
+    function isServiceData(obj: any): obj is FindProviderServiceResProps {
+      return obj && typeof obj === 'object' && '_id' in obj;
+    }
+
+    if (!isServiceData(serviceData)) {
+      return { success: true, message: "Service fetched successfully.", service: {} };
+    }
+
+    const { serviceName, serviceDescription, servicePrice, providerExperience, serviceCategory } = serviceData;
+
+    return { success: true, message: "Service provider address fetched", service : { serviceName, serviceDescription, servicePrice, providerExperience, serviceCategory } }
   }
 }
