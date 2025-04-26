@@ -5,6 +5,7 @@ export class Booking {
         public _id: Types.ObjectId,
         public serviceProviderId: Types.ObjectId,
         public userId: Types.ObjectId,
+        public appointmentDate: Date,
         public appointmentTime: string,
         public appointmentMode: string,
         public appointmentDay: string,

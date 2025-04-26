@@ -1,7 +1,7 @@
 import { Types } from "mongoose";
 import { Booking } from "../entities/booking.entity";
 
-export type createBookingPayloadProps = Pick<Booking, "serviceProviderId" | "userId" | "appointmentDay" | "appointmentMode" | "appointmentStatus" | "appointmentTime" | "paymentId">;
+export type createBookingPayloadProps = Pick<Booking, "serviceProviderId" | "userId" | "appointmentDate" | "appointmentDay" | "appointmentMode" | "appointmentStatus" | "appointmentTime" | "paymentId">;
 
 export interface IBookingRepository {
 

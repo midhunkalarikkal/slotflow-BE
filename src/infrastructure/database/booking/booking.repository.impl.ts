@@ -1,7 +1,7 @@
+import { Types } from "mongoose";
 import { BookingModel, IBooking } from "./booking.model";
 import { Booking } from "../../../domain/entities/booking.entity";
 import { createBookingPayloadProps, IBookingRepository } from "../../../domain/repositories/IBooking.repository";
-import { Types } from "mongoose";
 
 export class BookingRepositoryImpl implements IBookingRepository {
     private mapToEntity(booking : IBooking) : Booking {
@@ -9,6 +9,7 @@ export class BookingRepositoryImpl implements IBookingRepository {
                 booking._id,
                 booking.serviceProviderId,
                 booking.userId,
+                booking.appointmentDate,
                 booking.appointmentTime,
                 booking.appointmentMode,
                 booking.appointmentDay,

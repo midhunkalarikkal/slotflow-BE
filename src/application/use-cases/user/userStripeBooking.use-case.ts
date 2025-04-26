@@ -19,12 +19,11 @@ export class UserAppointmentBookingViaStripeUseCase {
         private bookingRepository: BookingRepositoryImpl,
     ) { }
 
-    async execute(userId: string, providerId: string, selectedDay: string, slotId: string, selectedServiceMode: string): Promise<{ success: boolean, message: string, sessionId: string }> {
-        if (!userId || !providerId || !selectedDay || !slotId || !selectedServiceMode) throw new Error("Invalid request");
+    async execute(userId: string, providerId: string, selectedDay: string, slotId: string, selectedServiceMode: string, date: string): Promise<{ success: boolean, message: string, sessionId: string }> {
+        if (!userId || !providerId || !selectedDay || !slotId || !selectedServiceMode || !date) throw new Error("Invalid request");
 
         const provider = await this.providerRepository.findProviderById(new Types.ObjectId(providerId));
         if (!provider) throw new Error("No provider found");
-
         
         const providerService = await this.providerServiceRepository.findProviderServiceByProviderId(new Types.ObjectId(providerId));
         if (!providerService) throw new Error("No service found");
@@ -46,7 +45,7 @@ export class UserAppointmentBookingViaStripeUseCase {
         
         if (!selectedSlot[0].available) throw new Error("This slot is not available for today");
 
-        const existBooking = await this.bookingRepository.findBookingByUserId(new Types.ObjectId(userId), selectedDay, new Date(), selectedSlot[0].slot);
+        const existBooking = await this.bookingRepository.findBookingByUserId(new Types.ObjectId(userId), selectedDay, new Date(date), selectedSlot[0].slot);
         if(existBooking && existBooking.length > 0) throw new Error("You have already an appointment on the same time");
         
         const session = await stripe.checkout.sessions.create({
@@ -69,6 +68,7 @@ export class UserAppointmentBookingViaStripeUseCase {
                 providerId: providerId,
                 selectedDay: selectedDay,
                 slotId: slotId,
+                appointmentDate: date,
                 selectedServiceMode: selectedServiceMode,
                 initialAmount: providerService.servicePrice * 100,
                 totalAmount: providerService.servicePrice * 100,
@@ -104,8 +104,9 @@ export class UserSaveBookingAfterStripePaymentUseCase {
         const totalAmount = session?.metadata?.totalAmount;
         const paymentStatus = session?.payment_status === "paid" ? "Paid" : "Pending";
         const paymentType = session?.payment_method_types[0];
+        const dateString = session?.metadata?.appointmentDate;
 
-        if (!providerId || !selectedDay || !slotId || !selectedServiceMode || !initialAmount || !totalAmount || !paymentStatus || !paymentType) throw new Error("Unexpected error, please try again");
+        if (!providerId || !selectedDay || !slotId || !selectedServiceMode || !initialAmount || !totalAmount || !paymentStatus || !paymentType || !dateString) throw new Error("Unexpected error, please try again");
 
         const providerServiceAvailability = await this.serviceAvailabilityRepository.findServiceAvailabilityByProviderId(new Types.ObjectId(providerId));
         if (!providerServiceAvailability) throw new Error("No availability found");
@@ -139,6 +140,7 @@ export class UserSaveBookingAfterStripePaymentUseCase {
             const newBooking = await this.bookingRepository.createBooking({
                 serviceProviderId: new Types.ObjectId(providerId),
                 userId: new Types.ObjectId(userId),
+                appointmentDate: new Date(dateString),
                 appointmentDay: selectedDay,
                 appointmentMode: selectedServiceMode,
                 appointmentStatus: "Booked",
