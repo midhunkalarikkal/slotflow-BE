@@ -1,6 +1,7 @@
 import { Types } from "mongoose";
 
 export interface TimeSlot {
+    _id: Types.ObjectId,
     slot: string,
     available: boolean,
 }

@@ -6,7 +6,7 @@ export interface ISubscription extends Document {
     subscriptionPlanId: Types.ObjectId,
     startDate: Date,
     endDate: Date,
-    subscriptionStatus: string,
+    subscriptionStatus: "Active" | "Expired" | "Cancelled",
     paymentId: Types.ObjectId,
     createdAt: Date,
     updatedAt: Date,
@@ -15,7 +15,7 @@ export interface ISubscription extends Document {
 const SubscriptionSchema = new Schema<ISubscription>({
     providerId: { type: mongoose.Schema.Types.ObjectId, ref: "Provider", required: true },
     subscriptionPlanId: { type: mongoose.Schema.Types.ObjectId, ref: "Plan", required: true },
-    startDate: { type: Date, require: true },
+    startDate: { type: Date, required: true },
     endDate: { type: Date, required: true },
     subscriptionStatus: { type: String, enum: ["Active", "Expired", "Cancelled"], required: true },
     paymentId: { type: mongoose.Schema.Types.ObjectId, ref: "Payment" },
