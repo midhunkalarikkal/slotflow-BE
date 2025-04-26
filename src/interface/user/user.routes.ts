@@ -24,5 +24,6 @@ router.get('/getServiceProviderServiceDetails/:providerId', authMiddleware, user
 router.get('/getServiceProviderServiceAvailability/:providerId', authMiddleware, userProviderController.fetchServiceProviderServiceAvailability);
 
 router.post('/createBookingCheckoutSession', authMiddleware, userBookingController.bookingViaStripe);
+router.post('/saveAppointmentBooking', authMiddleware, userBookingController.saveBookingAfterStripePayment)
 
 export default router;

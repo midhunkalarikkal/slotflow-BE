@@ -6,4 +6,6 @@ export interface IServiceAvailabilityRepository {
 
     findServiceAvailabilityByProviderId(providerId: Types.ObjectId): Promise<ServiceAvailability | null>;
 
+    updateServiceAvailability(providerId: Types.ObjectId, day: string, slotId: Types.ObjectId, options : { session?: any }): Promise<ServiceAvailability | null>;
+
 }

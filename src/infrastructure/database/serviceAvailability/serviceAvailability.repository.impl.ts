@@ -34,4 +34,28 @@ export class ServiceAvailabilityRepositoryImpl implements IServiceAvailabilityRe
             throw new Error("Service availability fetching error.");
         }
     }
+
+    async updateServiceAvailability(providerId: Types.ObjectId, day: string, slotId: Types.ObjectId, options : { session?: any }): Promise<ServiceAvailability | null> {
+        try{
+            const updatedServiceAvailability = await ServiceAvailabilityModel.findOneAndUpdate(
+                { providerId, "availability.day": day, "availability.slots._id": new Types.ObjectId(slotId) },
+                {
+                    $set: {
+                        "availability.$[dayElem].slots.$[slotElem].available": false
+                    }
+                },
+                {
+                    new: true,
+                    arrayFilters: [
+                        { "dayElem.day": day },
+                        { "slotElem._id": new Types.ObjectId(slotId) }
+                    ]
+                }
+            );
+    
+            return updatedServiceAvailability ? this.mapToEntity(updatedServiceAvailability) : null;
+        }catch(error){
+            throw new Error("Service availability updating error.");
+        }
+    }
 }

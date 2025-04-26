@@ -1,7 +1,7 @@
 import { Types } from "mongoose";
-import { Payment } from "../../../domain/entities/payment.entity";
-import { CreatePaymentForSubscriptionProps, FindAllPayments, FindAllPaymentsByProviderIdResProps, IPaymentRepository } from "../../../domain/repositories/IPayment.repository";
 import { IPayment, PaymentModel } from "./payment.model";
+import { Payment } from "../../../domain/entities/payment.entity";
+import { CreatePaymentForBookingProps, CreatePaymentForSubscriptionProps, FindAllPayments, FindAllPaymentsByProviderIdResProps, IPaymentRepository } from "../../../domain/repositories/IPayment.repository";
 
 export class PaymentRepositoryImpl implements IPaymentRepository {
     private mapToEntity(payment: IPayment): Payment {
@@ -23,6 +23,15 @@ export class PaymentRepositoryImpl implements IPaymentRepository {
     }
 
     async createPaymentForSubscription(payment: CreatePaymentForSubscriptionProps, options: { session?: any } = {}): Promise<Payment | null> {
+        try {
+            const newPayment = await PaymentModel.create([payment],options);
+            return newPayment ? this.mapToEntity(newPayment[0]) : null;
+        } catch (error) {
+            throw new Error("Payment creation error.");
+        }
+    }
+    
+    async createPaymentForBooking(payment: CreatePaymentForBookingProps, options: { session?: any } = {}): Promise<Payment | null> {
         try {
             const newPayment = await PaymentModel.create([payment],options);
             return newPayment ? this.mapToEntity(newPayment[0]) : null;

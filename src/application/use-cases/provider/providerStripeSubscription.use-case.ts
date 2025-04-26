@@ -1,10 +1,11 @@
 import dayjs from "dayjs";
 import Stripe from "stripe";
 import { startSession, Types } from "mongoose";
+import { CommonResponse } from "../../../shared/interface/commonInterface";
 import { PlanRepositoryImpl } from "../../../infrastructure/database/plan/plan.repository.impl";
+import { PaymentRepositoryImpl } from "../../../infrastructure/database/payment/payment.repository.impl";
 import { ProviderRepositoryImpl } from "../../../infrastructure/database/provider/provider.repository.impl";
 import { SubscriptionRepositoryImpl } from "../../../infrastructure/database/subscription/subscription.repository.impl";
-import { PaymentRepositoryImpl } from "../../../infrastructure/database/payment/payment.repository.impl";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
@@ -69,7 +70,7 @@ export class ProviderSaveSubscriptionUseCase {
         private subscriptionRepository: SubscriptionRepositoryImpl,
     ) { }
 
-    async execute(providerId: string, sessionId: string): Promise<{ success: boolean, message: string }> {
+    async execute(providerId: string, sessionId: string): Promise<CommonResponse> {
         if (!providerId || !sessionId) throw new Error("Invalid request.");
 
         const provider = await this.providerRepository.findProviderById(new Types.ObjectId(providerId));

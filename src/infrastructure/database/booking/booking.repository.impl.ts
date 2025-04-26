@@ -8,7 +8,6 @@ export class BookingRepositoryImpl implements IBookingRepository {
                 booking._id,
                 booking.serviceProviderId,
                 booking.userId,
-                booking.appointmentDate,
                 booking.appointmentTime,
                 booking.appointmentMode,
                 booking.appointmentDay,
