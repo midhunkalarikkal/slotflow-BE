@@ -1,13 +1,13 @@
 import Stripe from "stripe";
 import { startSession, Types } from "mongoose";
 import { CommonResponse } from "../../../shared/interface/commonInterface";
+import { UserRepositoryImpl } from "../../../infrastructure/database/user/user.repository.impl";
 import { FindProviderServiceResProps } from "../../../domain/repositories/IProviderService.repository";
+import { PaymentRepositoryImpl } from "../../../infrastructure/database/payment/payment.repository.impl";
+import { BookingRepositoryImpl } from "../../../infrastructure/database/booking/booking.repository.impl";
 import { ProviderRepositoryImpl } from "../../../infrastructure/database/provider/provider.repository.impl";
 import { ProviderServiceRepositoryImpl } from "../../../infrastructure/database/providerService/providerService.repository.impl";
 import { ServiceAvailabilityRepositoryImpl } from "../../../infrastructure/database/serviceAvailability/serviceAvailability.repository.impl";
-import { UserRepositoryImpl } from "../../../infrastructure/database/user/user.repository.impl";
-import { PaymentRepositoryImpl } from "../../../infrastructure/database/payment/payment.repository.impl";
-import { BookingRepositoryImpl } from "../../../infrastructure/database/booking/booking.repository.impl";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
@@ -16,6 +16,7 @@ export class UserAppointmentBookingViaStripeUseCase {
         private providerRepository: ProviderRepositoryImpl,
         private providerServiceRepository: ProviderServiceRepositoryImpl,
         private serviceAvailabilityRepository: ServiceAvailabilityRepositoryImpl,
+        private bookingRepository: BookingRepositoryImpl,
     ) { }
 
     async execute(userId: string, providerId: string, selectedDay: string, slotId: string, selectedServiceMode: string): Promise<{ success: boolean, message: string, sessionId: string }> {
@@ -24,32 +25,30 @@ export class UserAppointmentBookingViaStripeUseCase {
         const provider = await this.providerRepository.findProviderById(new Types.ObjectId(providerId));
         if (!provider) throw new Error("No provider found");
 
+        
         const providerService = await this.providerServiceRepository.findProviderServiceByProviderId(new Types.ObjectId(providerId));
         if (!providerService) throw new Error("No service found");
-
+        
         function isServiceData(obj: any): obj is FindProviderServiceResProps {
             return obj && typeof obj === 'object' && '_id' in obj;
         }
-
+        
         if (!isServiceData(providerService)) throw new Error("No service data found");
-
+        
         const providerServiceAvailability = await this.serviceAvailabilityRepository.findServiceAvailabilityByProviderId(new Types.ObjectId(providerId));
         if (!providerServiceAvailability) throw new Error("No availability found");
-
+        
         const dayAvailability = providerServiceAvailability.availability.filter((avail) => avail.day === selectedDay);
         if (!dayAvailability || dayAvailability.length === 0) throw new Error("No available slots found for this day");
 
         const selectedSlot = dayAvailability[0].slots.filter((slot) => slot._id.toString() === slotId);
         if (!selectedSlot || selectedSlot.length === 0) throw new Error("Not slot found");
-
+        
         if (!selectedSlot[0].available) throw new Error("This slot is not available for today");
 
-        console.log("provider : ", provider);
-        console.log("providerService : ", providerService);
-        console.log("providerServiceAvailability : ", providerServiceAvailability);
-        console.log("dayAvailability : ", dayAvailability);
-        console.log("selectedSlot : ", selectedSlot);
-
+        const existBooking = await this.bookingRepository.findBookingByUserId(new Types.ObjectId(userId), selectedDay, new Date(), selectedSlot[0].slot);
+        if(existBooking && existBooking.length > 0) throw new Error("You have already an appointment on the same time");
+        
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ["card"],
             mode: "payment",
