@@ -7,6 +7,7 @@ import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/p
 import { ProviderServiceRepositoryImpl } from "../../infrastructure/database/providerService/providerService.repository.impl";
 import { ServiceAvailabilityRepositoryImpl } from "../../infrastructure/database/serviceAvailability/serviceAvailability.repository.impl";
 import { UserAppointmentBookingViaStripeUseCase, UserSaveBookingAfterStripePaymentUseCase } from "../../application/use-cases/user/userStripeBooking.use-case";
+import { UserFetchBookingsUseCase } from "../../application/use-cases/user/userBooking.use-case";
 
 const userRepositoryImpl = new UserRepositoryImpl();
 const paymentRepositoryImpl = new PaymentRepositoryImpl();
@@ -16,14 +17,17 @@ const providerServiceRepositoryImpl = new ProviderServiceRepositoryImpl();
 const serviceAvailabilityRepositoryImpl = new ServiceAvailabilityRepositoryImpl();
 const userAppointmentBookingViaStrpieUseCase = new UserAppointmentBookingViaStripeUseCase(proviserRepositoryImpl, providerServiceRepositoryImpl, serviceAvailabilityRepositoryImpl, bookingRepositoryImpl);
 const userSaveBookingAfterStripePaymentUseCase = new UserSaveBookingAfterStripePaymentUseCase(userRepositoryImpl, paymentRepositoryImpl, bookingRepositoryImpl, serviceAvailabilityRepositoryImpl);
+const userFetchBookingsUseCase = new UserFetchBookingsUseCase(bookingRepositoryImpl);
 
 export class UserBookingController {
     constructor(
         private userAppointmentBookingViaStripeUseCase : UserAppointmentBookingViaStripeUseCase,
         private userSaveBookingAfterStripePaymentUseCase: UserSaveBookingAfterStripePaymentUseCase,
+        private userFetchBookingsUseCase: UserFetchBookingsUseCase,
     ) { 
         this.bookingViaStripe = this.bookingViaStripe.bind(this);
         this.saveBookingAfterStripePayment = this.saveBookingAfterStripePayment.bind(this);
+        this.fetchAllBooking = this.fetchAllBooking.bind(this);
     }
     
     async bookingViaStripe(req: Request, res: Response) {
@@ -49,7 +53,18 @@ export class UserBookingController {
             HandleError.handle(error, res);
         }
     }
+
+    async fetchAllBooking(req: Request, res: Response) {
+        try {
+            const userId = req.user.userOrProviderId;
+            if(!userId) throw new Error("Invalid request");
+            const result = await this.userFetchBookingsUseCase.execute(userId);
+            res.status(200).json(result);
+        } catch(error) {
+            HandleError.handle(error, res);
+        }
+    }
 }
 
-const userBookingController = new UserBookingController( userAppointmentBookingViaStrpieUseCase, userSaveBookingAfterStripePaymentUseCase );
+const userBookingController = new UserBookingController( userAppointmentBookingViaStrpieUseCase, userSaveBookingAfterStripePaymentUseCase, userFetchBookingsUseCase );
 export { userBookingController };
