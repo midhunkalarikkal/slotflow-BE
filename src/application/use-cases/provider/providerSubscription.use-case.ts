@@ -1,20 +1,7 @@
 import { Types } from "mongoose";
-import { CommonResponse } from "../../../shared/interface/commonInterface";
-import { Subscription } from "../../../domain/entities/subscription.entity";
+import { ProviderFetchProviderSubscriptionsResProps } from "../../../shared/interface/providerInterface";
 import { ProviderRepositoryImpl } from "../../../infrastructure/database/provider/provider.repository.impl";
 import { SubscriptionRepositoryImpl } from "../../../infrastructure/database/subscription/subscription.repository.impl";
-
-
-type SubscripionsResProps = Pick<Subscription, "startDate" | "endDate" | "subscriptionStatus">;
-interface AdminFetchProviderSubscriptions extends SubscripionsResProps {
-    subscriptionPlanId?: {
-        _id: string;
-        planName: string;
-    };
-}
-interface ProviderFetchProviderSubscriptionsResProps extends CommonResponse {
-    subscriptions: AdminFetchProviderSubscriptions[] | [];
-}
 
 
 export class ProviderFetchAllSubscriptionsUseCase {

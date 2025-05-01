@@ -5,6 +5,7 @@ import { CommonResponse } from "../../../shared/interface/commonInterface";
 import { PlanRepositoryImpl } from "../../../infrastructure/database/plan/plan.repository.impl";
 import { PaymentRepositoryImpl } from "../../../infrastructure/database/payment/payment.repository.impl";
 import { ProviderRepositoryImpl } from "../../../infrastructure/database/provider/provider.repository.impl";
+import { ProviderStripeSubscriptionCreateSessionIdResProps } from "../../../shared/interface/providerInterface";
 import { SubscriptionRepositoryImpl } from "../../../infrastructure/database/subscription/subscription.repository.impl";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
@@ -16,7 +17,7 @@ export class ProviderStripeSubscriptionUseCase {
             private subscriptionRepository: SubscriptionRepositoryImpl,
         ) { }
     
-        async execute(providerId: string, planId: string, duration: string): Promise<{ success: boolean, message: string, sessionId: string }> {
+        async execute(providerId: string, planId: string, duration: string): Promise<ProviderStripeSubscriptionCreateSessionIdResProps> {
             if (!providerId || !planId || !duration) throw new Error("Invalid request.");
             let planDuration: number = parseInt(duration.trim().split(" ")[0]);
     

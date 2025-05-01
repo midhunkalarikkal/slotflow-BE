@@ -3,17 +3,9 @@ import { S3Client } from "@aws-sdk/client-s3";
 import { Upload } from "@aws-sdk/lib-storage";
 import { aws_s3Config } from "../../../config/env";
 import { generateSignedUrl } from "../../../config/aws_s3";
-import { Provider } from "../../../domain/entities/provider.entity";
 import { extractS3Key } from "../../../infrastructure/helpers/helper";
-import { CommonResponse } from "../../../shared/interface/commonInterface";
 import { ProviderRepositoryImpl } from "../../../infrastructure/database/provider/provider.repository.impl";
-
-
-interface ProviderFetchProfileDetailsResProps extends CommonResponse {
-    profileDetails: Pick<Provider, "username" | "email" | "isAdminVerified" | "isBlocked" | "isEmailVerified" | "phone" | "createdAt"> | {};
-}
-
-interface ProviderUpdateprofileImageResProps extends CommonResponse, Pick<Provider, "profileImage"> { }
+import { ProviderFetchProfileDetailsResProps, ProviderUpdateprofileImageResProps } from "../../../shared/interface/providerInterface";
 
 
 export class ProviderFetchProfileDetailsUseCase {

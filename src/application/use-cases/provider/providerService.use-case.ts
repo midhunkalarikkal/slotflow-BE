@@ -3,22 +3,12 @@ import { S3Client } from '@aws-sdk/client-s3';
 import { Upload } from "@aws-sdk/lib-storage";
 import { aws_s3Config } from '../../../config/env';
 import { generateSignedUrl } from '../../../config/aws_s3';
-import { Service } from '../../../domain/entities/service.entity';
 import { extractS3Key } from '../../../infrastructure/helpers/helper';
 import { Validator } from '../../../infrastructure/validator/validator';
 import { CommonResponse } from '../../../shared/interface/commonInterface';
-import { ProviderService } from '../../../domain/entities/providerService.entity';
 import { ProviderRepositoryImpl } from '../../../infrastructure/database/provider/provider.repository.impl';
 import { ProviderServiceRepositoryImpl } from '../../../infrastructure/database/providerService/providerService.repository.impl';
-
-
-type FindProviderServiceProps = Pick<ProviderService, "_id" | "serviceName" | "serviceDescription" | "servicePrice" | "providerAdhaar" | "providerExperience" | "providerCertificateUrl" | "updatedAt" | "createdAt">;
-interface FindProviderServiceResProps extends FindProviderServiceProps {
-    serviceCategory: Pick<Service, "serviceName">
-}
-interface AdminFetchProviderServiceResProps extends CommonResponse {
-    service: FindProviderServiceResProps | {};
-}
+import { ProviderFetchProviderServiceResProps, ProviderFindProviderServiceResProps } from '../../../shared/interface/providerInterface';
 
 
 export class ProviderAddServiceDetailsUseCase {
@@ -76,14 +66,15 @@ export class ProviderAddServiceDetailsUseCase {
 
 
 export class ProviderFetchServiceDetailsUseCase {
+    
     constructor(private provderServiceRepository: ProviderServiceRepositoryImpl) { }
 
-    async execute(providerId: string): Promise<AdminFetchProviderServiceResProps> {
+    async execute(providerId: string): Promise<ProviderFetchProviderServiceResProps> {
         if (!providerId) throw new Error("Invalid request.");
 
         const service = await this.provderServiceRepository.findProviderServiceByProviderId(new Types.ObjectId(providerId));
         if(service === null) return { success: true, message: "Provider service details not yet addedd", service: {} };
-        function isServiceData(obj: any): obj is FindProviderServiceResProps {
+        function isServiceData(obj: any): obj is ProviderFindProviderServiceResProps {
             return obj && typeof obj === 'object' && '_id' in obj;
         }
         

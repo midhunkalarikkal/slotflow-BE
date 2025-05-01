@@ -1,10 +1,10 @@
 import { Types } from "mongoose";
 import { Validator } from "../../../infrastructure/validator/validator";
+import { CommonResponse } from "../../../shared/interface/commonInterface";
+import { ProviderFetchServiceAvailabilityResProps } from "../../../shared/interface/providerInterface";
+import { Availability, FontendAvailability } from "../../../domain/entities/serviceAvailability.entity";
 import { ProviderRepositoryImpl } from "../../../infrastructure/database/provider/provider.repository.impl";
 import { ServiceAvailabilityRepositoryImpl } from "../../../infrastructure/database/serviceAvailability/serviceAvailability.repository.impl";
-import { Availability, FontendAvailability, ServiceAvailability } from "../../../domain/entities/serviceAvailability.entity";
-
-type ProviderFetchServiceAvailabilityResProps = Pick<ServiceAvailability, "_id" | "availability">;
 
 export class ProviderAddServiceAvailabilityUseCase {
     constructor(
@@ -12,7 +12,7 @@ export class ProviderAddServiceAvailabilityUseCase {
         private serviceAvailabilityRepository: ServiceAvailabilityRepositoryImpl,
     ){}
 
-    async execute(providerId: string, availability: FontendAvailability[]): Promise<{success: boolean, message: string }> {
+    async execute(providerId: string, availability: FontendAvailability[]): Promise<CommonResponse> {
         if(!providerId || !availability || availability.length  === 0) throw new Error("Invalid request.");
 
         const convertedProviderId = new Types.ObjectId(providerId);
@@ -30,7 +30,9 @@ export class ProviderAddServiceAvailabilityUseCase {
         const newAvailability: Availability[] = availability.map((avail: FontendAvailability) => ({
             ...avail,
             slots: avail.slots.map((slot: string) => ({
-                slot: slot, available: true
+                _id: new Types.ObjectId(),
+                slot: slot, 
+                available: true
             }))
         }));
 
@@ -52,7 +54,7 @@ export class ProviderAddServiceAvailabilityUseCase {
 export class ProviderFetchServiceAvailabilityUseCase {
     constructor(private serviceAvailabilityRepository: ServiceAvailabilityRepositoryImpl) { }
 
-    async execute(providerId: string): Promise<{ success: boolean, message: string, availability: ProviderFetchServiceAvailabilityResProps | {}}> {
+    async execute(providerId: string): Promise<ProviderFetchServiceAvailabilityResProps> {
         if (!providerId) throw new Error("Invalid request.");
         const availability = await this.serviceAvailabilityRepository.findServiceAvailabilityByProviderId(new Types.ObjectId(providerId));
         if(availability === null) return { success: true, message: "Provider service availability not yet added.", availability: {} };

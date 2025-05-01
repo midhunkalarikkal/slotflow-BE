@@ -1,13 +1,7 @@
 import { Types } from "mongoose";
-import { Payment } from "../../../domain/entities/payment.entity";
-import { CommonResponse } from "../../../shared/interface/commonInterface";
+import { ProviderFetchAllPaymentsResProps } from "../../../shared/interface/providerInterface";
 import { PaymentRepositoryImpl } from "../../../infrastructure/database/payment/payment.repository.impl";
 import { ProviderRepositoryImpl } from "../../../infrastructure/database/provider/provider.repository.impl";
-
-
-interface ProviderFetchAllPaymentsResProps extends CommonResponse {
-    payments: Array<Pick<Payment, "paymentStatus" | "paymentMethod" | "paymentGateway" | "paymentFor" | "discountAmount" | "totalAmount" | "createdAt" | "_id">> | [];
-}
 
 
 export class ProviderFetchAllPaymentsUseCase {

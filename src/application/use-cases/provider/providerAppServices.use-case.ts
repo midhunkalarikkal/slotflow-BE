@@ -1,11 +1,6 @@
-import { Service } from "../../../domain/entities/service.entity";
-import { CommonResponse } from "../../../shared/interface/commonInterface";
+
+import { ProviderFetchAllAppServicesResProps } from '../../../shared/interface/providerInterface';
 import { ServiceRepositoryImpl } from '../../../infrastructure/database/appservice/service.repository.impl';
-
-
-interface ProviderFetchAllAppServicesResProps extends CommonResponse {
-    services: Array<Pick<Service, "_id" | "serviceName">> | [];
-}
 
 
 export class ProviderFetchAllAppServicesUseCase {
