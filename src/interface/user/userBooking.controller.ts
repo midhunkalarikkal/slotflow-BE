@@ -27,7 +27,7 @@ export class UserBookingController {
     ) { 
         this.bookingViaStripe = this.bookingViaStripe.bind(this);
         this.saveBookingAfterStripePayment = this.saveBookingAfterStripePayment.bind(this);
-        this.fetchAllBooking = this.fetchAllBooking.bind(this);
+        this.fetchBookings = this.fetchBookings.bind(this);
     }
     
     async bookingViaStripe(req: Request, res: Response) {
@@ -54,7 +54,7 @@ export class UserBookingController {
         }
     }
 
-    async fetchAllBooking(req: Request, res: Response) {
+    async fetchBookings(req: Request, res: Response) {
         try {
             const userId = req.user.userOrProviderId;
             if(!userId) throw new Error("Invalid request");

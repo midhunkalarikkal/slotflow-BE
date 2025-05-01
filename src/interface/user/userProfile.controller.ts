@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
-import { UserRepositoryImpl } from "../../infrastructure/database/user/user.repository.impl";
-import { HandleError } from "../../infrastructure/error/error";
-import { UserFetchProfileDetailsUseCase, UserUpdateProfileImageUseCase } from "../../application/use-cases/user/userProfile.Use-Case";
 import { s3Client } from "../../config/aws_s3";
+import { HandleError } from "../../infrastructure/error/error";
+import { UserRepositoryImpl } from "../../infrastructure/database/user/user.repository.impl";
+import { UserFetchProfileDetailsUseCase, UserUpdateProfileImageUseCase } from "../../application/use-cases/user/userProfile.use-Case";
 
 
 const userRepositoryImpl = new UserRepositoryImpl();
@@ -33,7 +33,6 @@ export class UserProfileController {
         try{
             const userId = req.user.userOrProviderId;
             const file = req.file;
-            console.log("userId , file : ",userId, file);
             if(!userId || !file) throw new Error("Invalid request.");
             const result = await this.userUpdateProfileImageUseCase.execute(userId, file);
             res.status(200).json(result);

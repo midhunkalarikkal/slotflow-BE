@@ -1,11 +1,11 @@
 import { Request, Response } from "express";
 import { HandleError } from "../../infrastructure/error/error";
 import { UserRepositoryImpl } from "../../infrastructure/database/user/user.repository.impl";
+import { AddressRepositoryImpl } from "../../infrastructure/database/address/address.repository.impl";
 import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/provider.repository.impl";
 import { ProviderServiceRepositoryImpl } from "../../infrastructure/database/providerService/providerService.repository.impl";
-import { UserFetchServiceProviderAddressUseCase, UserFetchServiceProviderProfileDetailsUseCase, UserFetchServiceProviderServiceAvailabilityUseCase, UserFetchServiceProviderServiceDetailsUseCase, UserFetchServiceProvidersUseCase } from "../../application/use-cases/user/userProvider.use-case";
-import { AddressRepositoryImpl } from "../../infrastructure/database/address/address.repository.impl";
 import { ServiceAvailabilityRepositoryImpl } from "../../infrastructure/database/serviceAvailability/serviceAvailability.repository.impl";
+import { UserFetchServiceProviderAddressUseCase, UserFetchServiceProviderProfileDetailsUseCase, UserFetchServiceProviderServiceAvailabilityUseCase, UserFetchServiceProviderServiceDetailsUseCase, UserFetchServiceProvidersUseCase } from "../../application/use-cases/user/userProvider.use-case";
 
 const userRepositoryImpl = new UserRepositoryImpl();
 const addressRepositoryImpl = new AddressRepositoryImpl();
@@ -38,7 +38,6 @@ export class UserProviderController {
         try{
             const userId = req.user.userOrProviderId;
             const selectedServices = req.params.selectedServices;
-            console.log("req.params.selectedServices : ",req.params.selectedServices);
             if(!userId || !selectedServices) throw new Error("Invalid request.");
             const serviceIds = selectedServices.split(",");
             const result = await this.userFetchServiceProvidersUseCase.execute( userId, serviceIds );
@@ -90,7 +89,6 @@ export class UserProviderController {
             const { providerId } = req.params;
             if(!userId || !providerId) throw new Error("Invalid request");
             const result = await this.userFetchServiceProviderServiceAvailabilityUseCase.execute(userId, providerId);
-            console.log("result : ",result);
             res.status(200).json(result);
         }catch (error) {
             HandleError.handle(error, res);

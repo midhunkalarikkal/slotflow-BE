@@ -1,18 +1,18 @@
 import { Types } from "mongoose";
-import { CommonResponse } from "../../../shared/interface/commonInterface";
-import { UserRepositoryImpl } from "../../../infrastructure/database/user/user.repository.impl";
-import { ProviderServiceRepositoryImpl } from "../../../infrastructure/database/providerService/providerService.repository.impl";
-import { FindProvidersUsingServiceCategoryIdsResProps } from "../../../domain/repositories/IProviderService.repository";
-import { extractS3Key } from "../../../infrastructure/helpers/helper";
 import { generateSignedUrl } from "../../../config/aws_s3";
-import { ProviderRepositoryImpl } from "../../../infrastructure/database/provider/provider.repository.impl";
-import { Provider } from "../../../domain/entities/provider.entity";
-import { AddressRepositoryImpl } from "../../../infrastructure/database/address/address.repository.impl";
-import { Address } from "../../../domain/entities/address.entity";
-import { ProviderService } from "../../../domain/entities/providerService.entity";
 import { Service } from "../../../domain/entities/service.entity";
-import { ServiceAvailabilityRepositoryImpl } from "../../../infrastructure/database/serviceAvailability/serviceAvailability.repository.impl";
+import { Address } from "../../../domain/entities/address.entity";
+import { Provider } from "../../../domain/entities/provider.entity";
+import { extractS3Key } from "../../../infrastructure/helpers/helper";
+import { CommonResponse } from "../../../shared/interface/commonInterface";
+import { ProviderService } from "../../../domain/entities/providerService.entity";
 import { ServiceAvailability } from "../../../domain/entities/serviceAvailability.entity";
+import { UserRepositoryImpl } from "../../../infrastructure/database/user/user.repository.impl";
+import { AddressRepositoryImpl } from "../../../infrastructure/database/address/address.repository.impl";
+import { ProviderRepositoryImpl } from "../../../infrastructure/database/provider/provider.repository.impl";
+import { FindProvidersUsingServiceCategoryIdsResProps } from "../../../domain/repositories/IProviderService.repository";
+import { ProviderServiceRepositoryImpl } from "../../../infrastructure/database/providerService/providerService.repository.impl";
+import { ServiceAvailabilityRepositoryImpl } from "../../../infrastructure/database/serviceAvailability/serviceAvailability.repository.impl";
 
 interface UserFetchServiceProvidersResProps extends CommonResponse {
   providers: Array<FindProvidersUsingServiceCategoryIdsResProps>
@@ -133,7 +133,6 @@ export class UserFetchServiceProviderServiceDetailsUseCase {
     if (!user) throw new Error("No user found");
 
     const serviceData = await this.providerServiceRepository.findProviderServiceByProviderId(new Types.ObjectId(providerId));
-    console.log("service Data : ",serviceData);
 
     function isServiceData(obj: any): obj is FindProviderServiceResProps {
       return obj && typeof obj === 'object' && '_id' in obj;

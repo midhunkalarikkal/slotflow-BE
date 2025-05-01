@@ -1,7 +1,7 @@
 import { Types } from "mongoose";
 import { BookingModel, IBooking } from "./booking.model";
 import { Booking } from "../../../domain/entities/booking.entity";
-import { CreateBookingPayloadProps, FindAllBookingResponseProps, IBookingRepository } from "../../../domain/repositories/IBooking.repository";
+import { CreateBookingPayloadProps, FindAllBookingsResponseProps, IBookingRepository } from "../../../domain/repositories/IBooking.repository";
 
 export class BookingRepositoryImpl implements IBookingRepository {
     private mapToEntity(booking : IBooking) : Booking {
@@ -44,11 +44,13 @@ export class BookingRepositoryImpl implements IBookingRepository {
         }
     }
 
-    async findAllBookingUsingUserId(userId: Types.ObjectId): Promise<Array<FindAllBookingResponseProps> | []> {
+    async findAllBookingsUsingUserId(userId: Types.ObjectId): Promise<Array<FindAllBookingsResponseProps> | []> {
         try {
             const bookings = await BookingModel.find({
                 userId : userId
-            },{ appointmentDate : 1, appointmentDay : 1, appointmentMode : 1, appointmentStatus : 1, appointmentTime : 1, createdAt : 1, paymentId : 1 });
+            },{
+                _id: 0, appointmentDay: 1, appointmentDate: 1, appointmentMode: 1, appointmentStatus: 1, appointmentTime: 1, createdAt: 1
+            });
             return bookings ?  bookings.map((booking) => this.mapToEntity(booking)) : [];
         } catch (error) {
             throw new Error("Bookings fetching error");
