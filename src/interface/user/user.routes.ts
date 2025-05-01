@@ -5,6 +5,7 @@ import { userProfileController } from "./userProfile.controller";
 import { userAddressController } from './userAddress.controller';
 import { userProviderController } from "./userProvider.controller";
 import { userBookingController, UserBookingController } from "./userBooking.controller";
+import { userPaymentController } from "./userPayment.controller";
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
@@ -27,5 +28,6 @@ router.post('/createBookingCheckoutSession', authMiddleware, userBookingControll
 router.post('/saveAppointmentBooking', authMiddleware, userBookingController.saveBookingAfterStripePayment);
 
 router.get('/getBookings', authMiddleware, userBookingController.fetchBookings);
+router.get('/getPayments', authMiddleware, userPaymentController.fetchPayments)
 
 export default router;

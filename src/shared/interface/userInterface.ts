@@ -7,6 +7,7 @@ import { Service } from "../../domain/entities/service.entity";
 import { Provider } from "../../domain/entities/provider.entity";
 import { ProviderService } from "../../domain/entities/providerService.entity";
 import { ServiceAvailability } from "../../domain/entities/serviceAvailability.entity";
+import { Payment } from "../../domain/entities/payment.entity";
 
 // **** used in userAddress.use-case **** \\
 
@@ -89,4 +90,15 @@ export interface UserFetchProviderServiceResProps extends CommonResponse {
 // user fetch provider servide availability
 export interface UserFetchProviderServiceAvailabilityResProps extends CommonResponse {
     availability: Pick<ServiceAvailability, "availability"> | {};
+}
+
+
+
+
+
+// **** used in userPayment.use-case **** \\
+
+// user fetch all payments response props
+export interface UserFetchAllPaymentsResponseProps extends CommonResponse {
+    payments: Array<Pick<Payment, "paymentStatus" | "paymentMethod" | "paymentGateway" | "paymentFor" | "discountAmount" | "totalAmount" | "createdAt" | "_id">> | [];
 }
