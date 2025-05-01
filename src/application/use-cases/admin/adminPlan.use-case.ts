@@ -1,20 +1,6 @@
 import { Types } from "mongoose";
-import { Plan } from "../../../domain/entities/plan.entity";
-import { CommonResponse } from "../../../shared/interface/commonInterface";
 import { PlanRepositoryImpl } from "../../../infrastructure/database/plan/plan.repository.impl";
-
-
-interface AdminPlanListResProps extends CommonResponse {
-    plans: Array<Pick<Plan, "_id" | "planName" | "isBlocked">>;
-}
-
-interface AdminCreatePlanResProps extends CommonResponse {
-    plan: Pick<Plan, "_id" | "planName" | "isBlocked">;
-}
-
-interface AdminChangePlanStatusResProps extends CommonResponse {
-    updatedPlan: Pick<Plan, "_id" | "planName" | "isBlocked">;
-}
+import { AdminChangePlanStatusResProps, AdminCreatePlanResProps, AdminPlanListResProps } from "../../../shared/interface/adminInterface";
 
 
 export class AdminPlanListUseCase {

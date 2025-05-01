@@ -1,25 +1,7 @@
 import { Types } from "mongoose";
-import { Provider } from "../../../../domain/entities/provider.entity";
 import { OTPService } from "../../../../infrastructure/services/otp.service";
-import { CommonResponse } from "../../../../shared/interface/commonInterface";
 import { ProviderRepositoryImpl } from "../../../../infrastructure/database/provider/provider.repository.impl";
-
-
-interface AdminProviderListResProps extends CommonResponse {
-    providers: Array<Pick<Provider, "_id" | "username" | "email" | "isBlocked" | "isAdminVerified" | "trustedBySlotflow">>;
-}
-
-interface AdminApproveProviderRespRops extends CommonResponse {
-    updatedProvider: Pick<Provider, "_id" | "username" | "email" | "isBlocked" | "isAdminVerified" | "trustedBySlotflow">;
-}
-
-interface AdminChangeProviderStatusResProps extends CommonResponse {
-    updatedProvider: Pick<Provider, "_id" | "username" | "email" | "isBlocked" | "isAdminVerified" | "trustedBySlotflow">;
-}
-
-interface AdminChangeProviderTrustTagResProps extends CommonResponse {
-    updatedProvider: Pick<Provider, "_id" | "username" | "email" | "isBlocked" | "isAdminVerified" | "trustedBySlotflow">;
-}
+import { AdminApproveProviderRespRops, AdminChangeProviderStatusResProps, AdminChangeProviderTrustTagResProps, AdminProviderListResProps } from "../../../../shared/interface/adminInterface";
 
 
 export class AdminProviderListUseCase {

@@ -1,15 +1,6 @@
 import { Types } from "mongoose";
-import { CommonResponse } from "../../../shared/interface/commonInterface";
-import { FindAllSubscriptionsResProps, findSubscriptionFullDetailsResProps } from "../../../domain/repositories/ISubscription.repository";
 import { SubscriptionRepositoryImpl } from "../../../infrastructure/database/subscription/subscription.repository.impl";
-
-interface AdminFetchAllSubscriptionsResProps extends CommonResponse {
-    subscriptions: Array<FindAllSubscriptionsResProps>
-}
-
-interface AdminFetchSubscriptionDetailsResProps extends CommonResponse {
-    subscriptionDetails: findSubscriptionFullDetailsResProps | {};
-}
+import { AdminFetchAllSubscriptionsResProps, AdminFetchSubscriptionDetailsResProps } from "../../../shared/interface/adminInterface";
 
 export class AdminFetchAllSubscriptionsUseCase {
     constructor(

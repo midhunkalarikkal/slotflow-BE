@@ -1,16 +1,6 @@
 import { Types } from "mongoose";
-import { User } from "../../../domain/entities/user.entity";
-import { CommonResponse } from "../../../shared/interface/commonInterface";
 import { UserRepositoryImpl } from "../../../infrastructure/database/user/user.repository.impl";
-
-
-interface AdminUsersListResProps extends CommonResponse {
-    users: Array<Pick<User, "_id" | "username" | "email" | "isBlocked" | "isEmailVerified">>
-}
-
-interface AdminChangeUserStatusResProps extends CommonResponse {
-    updatedUser: Pick<User, "_id" | "username" | "email" | "isBlocked" | "isEmailVerified">;
-}
+import { AdminChangeUserStatusResProps, AdminUsersListResProps } from "../../../shared/interface/adminInterface";
 
 export class AdminUserListUseCase {
     constructor(private userRepository: UserRepositoryImpl) { }

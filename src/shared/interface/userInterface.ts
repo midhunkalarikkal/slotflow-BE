@@ -3,9 +3,9 @@ import { CommonResponse } from "./commonInterface";
 import { User } from "../../domain/entities/user.entity";
 import { Address } from "../../domain/entities/address.entity";
 import { Booking } from "../../domain/entities/booking.entity";
+import { Service } from "../../domain/entities/service.entity";
 import { Provider } from "../../domain/entities/provider.entity";
 import { ProviderService } from "../../domain/entities/providerService.entity";
-import { Service } from "../../domain/entities/service.entity";
 import { ServiceAvailability } from "../../domain/entities/serviceAvailability.entity";
 
 // **** used in userAddress.use-case **** \\

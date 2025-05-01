@@ -1,21 +1,6 @@
 import { Types } from "mongoose";
-import { Service } from "../../../domain/entities/service.entity";
-import { CommonResponse } from "../../../shared/interface/commonInterface";
 import { ServiceRepositoryImpl } from "../../../infrastructure/database/appservice/service.repository.impl";
-
-
-interface AdminServiceListResProps extends CommonResponse {
-    services: Array<Pick<Service, "_id" | "serviceName" | "isBlocked">>;
-}
-
-interface AdminAddServiceResProps extends CommonResponse {
-    service: Pick<Service, "_id" | "serviceName" | "isBlocked">;
-}
-
-interface AdminChangeServiceStatusResProps extends CommonResponse {
-    updatedService: Pick<Service, "_id" | "serviceName" | "isBlocked">;
-}
-
+import { AdminAddServiceResProps, AdminChangeServiceStatusResProps, AdminServiceListResProps } from "../../../shared/interface/adminInterface";
 
 export class AdminServiceListUseCase {
     constructor(private seriveRepository: ServiceRepositoryImpl) { }

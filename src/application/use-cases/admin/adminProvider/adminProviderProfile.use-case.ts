@@ -1,55 +1,12 @@
 import { Types } from "mongoose";
 import { generateSignedUrl } from "../../../../config/aws_s3";
-import { Address } from "../../../../domain/entities/address.entity";
-import { Service } from "../../../../domain/entities/service.entity";
-import { Payment } from "../../../../domain/entities/payment.entity";
-import { Provider } from "../../../../domain/entities/provider.entity";
-import { CommonResponse } from "../../../../shared/interface/commonInterface";
-import { Subscription } from "../../../../domain/entities/subscription.entity";
-import { ProviderService } from "../../../../domain/entities/providerService.entity";
-import { ServiceAvailability } from "../../../../domain/entities/serviceAvailability.entity";
 import { AddressRepositoryImpl } from "../../../../infrastructure/database/address/address.repository.impl";
 import { PaymentRepositoryImpl } from "../../../../infrastructure/database/payment/payment.repository.impl";
 import { ProviderRepositoryImpl } from "../../../../infrastructure/database/provider/provider.repository.impl";
 import { SubscriptionRepositoryImpl } from "../../../../infrastructure/database/subscription/subscription.repository.impl";
 import { ProviderServiceRepositoryImpl } from "../../../../infrastructure/database/providerService/providerService.repository.impl";
 import { ServiceAvailabilityRepositoryImpl } from "../../../../infrastructure/database/serviceAvailability/serviceAvailability.repository.impl";
-
-
-interface AdminFetchProviderDetailsResProps extends CommonResponse {
-    provider: Pick<Provider, "_id" | "username" | "email" | "isBlocked" | "isEmailVerified" | "isAdminVerified" | "phone" | "profileImage" | "trustedBySlotflow" | "createdAt"> | {};
-}
-
-interface AdminFetchProviderAddressResProps extends CommonResponse {
-    address: Pick<Address, "userId" | "addressLine" | "phone" | "place" | "city" | "district" | "pincode" | "state" | "country" | "googleMapLink"> | {};
-}
-
-type FindProviderServiceProps = Omit<ProviderService, "serviceCategory">;
-interface FindProviderServiceResProps extends FindProviderServiceProps {
-    serviceCategory: Pick<Service, "serviceName">
-}
-interface AdminFetchProviderServiceResProps extends CommonResponse {
-    service: FindProviderServiceResProps | {};
-}
-
-interface AdminFetchProviderServiceAvailabilityResProps extends CommonResponse {
-    availability: Pick<ServiceAvailability, "availability"> | {};
-}
-
-type SubscripionsResProps = Pick<Subscription, "startDate" | "endDate" | "subscriptionStatus">;
-interface AdminFetchProviderSubscriptions extends SubscripionsResProps {
-    subscriptionPlanId?: {
-        _id: string;
-        planName: string;
-    };
-}
-interface AdminFetchProviderSubscriptionsResProps extends CommonResponse {
-    subscriptions: AdminFetchProviderSubscriptions[] | [];
-}
-
-interface AdminFetchProviderPaymentsResProps extends CommonResponse {
-    payments: Array<Pick<Payment, "paymentStatus" | "paymentMethod" | "paymentGateway" | "paymentFor" | "discountAmount" | "totalAmount" | "createdAt" | "_id">> | [];
-}
+import { AdminFetchProviderAddressResProps, AdminFetchProviderDetailsResProps, AdminFetchProviderPaymentsResProps, AdminFetchProviderServiceAvailabilityResProps, AdminFetchProviderServiceResProps, AdminFetchProviderSubscriptionsResProps, FindProviderServiceResProps } from "../../../../shared/interface/adminInterface";
 
 
 export class AdminFetchProviderDetailsUseCase {

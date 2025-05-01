@@ -1,11 +1,5 @@
-import { Payment } from "../../../domain/entities/payment.entity";
+import { AdminFetchAllPaymentsResProps } from "../../../shared/interface/adminInterface";
 import { PaymentRepositoryImpl } from "../../../infrastructure/database/payment/payment.repository.impl";
-import { CommonResponse } from "../../../shared/interface/commonInterface";
-
-type FetchAllPayments = Pick<Payment, "createdAt" | "totalAmount" | "paymentFor" | "paymentGateway" | "paymentStatus" | "paymentMethod">;
-interface AdminFetchAllPaymentsResProps extends CommonResponse {
-    payments: Array<FetchAllPayments>
-}
 
 export class AdminFetchAllPaymentsUseCase {
     constructor(
