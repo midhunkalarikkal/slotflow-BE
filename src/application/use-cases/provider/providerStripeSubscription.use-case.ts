@@ -10,7 +10,7 @@ import { SubscriptionRepositoryImpl } from "../../../infrastructure/database/sub
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
-export class ProviderStripeSubscriptionUseCase {
+export class ProviderStripeSubscriptionCreateSessionIdUseCase {
     constructor(
             private planRepository: PlanRepositoryImpl,
             private providerRepository: ProviderRepositoryImpl,
