@@ -49,11 +49,33 @@ export class BookingRepositoryImpl implements IBookingRepository {
             const bookings = await BookingModel.find({
                 userId : userId
             },{
-                _id: 0, appointmentDay: 1, appointmentDate: 1, appointmentMode: 1, appointmentStatus: 1, appointmentTime: 1, createdAt: 1
+                appointmentDay: 1, appointmentDate: 1, appointmentMode: 1, appointmentStatus: 1, appointmentTime: 1, createdAt: 1
             });
             return bookings ?  bookings.map((booking) => this.mapToEntity(booking)) : [];
         } catch (error) {
             throw new Error("Bookings fetching error");
+        }
+    }
+    
+    async findBookingById(bookingId: Types.ObjectId): Promise<Booking | null> {
+        try{
+            const booking = await BookingModel.findById(bookingId);
+            return booking ? this.mapToEntity(booking) : null;
+        }catch(error){
+            throw new Error("Finding booking error");
+        }
+    }
+
+    async updateBooking(booking: Booking): Promise<Booking | null> {
+        try{
+            const updatedBooking = await BookingModel.findByIdAndUpdate(
+                booking._id,
+                { ...booking },
+                { new: true }
+            );
+            return updatedBooking ? this.mapToEntity(updatedBooking) : null;
+        }catch(error){
+            throw new Error("Booking updating error");
         }
     }
 }

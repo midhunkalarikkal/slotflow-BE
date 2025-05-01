@@ -12,8 +12,16 @@ export interface IPayment extends Document {
     totalAmount: number;
     createdAt: Date;
     updatedAt: Date;
+
     userId?: Types.ObjectId;
     providerId?: Types.ObjectId;
+
+    refundId?: string;
+    refundAmount?: number;
+    refundStatus?: string;
+    refundAt?: Date;
+    refundReason?: string;
+    chargeId?: string;
 }
 
 const PaymentSchema = new Schema<IPayment>({
@@ -44,6 +52,16 @@ const PaymentSchema = new Schema<IPayment>({
 
     userId: { type: Types.ObjectId, ref: "User", required: false },
     providerId: { type: Types.ObjectId, ref: "Provider", required: false },
+
+    refundId: { type: String },
+    refundAmount: { type: Number },
+    refundStatus: {
+        type: String,
+        enum: ["succeeded", "pending", "failed"]
+    },
+    refundAt: { type: Date },
+    refundReason: { type: String },
+    chargeId: { type: String },
 },
     { timestamps: true });
 

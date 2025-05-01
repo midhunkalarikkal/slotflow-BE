@@ -28,6 +28,11 @@ export interface UserFetchAllBookingsResponseProps extends CommonResponse {
     bookings: Array<FindAllBookingsResponseProps>
 }
 
+// user cancel booking
+export interface UserCancelBookingUseCaseResProps extends CommonResponse {
+    updatedBooking : Pick<Booking, "_id" | "appointmentDay" | "appointmentDate" | "appointmentMode" | "appointmentStatus" | "appointmentTime" | "createdAt">;
+}
+
 
 
 

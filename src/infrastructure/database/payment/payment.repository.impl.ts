@@ -1,7 +1,7 @@
 import { Types } from "mongoose";
 import { IPayment, PaymentModel } from "./payment.model";
 import { Payment } from "../../../domain/entities/payment.entity";
-import { CreatePaymentForBookingProps, CreatePaymentForSubscriptionProps, FindAllPayments, FindAllPaymentsByProviderIdResProps, FindAllPaymentsByUserIdResProps, IPaymentRepository } from "../../../domain/repositories/IPayment.repository";
+import { CreatePaymentForBookingProps, CreatePaymentForSubscriptionProps, FindAllPayments, FindAllPaymentsByProviderIdResProps, FindAllPaymentsByUserIdResProps, IPaymentRepository, UpdateForCancelBookingRefundReqProps } from "../../../domain/repositories/IPayment.repository";
 
 export class PaymentRepositoryImpl implements IPaymentRepository {
     private mapToEntity(payment: IPayment): Payment {
@@ -17,8 +17,16 @@ export class PaymentRepositoryImpl implements IPaymentRepository {
             payment.totalAmount,
             payment.createdAt,
             payment.updatedAt,
-            payment.userId,
-            payment.providerId,
+
+            payment?.userId,
+            payment?.providerId,
+
+            payment?.refundId,
+            payment?. refundAmount,
+            payment?.refundStatus,
+            payment?.refundAt,
+            payment?.refundReason,
+            payment?.chargeId,
         )
     }
 
@@ -67,6 +75,28 @@ export class PaymentRepositoryImpl implements IPaymentRepository {
             return payments;
         }catch (error) {
             throw new Error("Payments fetching error.");
+        }
+    }
+
+    async findAllPaymentById(paymentId: Types.ObjectId): Promise<Payment | null> {
+        try{
+            const payment = await PaymentModel.findById(paymentId);
+            return payment ? this.mapToEntity(payment) : null;
+        }catch(error){
+            throw new Error("Payment fetching error");
+        }
+    }
+
+    async updateForCancelBookingRefund(payment: UpdateForCancelBookingRefundReqProps, options: { session?: any } = {}): Promise<Payment | null> {
+        try{
+            const updatedPayment = await PaymentModel.findByIdAndUpdate(
+                payment._id,
+                { ...payment },
+                { new : true, ...options }
+            );
+            return updatedPayment ? this.mapToEntity(updatedPayment) : null;
+        }catch(error){
+            throw new Error("Payment updating error");
         }
     }
 }

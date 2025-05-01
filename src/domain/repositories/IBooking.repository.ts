@@ -11,5 +11,9 @@ export interface IBookingRepository {
 
     findBookingByUserId(userId: Types.ObjectId, day: string, date: Date, time: string): Promise<Array<Booking> | null>;
 
-    findAllBookingsUsingUserId(userId: Types.ObjectId): Promise<Array<FindAllBookingsResponseProps> | []>
+    findAllBookingsUsingUserId(userId: Types.ObjectId): Promise<Array<FindAllBookingsResponseProps> | []>;
+
+    findBookingById(bookingId: Types.ObjectId): Promise<Booking | null>;
+
+    updateBooking(booking: Booking) : Promise<Booking | null>;
 }

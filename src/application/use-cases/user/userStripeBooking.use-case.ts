@@ -96,6 +96,8 @@ export class UserSaveBookingAfterStripePaymentUseCase {
 
         const session = await stripe.checkout.sessions.retrieve(sessionId);
 
+        console.log("session : ",session);
+
         const providerId = session?.metadata?.providerId;
         const selectedDay = session?.metadata?.selectedDay;
         const slotId = session?.metadata?.slotId;
@@ -105,8 +107,9 @@ export class UserSaveBookingAfterStripePaymentUseCase {
         const paymentStatus = session?.payment_status === "paid" ? "Paid" : "Pending";
         const paymentType = session?.payment_method_types[0];
         const dateString = session?.metadata?.appointmentDate;
+        const paymentIntent = session?.payment_intent;
 
-        if (!providerId || !selectedDay || !slotId || !selectedServiceMode || !initialAmount || !totalAmount || !paymentStatus || !paymentType || !dateString) throw new Error("Unexpected error, please try again");
+        if (!providerId || !selectedDay || !slotId || !selectedServiceMode || !initialAmount || !totalAmount || !paymentStatus || !paymentType || !dateString || !paymentIntent) throw new Error("Unexpected error, please try again");
 
         const providerServiceAvailability = await this.serviceAvailabilityRepository.findServiceAvailabilityByProviderId(new Types.ObjectId(providerId));
         if (!providerServiceAvailability) throw new Error("No availability found");
@@ -124,7 +127,7 @@ export class UserSaveBookingAfterStripePaymentUseCase {
 
         try {
             const payment = await this.paymentRepository.createPaymentForBooking({
-                transactionId: session.id,
+                transactionId: paymentIntent.toString(),
                 paymentStatus: paymentStatus,
                 paymentMethod: paymentType,
                 paymentGateway: "Stripe",
