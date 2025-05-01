@@ -1,42 +1,12 @@
 import { Types } from "mongoose";
 import { generateSignedUrl } from "../../../config/aws_s3";
-import { Service } from "../../../domain/entities/service.entity";
-import { Address } from "../../../domain/entities/address.entity";
-import { Provider } from "../../../domain/entities/provider.entity";
 import { extractS3Key } from "../../../infrastructure/helpers/helper";
-import { CommonResponse } from "../../../shared/interface/commonInterface";
-import { ProviderService } from "../../../domain/entities/providerService.entity";
-import { ServiceAvailability } from "../../../domain/entities/serviceAvailability.entity";
 import { UserRepositoryImpl } from "../../../infrastructure/database/user/user.repository.impl";
 import { AddressRepositoryImpl } from "../../../infrastructure/database/address/address.repository.impl";
 import { ProviderRepositoryImpl } from "../../../infrastructure/database/provider/provider.repository.impl";
-import { FindProvidersUsingServiceCategoryIdsResProps } from "../../../domain/repositories/IProviderService.repository";
 import { ProviderServiceRepositoryImpl } from "../../../infrastructure/database/providerService/providerService.repository.impl";
 import { ServiceAvailabilityRepositoryImpl } from "../../../infrastructure/database/serviceAvailability/serviceAvailability.repository.impl";
-
-interface UserFetchServiceProvidersResProps extends CommonResponse {
-  providers: Array<FindProvidersUsingServiceCategoryIdsResProps>
-}
-
-interface UserFetchServiceProviderDetailsResProps extends CommonResponse {
-  provider: Pick<Provider, "_id" | "username" | "email" | "profileImage" | "trustedBySlotflow" | "phone">
-}
-
-interface UserFetchServiceProviderAddressResProps extends CommonResponse {
-  address: Pick<Address, "userId" | "addressLine" | "phone" | "place" | "city" | "district" | "pincode" | "state" | "country" | "googleMapLink">
-}
-
-type FindProviderServiceProps = Omit<ProviderService, "serviceCategory">;
-interface FindProviderServiceResProps extends FindProviderServiceProps {
-  serviceCategory: Pick<Service, "serviceName">
-}
-interface UserFetchProviderServiceResProps extends CommonResponse {
-  service: FindProviderServiceResProps | {};
-}
-
-interface UserFetchProviderServiceAvailabilityResProps extends CommonResponse {
-    availability: Pick<ServiceAvailability, "availability"> | {};
-}
+import { FindProviderServiceResProps, FindProvidersUsingServiceCategoryIdsResProps, UserFetchProviderServiceAvailabilityResProps, UserFetchProviderServiceResProps, UserFetchServiceProviderAddressResProps, UserFetchServiceProviderDetailsResProps, UserFetchServiceProvidersResProps } from "../../../shared/interface/userInterface";
 
 export class UserFetchServiceProvidersUseCase {
   constructor(

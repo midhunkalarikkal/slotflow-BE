@@ -3,17 +3,9 @@ import { S3Client } from "@aws-sdk/client-s3";
 import { Upload } from "@aws-sdk/lib-storage";
 import { aws_s3Config } from "../../../config/env";
 import { generateSignedUrl } from "../../../config/aws_s3";
-import { User } from "../../../domain/entities/user.entity";
 import { extractS3Key } from "../../../infrastructure/helpers/helper";
-import { CommonResponse } from "../../../shared/interface/commonInterface";
 import { UserRepositoryImpl } from "../../../infrastructure/database/user/user.repository.impl";
-
-
-interface UserFetchProfileDetails extends CommonResponse {
-    profileDetails: Pick<User, "username" | "email" | "isBlocked" | "isEmailVerified" | "phone" | "createdAt"> | {};
-}
-
-interface UserUpdateProfileImageResProps extends CommonResponse , Pick<User, "profileImage"> { };
+import { UserFetchProfileDetails, UserUpdateProfileImageResProps } from "../../../shared/interface/userInterface";
 
 
 export class UserFetchProfileDetailsUseCase {

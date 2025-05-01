@@ -1,12 +1,6 @@
 import { Types } from "mongoose";
-import { Booking } from "../../../domain/entities/booking.entity";
-import { CommonResponse } from "../../../shared/interface/commonInterface";
+import { UserFetchAllBookingsResponseProps } from "../../../shared/interface/userInterface";
 import { BookingRepositoryImpl } from "../../../infrastructure/database/booking/booking.repository.impl";
-
-type FindAllBookingsResponseProps = Pick<Booking, "_id" | "appointmentDay" | "appointmentDate" | "appointmentMode" | "appointmentStatus" | "appointmentTime" | "createdAt" | "paymentId">;
-interface UserFetchAllBookingsResponseProps extends CommonResponse {
-    bookings : Array<FindAllBookingsResponseProps>
-}
 
 export class UserFetchBookingsUseCase {
     constructor(

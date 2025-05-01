@@ -1,6 +1,6 @@
 import { Types } from "mongoose";
-import { ProviderService } from "../entities/providerService.entity";
 import { Service } from "../entities/service.entity";
+import { ProviderService } from "../entities/providerService.entity";
 
 export type CreateProviderServiceReqProps = Pick<ProviderService, "providerId" | "serviceCategory" | "serviceName" | "serviceDescription" | "servicePrice" | "providerAdhaar" | "providerExperience" | "providerCertificateUrl">;
 

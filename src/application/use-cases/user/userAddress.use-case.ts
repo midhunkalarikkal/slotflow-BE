@@ -1,15 +1,9 @@
 import { Types } from "mongoose";
-import { Address } from "../../../domain/entities/address.entity";
 import { Validator } from "../../../infrastructure/validator/validator";
 import { CommonResponse } from "../../../shared/interface/commonInterface";
+import { UserFetchAddressResProps } from "../../../shared/interface/userInterface";
 import { UserRepositoryImpl } from "../../../infrastructure/database/user/user.repository.impl";
 import { AddressRepositoryImpl } from "../../../infrastructure/database/address/address.repository.impl";
-
-
-interface UserFetchAddressResProps extends CommonResponse {
-    address: Pick<Address, "addressLine" | "phone" | "place" | "city" | "district" | "pincode" | "state" | "country" | "googleMapLink"> | {};
-}
-
 
 export class UserFetchAddressUseCase {
     constructor(
