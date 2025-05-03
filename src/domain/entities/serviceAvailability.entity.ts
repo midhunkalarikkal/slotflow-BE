@@ -1,9 +1,7 @@
 import { Types } from "mongoose";
 
 export interface TimeSlot {
-    _id: Types.ObjectId,
-    slot: string,
-    available: boolean,
+    time: string,
 }
 
 export interface Availability {
@@ -23,7 +21,7 @@ export class ServiceAvailability {
     constructor(
         public _id: Types.ObjectId,
         public providerId: Types.ObjectId,
-        public availability: Availability[],
+        public availabilities: Availability[],
         public createdAt: Date,
         public updatedAt: Date,
     ){}

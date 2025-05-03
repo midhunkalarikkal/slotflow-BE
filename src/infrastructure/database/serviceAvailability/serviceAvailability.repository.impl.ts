@@ -8,16 +8,16 @@ export class ServiceAvailabilityRepositoryImpl implements IServiceAvailabilityRe
         return new ServiceAvailability(
             serviceAvailability._id,
             serviceAvailability.providerId,
-            serviceAvailability.availability,
+            serviceAvailability.availabilities,
             serviceAvailability.createdAt,
             serviceAvailability.updatedAt,
         )
     }
 
-    async createServiceAvailability(providerId: Types.ObjectId, availability: Array<Availability>): Promise<ServiceAvailability> {
+    async createServiceAvailabilities(providerId: Types.ObjectId, availabilities: Array<Availability>): Promise<ServiceAvailability> {
         try {
             const serviceAvailability = {
-                providerId,availability
+                providerId, availabilities
             }
             const newServiceAvailability = await ServiceAvailabilityModel.create(serviceAvailability);
             return this.mapToEntity(newServiceAvailability);

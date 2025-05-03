@@ -12,8 +12,8 @@ export class BookingRepositoryImpl implements IBookingRepository {
                 booking.appointmentDate,
                 booking.appointmentTime,
                 booking.appointmentMode,
-                booking.appointmentDay,
                 booking.appointmentStatus,
+                booking.slotId,
                 booking.paymentId,
                 booking.createdAt,
                 booking.updatedAt,
@@ -25,7 +25,7 @@ export class BookingRepositoryImpl implements IBookingRepository {
             const newBooking = await BookingModel.create([booking], options);
             return this.mapToEntity(newBooking[0]);
         } catch (error) {
-            throw new Error("Appointment booking error");
+            throw new Error("Appointment booking creating error");
         }
     }
     

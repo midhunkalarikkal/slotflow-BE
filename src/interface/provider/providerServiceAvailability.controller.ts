@@ -2,17 +2,17 @@ import { Request, Response } from "express";
 import { HandleError } from "../../infrastructure/error/error";
 import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/provider.repository.impl";
 import { ServiceAvailabilityRepositoryImpl } from "../../infrastructure/database/serviceAvailability/serviceAvailability.repository.impl";
-import { ProviderAddServiceAvailabilityUseCase, ProviderFetchServiceAvailabilityUseCase } from "../../application/use-cases/provider/providerServiceAvailability.use-case";
+import { ProviderAddServiceAvailabilitiesUseCase, ProviderFetchServiceAvailabilityUseCase } from "../../application/use-cases/provider/providerServiceAvailability.use-case";
 
 const providerRepositoryImpl = new ProviderRepositoryImpl();
 const serviceAvailabilityRepositoryImpl = new ServiceAvailabilityRepositoryImpl();
 
-const providerAddServiceAvailabilityUseCase = new ProviderAddServiceAvailabilityUseCase(providerRepositoryImpl, serviceAvailabilityRepositoryImpl);
+const providerAddServiceAvailabilitiesUseCase = new ProviderAddServiceAvailabilitiesUseCase(providerRepositoryImpl, serviceAvailabilityRepositoryImpl);
 const providerFetchServiceAvailabilityUseCase = new ProviderFetchServiceAvailabilityUseCase(serviceAvailabilityRepositoryImpl);
 
 class ProviderServiceAvailabilityController {
     constructor(
-        private providerAddServiceAvailabilityUseCase: ProviderAddServiceAvailabilityUseCase,
+        private providerAddServiceAvailabilitiesUseCase: ProviderAddServiceAvailabilitiesUseCase,
         private providerFetchServiceAvailabilityUseCase: ProviderFetchServiceAvailabilityUseCase,
     ) {
         this.addServiceAvailability = this.addServiceAvailability.bind(this);
@@ -22,9 +22,9 @@ class ProviderServiceAvailabilityController {
     async addServiceAvailability(req: Request, res: Response) {
         try{
             const providerId = req.user.userOrProviderId;
-            const availability = req.body;
-            if(!providerId || !availability || availability.length  === 0) throw new Error("Invalid request.");
-            const result = await this.providerAddServiceAvailabilityUseCase.execute(providerId, availability);
+            const availabilities = req.body;
+            if(!providerId || !availabilities || availabilities.length  === 0) throw new Error("Invalid request.");
+            const result = await this.providerAddServiceAvailabilitiesUseCase.execute(providerId, availabilities);
             res.status(200).json(result);
         }catch(error){
             HandleError.handle(error, res);
@@ -44,5 +44,5 @@ class ProviderServiceAvailabilityController {
 
 }
 
-const providerServiceAvailabilityController = new ProviderServiceAvailabilityController( providerAddServiceAvailabilityUseCase, providerFetchServiceAvailabilityUseCase );
+const providerServiceAvailabilityController = new ProviderServiceAvailabilityController( providerAddServiceAvailabilitiesUseCase, providerFetchServiceAvailabilityUseCase );
 export { providerServiceAvailabilityController };

@@ -148,7 +148,14 @@ export class Validator {
         if (!time || time.trim().length === 0) {
             throw new Error(`${fieldName} is required.`);
         }
-        if (!/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/.test(time.trim())) throw new Error(`Invalid ${fieldName}. ${fieldName} must be in HH:MM format (24-hour).`);
+    
+        const timePattern = /^(0?[1-9]|1[0-2]):[0-5][0-9]\s?(AM|PM)$/i;
+    
+        if (!timePattern.test(time.trim())) {
+            throw new Error(
+                `Invalid ${fieldName}. ${fieldName} must be in HH:MM AM/PM format (12-hour).`
+            );
+        }
     }
 
     static validateStartTime(startTime: string): void {

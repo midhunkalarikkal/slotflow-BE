@@ -6,20 +6,22 @@ import { Availability, FontendAvailability } from "../../../domain/entities/serv
 import { ProviderRepositoryImpl } from "../../../infrastructure/database/provider/provider.repository.impl";
 import { ServiceAvailabilityRepositoryImpl } from "../../../infrastructure/database/serviceAvailability/serviceAvailability.repository.impl";
 
-export class ProviderAddServiceAvailabilityUseCase {
+export class ProviderAddServiceAvailabilitiesUseCase {
     constructor(
         private providerRepository: ProviderRepositoryImpl,
         private serviceAvailabilityRepository: ServiceAvailabilityRepositoryImpl,
     ){}
 
-    async execute(providerId: string, availability: FontendAvailability[]): Promise<CommonResponse> {
-        if(!providerId || !availability || availability.length  === 0) throw new Error("Invalid request.");
+    async execute(providerId: string, availabilities: FontendAvailability[]): Promise<CommonResponse> {
+        if(!providerId || !availabilities || availabilities.length  === 0) throw new Error("Invalid request.");
+
+        console.log("availabilites : ",availabilities);
 
         const convertedProviderId = new Types.ObjectId(providerId);
         const provider = await this.providerRepository.findProviderById(new Types.ObjectId(providerId));
         if(!provider) throw new Error("Please logout and try again.");
 
-        availability.map((data) => {
+        availabilities.map((data) => {
             Validator.validateDay(data.day);
             Validator.validateDuration(data.duration);
             Validator.validateStartTime(data.startTime);
@@ -27,19 +29,20 @@ export class ProviderAddServiceAvailabilityUseCase {
             Validator.validateModes(data.modes);
         })
 
-        const newAvailability: Availability[] = availability.map((avail: FontendAvailability) => ({
-            ...avail,
-            slots: avail.slots.map((slot: string) => ({
-                _id: new Types.ObjectId(),
-                slot: slot, 
-                available: true
+        const newAvailabilities: Availability[] = availabilities.map((availability: FontendAvailability) => ({
+            ...availability,
+            slots: availability.slots.map((time: string) => ({
+                time: time, 
             }))
         }));
 
+        console.log("newAvailabilities : ",newAvailabilities);
+        console.log("newAvailabilites[0].slots[0]",newAvailabilities[0].slots[0]);
 
-        const serviceAvailability = await this.serviceAvailabilityRepository.createServiceAvailability(convertedProviderId, newAvailability)
+        
+        const serviceAvailability = await this.serviceAvailabilityRepository.createServiceAvailabilities(convertedProviderId, newAvailabilities)
         if(!serviceAvailability) throw new Error("Service availability adding failed.");
-
+        
         if (provider && serviceAvailability && serviceAvailability._id) {
             provider.serviceAvailabilityId = serviceAvailability._id;
             const updatedProvider = await this.providerRepository.updateProvider(provider);

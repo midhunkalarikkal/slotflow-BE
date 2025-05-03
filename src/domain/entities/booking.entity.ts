@@ -1,5 +1,12 @@
 import { Types } from "mongoose";
 
+export enum AppointmentStatus {
+    Booked = "Booked",
+    Completed = "Completed",
+    Cancelled = "Cancelled",
+    Rejected = "Rejected",
+}
+
 export class Booking {
     constructor(
         public _id: Types.ObjectId,
@@ -8,11 +15,10 @@ export class Booking {
         public appointmentDate: Date,
         public appointmentTime: string,
         public appointmentMode: string,
-        public appointmentDay: string,
-        public appointmentStatus: string,
+        public appointmentStatus: AppointmentStatus,
         public slotId: Types.ObjectId,
         public paymentId: Types.ObjectId | null,
         public createdAt: Date,
         public updatedAt: Date,
-    ){}
+    ) { }
 }

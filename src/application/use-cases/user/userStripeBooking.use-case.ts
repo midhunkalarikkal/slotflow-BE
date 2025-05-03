@@ -8,6 +8,7 @@ import { BookingRepositoryImpl } from "../../../infrastructure/database/booking/
 import { ProviderRepositoryImpl } from "../../../infrastructure/database/provider/provider.repository.impl";
 import { ProviderServiceRepositoryImpl } from "../../../infrastructure/database/providerService/providerService.repository.impl";
 import { ServiceAvailabilityRepositoryImpl } from "../../../infrastructure/database/serviceAvailability/serviceAvailability.repository.impl";
+import { AppointmentStatus } from "../../../domain/entities/booking.entity";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
@@ -144,11 +145,12 @@ export class UserSaveBookingAfterStripePaymentUseCase {
                 serviceProviderId: new Types.ObjectId(providerId),
                 userId: new Types.ObjectId(userId),
                 appointmentDate: new Date(dateString),
-                appointmentDay: selectedDay,
+                // appointmentDay: selectedDay,
                 appointmentMode: selectedServiceMode,
-                appointmentStatus: "Booked",
+                appointmentStatus: AppointmentStatus.Booked,
                 appointmentTime: selectedSlot[0].slot,
-                paymentId: payment._id
+                paymentId: payment._id,
+                slotId: new Types.ObjectId(),
             }, { session: mongoSession });
 
             if (!newBooking) throw new Error("Error in slot booking, please try again");
