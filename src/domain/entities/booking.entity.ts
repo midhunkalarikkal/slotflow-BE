@@ -10,6 +10,7 @@ export class Booking {
         public appointmentMode: string,
         public appointmentDay: string,
         public appointmentStatus: string,
+        public slotId: Types.ObjectId,
         public paymentId: Types.ObjectId | null,
         public createdAt: Date,
         public updatedAt: Date,

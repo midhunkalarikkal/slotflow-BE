@@ -9,6 +9,7 @@ export interface IBooking extends Document {
     appointmentMode: string,
     appointmentDay: string,
     appointmentStatus: "Booked" | "Completed" | "Cancelled" | "Rejected",
+    slotId: Types.ObjectId,
     paymentId: Types.ObjectId | null,
     createdAt: Date,
     updatedAt: Date,
@@ -22,6 +23,7 @@ const BookingSchema = new Schema<IBooking>({
     appointmentMode: { type: String, required: true },
     appointmentDay: { type: String, required: true },
     appointmentStatus: { type: String, enum: ["Booked", "Completed", "Cancelled", "Rejected"], required: true },
+    slotId: { type: mongoose.Schema.Types.ObjectId, required: true },
     paymentId: { type: mongoose.Schema.Types.ObjectId, ref: "Payment" },
 }, {
     timestamps: true

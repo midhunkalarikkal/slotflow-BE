@@ -58,4 +58,18 @@ export class ServiceAvailabilityRepositoryImpl implements IServiceAvailabilityRe
             throw new Error("Service availability updating error.");
         }
     }
+
+    async findServiceAvailabilityWithLiveData(providerId: Types.ObjectId, date: Date, day: string): Promise<{} | null> {
+        try{
+            const availability = await ServiceAvailabilityModel.aggregate([
+                {
+                    $match : { providerId : providerId }
+                }
+            ]);
+
+            return availability || null;
+        }catch(error){
+            throw new Error("Availability fetching error");
+        }
+    }
 }

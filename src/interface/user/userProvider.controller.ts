@@ -87,8 +87,9 @@ export class UserProviderController {
         try {
             const userId = req.user.userOrProviderId;
             const { providerId } = req.params;
-            if(!userId || !providerId) throw new Error("Invalid request");
-            const result = await this.userFetchServiceProviderServiceAvailabilityUseCase.execute(userId, providerId);
+            const date = new Date(req.query.date as string);
+            if(!userId || !providerId || !date) throw new Error("Invalid request");
+            const result = await this.userFetchServiceProviderServiceAvailabilityUseCase.execute(userId, providerId, date);
             res.status(200).json(result);
         }catch (error) {
             HandleError.handle(error, res);

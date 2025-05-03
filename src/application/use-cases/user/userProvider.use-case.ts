@@ -1,6 +1,6 @@
 import { Types } from "mongoose";
 import { generateSignedUrl } from "../../../config/aws_s3";
-import { extractS3Key } from "../../../infrastructure/helpers/helper";
+import { extractS3Key, findDayFromCalendar } from "../../../infrastructure/helpers/helper";
 import { UserRepositoryImpl } from "../../../infrastructure/database/user/user.repository.impl";
 import { AddressRepositoryImpl } from "../../../infrastructure/database/address/address.repository.impl";
 import { ProviderRepositoryImpl } from "../../../infrastructure/database/provider/provider.repository.impl";
@@ -124,11 +124,14 @@ export class UserFetchServiceProviderServiceAvailabilityUseCase {
         private serviceAvailabilityRepository: ServiceAvailabilityRepositoryImpl,
     ) { }
 
-    async execute(userId: string,providerId: string): Promise<UserFetchProviderServiceAvailabilityResProps> {
-        if (!userId || !providerId) throw new Error("Invalid request.");
+    async execute(userId: string,providerId: string, date: Date): Promise<UserFetchProviderServiceAvailabilityResProps> {
+        if (!userId || !providerId || !date) throw new Error("Invalid request.");
 
         const user = await this.userRepository.findUserById(new Types.ObjectId(userId));
-    if (!user) throw new Error("No user found");
+        if (!user) throw new Error("No user found");
+
+        const day = findDayFromCalendar(date);
+        console.log("day : ",day);
 
         const availability = await this.serviceAvailabilityRepository.findServiceAvailabilityByProviderId(new Types.ObjectId(providerId));
         if (availability == null) return { success: true, message: "Service availability fetched successfully.", availability: {} };
