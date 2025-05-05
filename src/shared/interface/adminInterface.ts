@@ -7,7 +7,7 @@ import { Provider } from "../../domain/entities/provider.entity";
 import { FindAllSubscriptionsResProps, findSubscriptionFullDetailsResProps } from "../../domain/repositories/ISubscription.repository";
 import { Address } from "../../domain/entities/address.entity";
 import { ProviderService } from "../../domain/entities/providerService.entity";
-import { ServiceAvailability } from "../../domain/entities/serviceAvailability.entity";
+import { FontendAvailability, ServiceAvailability } from "../../domain/entities/serviceAvailability.entity";
 import { Subscription } from "../../domain/entities/subscription.entity";
 
 // **** used in adminUser.use-case **** \\
@@ -139,7 +139,7 @@ export interface AdminFetchProviderServiceResProps extends CommonResponse {
 
 // admin fetch provider service availability details response props
 export interface AdminFetchProviderServiceAvailabilityResProps extends CommonResponse {
-    availability: Pick<ServiceAvailability, "availability"> | {};
+    availabilities: Array<FontendAvailability> | [];
 }
 
 // admin fetch provider subscriptions response props

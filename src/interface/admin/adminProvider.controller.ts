@@ -129,8 +129,9 @@ class AdminProviderController {
     async fetchProviderServiceAvailability(req:Request, res: Response) {
         try{
             const { providerId } = req.params;
-            if(!providerId) throw new Error("Invalid request.");
-            const result = await this.adminFetchProviderServiceAvailabilityUseCase.execute(providerId);
+            const date = new Date(req.query.date as string);
+            if(!providerId || !date) throw new Error("Invalid request.");
+            const result = await this.adminFetchProviderServiceAvailabilityUseCase.execute(providerId, date);
             res.status(200).json(result);
         }catch(error){
             HandleError.handle(error, res);

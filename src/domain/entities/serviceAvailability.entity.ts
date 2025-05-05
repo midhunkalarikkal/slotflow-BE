@@ -4,6 +4,12 @@ export interface TimeSlot {
     time: string,
 }
 
+export interface TimeSlotForFrontendResponse {
+    time: string,
+    available: boolean,
+    _id: Types.ObjectId,
+}
+
 export interface Availability {
     day: string,
     duration: string,
@@ -14,7 +20,7 @@ export interface Availability {
 }
 
 export interface FontendAvailability extends Omit<Availability, "slots"> {
-    slots : string[]
+    slots : TimeSlotForFrontendResponse[]
 }
 
 export class ServiceAvailability {

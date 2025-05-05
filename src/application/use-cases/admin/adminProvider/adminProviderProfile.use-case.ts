@@ -87,17 +87,20 @@ export class AdminfetchProviderServiceAvailabilityUseCase {
         private serviceAvailabilityRepository: ServiceAvailabilityRepositoryImpl,
     ) { }
 
-    async execute(providerId: string): Promise<AdminFetchProviderServiceAvailabilityResProps> {
-        if (!providerId) throw new Error("Invalid request.");
+    async execute(providerId: string, date: Date): Promise<AdminFetchProviderServiceAvailabilityResProps> {
+
+        console.log("fetching service availability");
+        if (!providerId || !date) throw new Error("Invalid request.");
+        console.log("providerId : ",providerId);
+        console.log("date : ",date);
 
         const provider = await this.providerRepository.findProviderById(new Types.ObjectId(providerId));
         if(!provider) throw new Error("No user found.");
 
-        const availability = await this.serviceAvailabilityRepository.findServiceAvailabilityByProviderId(new Types.ObjectId(providerId));
-        if (availability == null) return { success: true, message: "Service availability fetched successfully.", availability: {} };
+        const availability = await this.serviceAvailabilityRepository.findServiceAvailabilityByProviderId(new Types.ObjectId(providerId), date);
+        if (availability == null) return { success: true, message: "Service availability fetched successfully.", availabilities: [] };
 
-        const { _id, providerId: spId, createdAt, updatedAt, ...rest } = availability;
-        return { success: true, message: "Service availability fetched successfully.", availability: rest };
+        return { success: true, message: "Service availability fetched successfully.", availabilities: availability };
     }
 }
 

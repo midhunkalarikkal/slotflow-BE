@@ -15,8 +15,6 @@ export class ProviderAddServiceAvailabilitiesUseCase {
     async execute(providerId: string, availabilities: FontendAvailability[]): Promise<CommonResponse> {
         if(!providerId || !availabilities || availabilities.length  === 0) throw new Error("Invalid request.");
 
-        console.log("availabilites : ",availabilities);
-
         const convertedProviderId = new Types.ObjectId(providerId);
         const provider = await this.providerRepository.findProviderById(new Types.ObjectId(providerId));
         if(!provider) throw new Error("Please logout and try again.");
@@ -35,10 +33,6 @@ export class ProviderAddServiceAvailabilitiesUseCase {
                 time: time, 
             }))
         }));
-
-        console.log("newAvailabilities : ",newAvailabilities);
-        console.log("newAvailabilites[0].slots[0]",newAvailabilities[0].slots[0]);
-
         
         const serviceAvailability = await this.serviceAvailabilityRepository.createServiceAvailabilities(convertedProviderId, newAvailabilities)
         if(!serviceAvailability) throw new Error("Service availability adding failed.");
