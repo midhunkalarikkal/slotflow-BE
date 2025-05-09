@@ -139,7 +139,7 @@ export interface AdminFetchProviderServiceResProps extends CommonResponse {
 
 // admin fetch provider service availability details response props
 export interface AdminFetchProviderServiceAvailabilityResProps extends CommonResponse {
-    availabilities: Array<FontendAvailabilityForResponse> | [];
+    availability: FontendAvailabilityForResponse | {};
 }
 
 // admin fetch provider subscriptions response props

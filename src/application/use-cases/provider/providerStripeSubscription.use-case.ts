@@ -86,15 +86,16 @@ export class ProviderSaveSubscriptionUseCase {
         const paymentType = session?.payment_method_types[0];
         const subscriptionPlanId = session?.metadata?.planId;
         const planDuration = Number(session?.metadata?.planDuration);
+        const paymentIntent = session?.payment_intent;
 
-        if (!pId || isNaN(totalAmount) || isNaN(initialAmount) || !paymentStatus || !paymentType || !subscriptionPlanId || !planDuration) throw new Error("Unexpected error, please try again.");
+        if (!pId || isNaN(totalAmount) || isNaN(initialAmount) || !paymentStatus || !paymentType || !subscriptionPlanId || !planDuration || !paymentIntent) throw new Error("Unexpected error, please try again.");
 
         const mongoSession = await startSession();
         mongoSession.startTransaction();
 
         try {
             const payment = await this.paymentRepository.createPaymentForSubscription({
-                transactionId: session.id,
+                transactionId: paymentIntent.toString(),
                 paymentStatus: paymentStatus,
                 paymentMethod: paymentType,
                 paymentGateway: "Stripe",

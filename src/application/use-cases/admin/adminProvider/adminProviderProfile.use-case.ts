@@ -98,9 +98,9 @@ export class AdminfetchProviderServiceAvailabilityUseCase {
         if(!provider) throw new Error("No user found.");
 
         const availability = await this.serviceAvailabilityRepository.findServiceAvailabilityByProviderId(new Types.ObjectId(providerId), date);
-        if (availability == null) return { success: true, message: "Service availability fetched successfully.", availabilities: [] };
+        if (availability == null) return { success: true, message: "Service availability fetched successfully.", availability: {} };
 
-        return { success: true, message: "Service availability fetched successfully.", availabilities: availability };
+        return { success: true, message: "Service availability fetched successfully.", availability };
     }
 }
 

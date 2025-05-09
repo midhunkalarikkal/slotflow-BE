@@ -30,7 +30,6 @@ export class ServiceAvailabilityRepositoryImpl implements IServiceAvailabilityRe
 
     async findServiceAvailabilityByProviderId(providerId: Types.ObjectId, date: Date): Promise<FontendAvailabilityForResponse | null> {
 
-        console.log("date : ",date);
         const startOfDay = new Date(date);
         startOfDay.setHours(0, 0, 0, 0);
 
@@ -38,7 +37,6 @@ export class ServiceAvailabilityRepositoryImpl implements IServiceAvailabilityRe
         endOfDay.setHours(23, 59, 59, 999);
 
         const targetDay = daysOfWeek[date.getDay()];
-        console.log("targetDay : ",targetDay);
 
         try {
             const availability = await ServiceAvailabilityModel.aggregate([

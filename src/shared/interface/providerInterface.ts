@@ -6,7 +6,7 @@ import { Service } from "../../domain/entities/service.entity";
 import { Provider } from "../../domain/entities/provider.entity";
 import { Subscription } from "../../domain/entities/subscription.entity";
 import { ProviderService } from "../../domain/entities/providerService.entity";
-import { ServiceAvailability } from "../../domain/entities/serviceAvailability.entity";
+import { FontendAvailabilityForResponse } from "../../domain/entities/serviceAvailability.entity";
 
 // **** used in providerAddress.use-case **** \\
 
@@ -84,9 +84,8 @@ export interface ProviderFetchProviderServiceResProps extends CommonResponse {
 // **** used in providerServiceAvailability **** \\
 
 //  provider fetch service availability response props
-type ServiceAvailabilityProps = Pick<ServiceAvailability, "availabilities">;
 export interface ProviderFetchServiceAvailabilityResProps extends CommonResponse {
-    availability : ServiceAvailabilityProps | {};
+    availability : FontendAvailabilityForResponse | {};
 }
 
 
