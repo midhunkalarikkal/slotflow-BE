@@ -1,7 +1,7 @@
 import { Types } from "mongoose";
 import { BookingModel, IBooking } from "./booking.model";
 import { Booking } from "../../../domain/entities/booking.entity";
-import { CreateBookingPayloadProps, FindAllBookingsResponseProps, IBookingRepository } from "../../../domain/repositories/IBooking.repository";
+import { CreateBookingPayloadProps, FindAllBookingAppointmentsUsingProviderIdResponseProps, FindAllBookingsUsingUserIdResponseProps, IBookingRepository } from "../../../domain/repositories/IBooking.repository";
 
 export class BookingRepositoryImpl implements IBookingRepository {
     private mapToEntity(booking : IBooking) : Booking {
@@ -44,7 +44,7 @@ export class BookingRepositoryImpl implements IBookingRepository {
         }
     }
 
-    async findAllBookingsUsingUserId(userId: Types.ObjectId): Promise<Array<FindAllBookingsResponseProps> | []> {
+    async findAllBookingsUsingUserId(userId: Types.ObjectId): Promise<Array<FindAllBookingsUsingUserIdResponseProps> | []> {
         try {
             const bookings = await BookingModel.find({
                 userId : userId
@@ -76,6 +76,19 @@ export class BookingRepositoryImpl implements IBookingRepository {
             return updatedBooking ? this.mapToEntity(updatedBooking) : null;
         }catch(error){
             throw new Error("Booking updating error");
+        }
+    }
+
+    async findAllBookingAppointmentsUsingProviderId(providerId: Types.ObjectId): Promise<Array<FindAllBookingAppointmentsUsingProviderIdResponseProps> | []> {
+        try {
+            const bookings = await BookingModel.find({
+                serviceProviderId: providerId
+            },{
+                appointmentDay: 1, appointmentDate: 1, appointmentMode: 1, appointmentStatus: 1, appointmentTime: 1, createdAt: 1
+            });
+            return bookings ? bookings.map((booking) => this.mapToEntity(booking)) : [];
+        }catch (error) {
+            throw new Error("Booking appointments fetching error");
         }
     }
 }

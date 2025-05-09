@@ -9,6 +9,7 @@ import { providerAppServiceController } from './providerAppService.controller';
 import { providerSubscriptionController } from './providerSubscription.controller';
 import { providerServiceAvailabilityController } from './providerServiceAvailability.controller';
 import { providerPaymentController } from './providerPayment.controller';
+import { providerBookingController } from './providerBooking.controller';
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
@@ -34,5 +35,7 @@ router.post('/saveSubscription', authMiddleware, providerSubscriptionController.
 router.post('/subscribeToTrialPlan', authMiddleware, providerSubscriptionController.subsribetoTrialPlan);
 
 router.get('/getPayments', authMiddleware, providerPaymentController.getPayments);
+
+router.get('/getBookingAppointments', authMiddleware, providerBookingController.fetchBookingAppointments);
 
 export default router;  
