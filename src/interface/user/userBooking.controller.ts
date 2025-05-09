@@ -36,9 +36,9 @@ export class UserBookingController {
     async bookingViaStripe(req: Request, res: Response) {
         try {
             const userId = req.user.userOrProviderId;
-            const { providerId, selectedDay, slotId, selectedServiceMode, date } = req.body;
-            if(!userId || !providerId || !selectedDay || !slotId || !selectedServiceMode || !date) throw new Error("Invalid request");
-            const result = await this.userAppointmentBookingViaStripeUseCase.execute(userId, providerId, selectedDay, slotId, selectedServiceMode, date);
+            const { providerId, slotId, date, selectedServiceMode } = req.body;
+            if(!userId || !providerId || !slotId || !selectedServiceMode || !date) throw new Error("Invalid request");
+            const result = await this.userAppointmentBookingViaStripeUseCase.execute(userId, providerId, slotId, selectedServiceMode, date);
             res.status(200).json(result);
         }catch (error) {
             HandleError.handle(error, res);

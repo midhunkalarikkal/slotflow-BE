@@ -2,8 +2,8 @@ import { Types } from "mongoose";
 import { Validator } from "../../../infrastructure/validator/validator";
 import { CommonResponse } from "../../../shared/interface/commonInterface";
 import { ProviderFetchServiceAvailabilityResProps } from "../../../shared/interface/providerInterface";
-import { Availability, FontendAvailability } from "../../../domain/entities/serviceAvailability.entity";
 import { ProviderRepositoryImpl } from "../../../infrastructure/database/provider/provider.repository.impl";
+import { FrontendAvailabilityForRequest, TimeSlot } from "../../../domain/entities/serviceAvailability.entity";
 import { ServiceAvailabilityRepositoryImpl } from "../../../infrastructure/database/serviceAvailability/serviceAvailability.repository.impl";
 
 export class ProviderAddServiceAvailabilitiesUseCase {
@@ -12,7 +12,7 @@ export class ProviderAddServiceAvailabilitiesUseCase {
         private serviceAvailabilityRepository: ServiceAvailabilityRepositoryImpl,
     ){}
 
-    async execute(providerId: string, availabilities: FontendAvailability[]): Promise<CommonResponse> {
+    async execute(providerId: string, availabilities: FrontendAvailabilityForRequest[]): Promise<CommonResponse> {
         if(!providerId || !availabilities || availabilities.length  === 0) throw new Error("Invalid request.");
 
         const convertedProviderId = new Types.ObjectId(providerId);
@@ -27,10 +27,10 @@ export class ProviderAddServiceAvailabilitiesUseCase {
             Validator.validateModes(data.modes);
         })
 
-        const newAvailabilities: Availability[] = availabilities.map((availability: FontendAvailability) => ({
+        const newAvailabilities: FrontendAvailabilityForRequest[] = availabilities.map((availability: FrontendAvailabilityForRequest) => ({
             ...availability,
-            slots: availability.slots.map((time: string) => ({
-                time: time, 
+            slots: availability.slots.map((slot: TimeSlot) => ({
+                time: slot.time, 
             }))
         }));
         
@@ -51,12 +51,11 @@ export class ProviderAddServiceAvailabilitiesUseCase {
 export class ProviderFetchServiceAvailabilityUseCase {
     constructor(private serviceAvailabilityRepository: ServiceAvailabilityRepositoryImpl) { }
 
-    async execute(providerId: string): Promise<ProviderFetchServiceAvailabilityResProps> {
-        if (!providerId) throw new Error("Invalid request.");
-        const availability = await this.serviceAvailabilityRepository.findServiceAvailabilityByProviderId(new Types.ObjectId(providerId));
+    async execute(providerId: string, date: string): Promise<ProviderFetchServiceAvailabilityResProps> {
+        if (!providerId || !date) throw new Error("Invalid request.");
+        const availability = await this.serviceAvailabilityRepository.findServiceAvailabilityByProviderId(new Types.ObjectId(providerId), new Date(date));
         if(availability === null) return { success: true, message: "Provider service availability not yet added.", availability: {} };
         if (!availability) throw new Error("Provider service availability fetching error.");
-        const { providerId: pId, createdAt, updatedAt, ...rest } = availability;
-        return { success: true, message: "Provider service availability fetched.", availability: rest };
+        return { success: true, message: "Provider service availability fetched.", availability };
     }
 }

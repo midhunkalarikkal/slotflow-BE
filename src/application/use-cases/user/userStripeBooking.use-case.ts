@@ -1,6 +1,7 @@
 import Stripe from "stripe";
 import { startSession, Types } from "mongoose";
 import { CommonResponse } from "../../../shared/interface/commonInterface";
+import { AppointmentStatus } from "../../../domain/entities/booking.entity";
 import { UserRepositoryImpl } from "../../../infrastructure/database/user/user.repository.impl";
 import { FindProviderServiceResProps } from "../../../domain/repositories/IProviderService.repository";
 import { PaymentRepositoryImpl } from "../../../infrastructure/database/payment/payment.repository.impl";
@@ -8,7 +9,6 @@ import { BookingRepositoryImpl } from "../../../infrastructure/database/booking/
 import { ProviderRepositoryImpl } from "../../../infrastructure/database/provider/provider.repository.impl";
 import { ProviderServiceRepositoryImpl } from "../../../infrastructure/database/providerService/providerService.repository.impl";
 import { ServiceAvailabilityRepositoryImpl } from "../../../infrastructure/database/serviceAvailability/serviceAvailability.repository.impl";
-import { AppointmentStatus } from "../../../domain/entities/booking.entity";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
@@ -20,35 +20,48 @@ export class UserAppointmentBookingViaStripeUseCase {
         private bookingRepository: BookingRepositoryImpl,
     ) { }
 
-    async execute(userId: string, providerId: string, selectedDay: string, slotId: string, selectedServiceMode: string, date: string): Promise<{ success: boolean, message: string, sessionId: string }> {
-        if (!userId || !providerId || !selectedDay || !slotId || !selectedServiceMode || !date) throw new Error("Invalid request");
+    async execute(userId: string, providerId: string, slotId: string, selectedServiceMode: string, date: string): Promise<{ success: boolean, message: string, sessionId: string }> {
+        if (!userId || !providerId || !slotId || !selectedServiceMode || !date) throw new Error("Invalid request");
+
+        console.log("userId:", userId);
+        console.log("providerId:", providerId);
+        console.log("slotId:", slotId);
+        console.log("selectedServiceMode:", selectedServiceMode);
+        console.log("date:", date);
 
         const provider = await this.providerRepository.findProviderById(new Types.ObjectId(providerId));
         if (!provider) throw new Error("No provider found");
-        
+
+        console.log("provider : ",provider);
+
         const providerService = await this.providerServiceRepository.findProviderServiceByProviderId(new Types.ObjectId(providerId));
         if (!providerService) throw new Error("No service found");
-        
+
         function isServiceData(obj: any): obj is FindProviderServiceResProps {
             return obj && typeof obj === 'object' && '_id' in obj;
         }
-        
-        if (!isServiceData(providerService)) throw new Error("No service data found");
-        
-        const providerServiceAvailability = await this.serviceAvailabilityRepository.findServiceAvailabilityByProviderId(new Types.ObjectId(providerId));
-        if (!providerServiceAvailability) throw new Error("No availability found");
-        
-        const dayAvailability = providerServiceAvailability.availability.filter((avail) => avail.day === selectedDay);
-        if (!dayAvailability || dayAvailability.length === 0) throw new Error("No available slots found for this day");
 
-        const selectedSlot = dayAvailability[0].slots.filter((slot) => slot._id.toString() === slotId);
+        if (!isServiceData(providerService)) throw new Error("No service data found");
+
+        console.log("providerService : ",providerService);
+
+        const providerServiceAvailability = await this.serviceAvailabilityRepository.findServiceAvailabilityByProviderId(new Types.ObjectId(providerId), new Date(date));
+        if (!providerServiceAvailability) throw new Error("No availability found");
+
+        console.log("Availability : ", providerServiceAvailability);
+
+        const selectedSlot = providerServiceAvailability.slots.filter((slot) => slot._id.toString() === slotId);
         if (!selectedSlot || selectedSlot.length === 0) throw new Error("Not slot found");
-        
+
+        console.log("selectedSlot : ",selectedSlot);
+
         if (!selectedSlot[0].available) throw new Error("This slot is not available for today");
 
-        const existBooking = await this.bookingRepository.findBookingByUserId(new Types.ObjectId(userId), selectedDay, new Date(date), selectedSlot[0].slot);
-        if(existBooking && existBooking.length > 0) throw new Error("You have already an appointment on the same time");
-        
+        const existBooking = await this.bookingRepository.findBookingByUserId(new Types.ObjectId(userId), providerServiceAvailability.day, new Date(date), selectedSlot[0].time);
+        if (existBooking && existBooking.length > 0) throw new Error("You have already an appointment on the same time");
+
+        console.log("existBooking : ",existBooking);
+
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ["card"],
             mode: "payment",
@@ -67,7 +80,7 @@ export class UserAppointmentBookingViaStripeUseCase {
             cancel_url: `http://localhost:5173/user/payment-failed/`,
             metadata: {
                 providerId: providerId,
-                selectedDay: selectedDay,
+                selectedDay: providerServiceAvailability.day,
                 slotId: slotId,
                 appointmentDate: date,
                 selectedServiceMode: selectedServiceMode,
@@ -97,7 +110,7 @@ export class UserSaveBookingAfterStripePaymentUseCase {
 
         const session = await stripe.checkout.sessions.retrieve(sessionId);
 
-        console.log("session : ",session);
+        console.log("session : ", session);
 
         const providerId = session?.metadata?.providerId;
         const selectedDay = session?.metadata?.selectedDay;
@@ -112,14 +125,11 @@ export class UserSaveBookingAfterStripePaymentUseCase {
 
         if (!providerId || !selectedDay || !slotId || !selectedServiceMode || !initialAmount || !totalAmount || !paymentStatus || !paymentType || !dateString || !paymentIntent) throw new Error("Unexpected error, please try again");
 
-        const providerServiceAvailability = await this.serviceAvailabilityRepository.findServiceAvailabilityByProviderId(new Types.ObjectId(providerId));
+        const providerServiceAvailability = await this.serviceAvailabilityRepository.findServiceAvailabilityByProviderId(new Types.ObjectId(providerId), new Date(dateString));
         if (!providerServiceAvailability) throw new Error("No availability found");
 
-        const dayAvailability = providerServiceAvailability.availability.filter((avail) => avail.day === selectedDay);
-        if (!dayAvailability || dayAvailability.length === 0) throw new Error("No available slots found for this day");
-
-        const selectedSlot = dayAvailability[0].slots.filter((slot) => slot._id.toString() === slotId);
-        if (!selectedSlot || selectedSlot.length === 0) throw new Error("Not slot found");
+        const selectedSlot = providerServiceAvailability.slots.filter((slot) => slot._id.toString() === slotId);
+        if (!selectedSlot || selectedSlot.length === 0) throw new Error("No available slots found for this day");
 
         if (!selectedSlot[0].available) throw new Error("This slot is not available for today");
 
@@ -145,18 +155,16 @@ export class UserSaveBookingAfterStripePaymentUseCase {
                 serviceProviderId: new Types.ObjectId(providerId),
                 userId: new Types.ObjectId(userId),
                 appointmentDate: new Date(dateString),
-                // appointmentDay: selectedDay,
                 appointmentMode: selectedServiceMode,
                 appointmentStatus: AppointmentStatus.Booked,
-                appointmentTime: selectedSlot[0].slot,
+                appointmentTime: selectedSlot[0].time,
                 paymentId: payment._id,
-                slotId: new Types.ObjectId(),
+                slotId: selectedSlot[0]._id,
             }, { session: mongoSession });
 
             if (!newBooking) throw new Error("Error in slot booking, please try again");
 
-            const updatedProviderServiceAvailability = await this.serviceAvailabilityRepository.updateServiceAvailability(new Types.ObjectId(providerId), selectedDay, new Types.ObjectId(slotId), { session: mongoSession });
-            if (!updatedProviderServiceAvailability) throw new Error("Error in booking, please try again");
+            console.log("newBooking : ",newBooking);
 
             await mongoSession.commitTransaction();
             mongoSession.endSession();

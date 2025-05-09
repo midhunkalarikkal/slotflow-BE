@@ -3,12 +3,12 @@ import { User } from "../../domain/entities/user.entity";
 import { Plan } from "../../domain/entities/plan.entity";
 import { Service } from "../../domain/entities/service.entity";
 import { Payment } from "../../domain/entities/payment.entity";
-import { Provider } from "../../domain/entities/provider.entity";
-import { FindAllSubscriptionsResProps, findSubscriptionFullDetailsResProps } from "../../domain/repositories/ISubscription.repository";
 import { Address } from "../../domain/entities/address.entity";
-import { ProviderService } from "../../domain/entities/providerService.entity";
-import { FontendAvailability, ServiceAvailability } from "../../domain/entities/serviceAvailability.entity";
+import { Provider } from "../../domain/entities/provider.entity";
 import { Subscription } from "../../domain/entities/subscription.entity";
+import { ProviderService } from "../../domain/entities/providerService.entity";
+import { FontendAvailabilityForResponse } from "../../domain/entities/serviceAvailability.entity";
+import { FindAllSubscriptionsResProps, findSubscriptionFullDetailsResProps } from "../../domain/repositories/ISubscription.repository";
 
 // **** used in adminUser.use-case **** \\
 
@@ -139,7 +139,7 @@ export interface AdminFetchProviderServiceResProps extends CommonResponse {
 
 // admin fetch provider service availability details response props
 export interface AdminFetchProviderServiceAvailabilityResProps extends CommonResponse {
-    availabilities: Array<FontendAvailability> | [];
+    availabilities: Array<FontendAvailabilityForResponse> | [];
 }
 
 // admin fetch provider subscriptions response props

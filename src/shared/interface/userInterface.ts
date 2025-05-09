@@ -4,10 +4,10 @@ import { User } from "../../domain/entities/user.entity";
 import { Address } from "../../domain/entities/address.entity";
 import { Booking } from "../../domain/entities/booking.entity";
 import { Service } from "../../domain/entities/service.entity";
+import { Payment } from "../../domain/entities/payment.entity";
 import { Provider } from "../../domain/entities/provider.entity";
 import { ProviderService } from "../../domain/entities/providerService.entity";
-import { ServiceAvailability } from "../../domain/entities/serviceAvailability.entity";
-import { Payment } from "../../domain/entities/payment.entity";
+import { FontendAvailabilityForResponse } from "../../domain/entities/serviceAvailability.entity";
 
 // **** used in userAddress.use-case **** \\
 
@@ -23,14 +23,14 @@ export interface UserFetchAddressResProps extends CommonResponse {
 // **** used in userBooking.use-case **** \\
 
 // user fetch bookings
-type FindAllBookingsResponseProps = Pick<Booking, "_id" | "appointmentDay" | "appointmentDate" | "appointmentMode" | "appointmentStatus" | "appointmentTime" | "createdAt" | "paymentId">;
+type FindAllBookingsResponseProps = Pick<Booking, "_id" | "appointmentDate" | "appointmentMode" | "appointmentStatus" | "appointmentTime" | "createdAt" | "paymentId">;
 export interface UserFetchAllBookingsResponseProps extends CommonResponse {
     bookings: Array<FindAllBookingsResponseProps>
 }
 
 // user cancel booking
 export interface UserCancelBookingUseCaseResProps extends CommonResponse {
-    updatedBooking : Pick<Booking, "_id" | "appointmentDay" | "appointmentDate" | "appointmentMode" | "appointmentStatus" | "appointmentTime" | "createdAt">;
+    updatedBooking : Pick<Booking, "_id" | "appointmentDate" | "appointmentMode" | "appointmentStatus" | "appointmentTime" | "createdAt">;
 }
 
 
@@ -94,7 +94,7 @@ export interface UserFetchProviderServiceResProps extends CommonResponse {
 
 // user fetch provider servide availability
 export interface UserFetchProviderServiceAvailabilityResProps extends CommonResponse {
-    availability: Pick<ServiceAvailability, "availability"> | {};
+    availability: FontendAvailabilityForResponse | {};
 }
 
 

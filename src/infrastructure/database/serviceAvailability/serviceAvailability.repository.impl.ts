@@ -1,7 +1,9 @@
 import { Types } from 'mongoose';
 import { IServiceAvailability, ServiceAvailabilityModel } from './serviceAvailability.model';
-import { Availability, FontendAvailability, ServiceAvailability } from '../../../domain/entities/serviceAvailability.entity';
+import { FontendAvailabilityForResponse, FrontendAvailabilityForRequest, ServiceAvailability } from '../../../domain/entities/serviceAvailability.entity';
 import { IServiceAvailabilityRepository } from '../../../domain/repositories/IServiceAvailability.repository';
+
+const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
 export class ServiceAvailabilityRepositoryImpl implements IServiceAvailabilityRepository {
     private mapToEntity(serviceAvailability: IServiceAvailability): ServiceAvailability {
@@ -14,7 +16,7 @@ export class ServiceAvailabilityRepositoryImpl implements IServiceAvailabilityRe
         )
     }
 
-    async createServiceAvailabilities(providerId: Types.ObjectId, availabilities: Array<Availability>): Promise<ServiceAvailability> {
+    async createServiceAvailabilities(providerId: Types.ObjectId, availabilities: Array<FrontendAvailabilityForRequest>): Promise<ServiceAvailability> {
         try {
             const serviceAvailability = {
                 providerId, availabilities
@@ -26,111 +28,112 @@ export class ServiceAvailabilityRepositoryImpl implements IServiceAvailabilityRe
         }
     }
 
-    async findServiceAvailabilityByProviderId(providerId: Types.ObjectId, date: Date): Promise<Array<FontendAvailability> | null> {
+    async findServiceAvailabilityByProviderId(providerId: Types.ObjectId, date: Date): Promise<FontendAvailabilityForResponse | null> {
 
+        console.log("date : ",date);
         const startOfDay = new Date(date);
         startOfDay.setHours(0, 0, 0, 0);
 
         const endOfDay = new Date(date);
         endOfDay.setHours(23, 59, 59, 999);
 
-        try{
+        const targetDay = daysOfWeek[date.getDay()];
+        console.log("targetDay : ",targetDay);
+
+        try {
             const availability = await ServiceAvailabilityModel.aggregate([
-                 {
-                $match: {
-                    providerId: providerId
-                }
-            },
-            {
-                $lookup: {
-                    from: "bookings",
-                    let: { providerId: "$providerId" },
-                    pipeline: [
-                        {
-                            $match: {
-                                $expr: {
-                                    $and: [
-                                        { $eq: ["$serviceProviderId", "$$providerId"] },
-                                        { $gte: ["$appointmentDate", startOfDay] },
-                                        { $lte: ["$appointmentDate", endOfDay] },
-                                        { $in: ["$appointmentStatus", ["booked", "completed"]] }
-                                    ]
+                {
+                    $match: {
+                        providerId: providerId,
+                    }
+                },
+                {
+                    $addFields : {
+                        availabilityForDay : {
+                            $arrayElemAt : [
+                                {
+                                    $filter : {
+                                        input: "$availabilities",
+                                        as: "availability",
+                                        cond: { $eq : [ "$$availability.day", targetDay ]}
+                                    }
+                                },
+                                0
+                            ]
+                        }
+                    }
+                },
+                {
+                    $lookup: {
+                        from: "bookings",
+                        let: { providerId: "$providerId", startOfDay: startOfDay, endOfDay: endOfDay }, 
+                        pipeline: [
+                            {
+                                $match: {
+                                    $expr: {
+                                        $and: [
+                                            { $eq: ["$serviceProviderId", "$$providerId"] },
+                                            { $gte: ["$appointmentDate", "$$startOfDay"] },
+                                            { $lte: ["$appointmentDate", "$$endOfDay"] },
+                                        ]
+                                    }
+                                }
+                            },
+                            {
+                                $project: {
+                                    appointmentDate: 1,
+                                    slotId: 1
                                 }
                             }
-                        },
-                        {
-                            $project: {
-                                slotId: 1
-                            }
-                        }
-                    ],
-                    as: "providerBookings"
-                }
-            },
-            {
-                $addFields: {
-                    availabilities: {
-                        $map: {
-                            input: "$availabilities",
-                            as: "availability",
-                            in: {
-                                $mergeObjects: [
-                                    "$$availability",
-                                    {
-                                        slots: {
-                                            $map: {
-                                                input: "$$availability.slots",
-                                                as: "slot",
-                                                in: {
-                                                    $mergeObjects: [
-                                                        "$$slot",
-                                                        {
-                                                            available: {
-                                                                $not: {
-                                                                    $in: [
-                                                                        "$$slot._id",
-                                                                        {
-                                                                            $map: {
-                                                                                input: "$providerBookings",
-                                                                                as: "booking",
-                                                                                in: "$$booking.slotId"
-                                                                            }
-                                                                        }
-                                                                    ]
-                                                                }
-                                                            }
-                                                        }
-                                                    ]
-                                                }
-                                            }
-                                        }
-                                    }
-                                ]
+                        ],
+                        as: "providerBookings"
+                    }
+                },
+                {
+                    $addFields: {
+                        bookedSlots: {
+                            $map: {
+                                input: "$providerBookings",
+                                as: "booking",
+                                in: "$$booking.slotId"
                             }
                         }
                     }
-                }
-            },
-            {
-                $project: {
-                    providerBookings: 0,
-                    _id: 0,
-                    providerId: 0,
-                    createdAt: 0,
-                    updatedAt: 0,
-                    __v: 0
-                }
-            }
+                },
+                {
+                    $addFields: {
+                        "availabilityForDay.slots": {
+                            $map: {
+                                input: "$availabilityForDay.slots",
+                                as: "slot",
+                                in: {
+                                    $mergeObjects: [
+                                        "$$slot",
+                                        {
+                                            available: {
+                                                $not: {
+                                                    $in: ["$$slot._id", "$bookedSlots"]
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    $replaceWith: "$availabilityForDay"
+                },
             ]);
-            console.log("availability : ",availability);
-            return availability?.[0] || null;
-        }catch(error){
+            return availability[0] || null;
+        } catch (error) {
             throw new Error("Service availability fetching error.");
         }
     }
 
-    async updateServiceAvailability(providerId: Types.ObjectId, day: string, slotId: Types.ObjectId, options : { session?: any }): Promise<ServiceAvailability | null> {
-        try{
+    async updateServiceAvailability(providerId: Types.ObjectId, day: string, slotId: Types.ObjectId, options: { session?: any }): Promise<ServiceAvailability | null> {
+        try {
             const updatedServiceAvailability = await ServiceAvailabilityModel.findOneAndUpdate(
                 { providerId, "availability.day": day, "availability.slots._id": new Types.ObjectId(slotId) },
                 {
@@ -146,23 +149,23 @@ export class ServiceAvailabilityRepositoryImpl implements IServiceAvailabilityRe
                     ]
                 }
             );
-    
+
             return updatedServiceAvailability ? this.mapToEntity(updatedServiceAvailability) : null;
-        }catch(error){
+        } catch (error) {
             throw new Error("Service availability updating error.");
         }
     }
 
     async findServiceAvailabilityWithLiveData(providerId: Types.ObjectId, date: Date, day: string): Promise<{} | null> {
-        try{
+        try {
             const availability = await ServiceAvailabilityModel.aggregate([
                 {
-                    $match : { providerId : providerId }
+                    $match: { providerId: providerId }
                 }
             ]);
 
             return availability || null;
-        }catch(error){
+        } catch (error) {
             throw new Error("Availability fetching error");
         }
     }

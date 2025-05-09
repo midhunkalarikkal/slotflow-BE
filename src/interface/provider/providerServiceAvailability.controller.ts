@@ -34,8 +34,9 @@ class ProviderServiceAvailabilityController {
     async getServiceAvailability(req: Request, res: Response) {
         try{
             const providerId = req.user.userOrProviderId;
-            if(!providerId) throw new Error("Invalid request.");
-            const result = await this.providerFetchServiceAvailabilityUseCase.execute(providerId);
+            const date = req.query.date as string;
+            if(!providerId || !date) throw new Error("Invalid request.");
+            const result = await this.providerFetchServiceAvailabilityUseCase.execute(providerId, date);
             res.status(200).json(result);
         }catch(error){
             HandleError.handle(error,res);

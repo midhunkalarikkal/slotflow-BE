@@ -19,8 +19,14 @@ export interface Availability {
     slots: TimeSlot[],
 }
 
-export interface FontendAvailability extends Omit<Availability, "slots"> {
+// Frontend availability interface for sending response
+export interface FontendAvailabilityForResponse extends Omit<Availability, "slots"> {
     slots : TimeSlotForFrontendResponse[]
+}
+
+// Frontend availability interface for adding to db
+export interface FrontendAvailabilityForRequest extends Omit<Availability, "slots"> {
+    slots : TimeSlot[]
 }
 
 export class ServiceAvailability {

@@ -1,11 +1,11 @@
 import { Types } from "mongoose";
-import { Availability, FontendAvailability, ServiceAvailability } from "../entities/serviceAvailability.entity";
+import { Availability, FontendAvailabilityForResponse, FrontendAvailabilityForRequest, ServiceAvailability } from "../entities/serviceAvailability.entity";
 
 export interface IServiceAvailabilityRepository {
     
-    createServiceAvailabilities(providerId: Types.ObjectId, serviceAvailability: Array<Availability>): Promise<ServiceAvailability>;
+    createServiceAvailabilities(providerId: Types.ObjectId, serviceAvailability: Array<FrontendAvailabilityForRequest>): Promise<ServiceAvailability>;
 
-    findServiceAvailabilityByProviderId(providerId: Types.ObjectId, date: Date): Promise<Array<FontendAvailability> | null>;
+    findServiceAvailabilityByProviderId(providerId: Types.ObjectId, date: Date): Promise<FontendAvailabilityForResponse | null>;
 
     updateServiceAvailability(providerId: Types.ObjectId, day: string, slotId: Types.ObjectId, options : { session?: any }): Promise<ServiceAvailability | null>;
 

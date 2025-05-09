@@ -84,7 +84,7 @@ export interface ProviderFetchProviderServiceResProps extends CommonResponse {
 // **** used in providerServiceAvailability **** \\
 
 //  provider fetch service availability response props
-type ServiceAvailabilityProps = Pick<ServiceAvailability, "_id" | "availability">;
+type ServiceAvailabilityProps = Pick<ServiceAvailability, "availabilities">;
 export interface ProviderFetchServiceAvailabilityResProps extends CommonResponse {
     availability : ServiceAvailabilityProps | {};
 }
