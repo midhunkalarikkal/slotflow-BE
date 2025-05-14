@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { HandleError } from "../../infrastructure/error/error";
-import { UserFetchAllPaymentsUseCase } from "../../application/use-cases/user/usePayment.use-case";
+import { UserFetchAllPaymentsUseCase } from "../../application/user-use.case/usePayment.use-case";
 import { UserRepositoryImpl } from "../../infrastructure/database/user/user.repository.impl";
 import { PaymentRepositoryImpl } from "../../infrastructure/database/payment/payment.repository.impl";
 

@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { HandleError } from "../../infrastructure/error/error";
 import { AddressRepositoryImpl } from "../../infrastructure/database/address/address.repository.impl";
 import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/provider.repository.impl";
-import { ProviderAddAddressUseCase, ProviderFetchAddressUseCase } from "../../application/use-cases/provider/providerAddress.use-case";
+import { ProviderAddAddressUseCase, ProviderFetchAddressUseCase } from "../../application/provider-use.case/providerAddress.use-case";
 
 const addressRepositoryImpl = new AddressRepositoryImpl();
 const providerRepositoryImpl = new ProviderRepositoryImpl();

@@ -4,9 +4,9 @@ import { PlanRepositoryImpl } from "../../infrastructure/database/plan/plan.repo
 import { PaymentRepositoryImpl } from "../../infrastructure/database/payment/payment.repository.impl";
 import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/provider.repository.impl";
 import { SubscriptionRepositoryImpl } from "../../infrastructure/database/subscription/subscription.repository.impl";
-import { ProviderFetchAllSubscriptionsUseCase } from "../../application/use-cases/provider/providerSubscription.use-case";
-import { ProviderTrialSubscriptionUseCase } from "../../application/use-cases/provider/providerTrailSubscription.use-case";
-import { ProviderSaveSubscriptionUseCase, ProviderStripeSubscriptionCreateSessionIdUseCase } from "../../application/use-cases/provider/providerStripeSubscription.use-case";
+import { ProviderFetchAllSubscriptionsUseCase } from "../../application/provider-use.case/providerSubscription.use-case";
+import { ProviderTrialSubscriptionUseCase } from "../../application/provider-use.case/providerTrailSubscription.use-case";
+import { ProviderSaveSubscriptionUseCase, ProviderStripeSubscriptionCreateSessionIdUseCase } from "../../application/provider-use.case/providerStripeSubscription.use-case";
 
 const planRepositoryImpl = new PlanRepositoryImpl();
 const paymentRepositoryImpl = new PaymentRepositoryImpl();

@@ -1,13 +1,13 @@
 import { Request, Response } from "express";
 import { HandleError } from "../../infrastructure/error/error";
 import { UserRepositoryImpl } from "../../infrastructure/database/user/user.repository.impl";
-import { UserCancelBookingUseCase, UserFetchBookingsUseCase } from "../../application/use-cases/user/userBooking.use-case";
+import { UserCancelBookingUseCase, UserFetchBookingsUseCase } from "../../application/user-use.case/userBooking.use-case";
 import { PaymentRepositoryImpl } from "../../infrastructure/database/payment/payment.repository.impl";
 import { BookingRepositoryImpl } from "../../infrastructure/database/booking/booking.repository.impl";
 import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/provider.repository.impl";
 import { ProviderServiceRepositoryImpl } from "../../infrastructure/database/providerService/providerService.repository.impl";
 import { ServiceAvailabilityRepositoryImpl } from "../../infrastructure/database/serviceAvailability/serviceAvailability.repository.impl";
-import { UserAppointmentBookingViaStripeUseCase, UserSaveBookingAfterStripePaymentUseCase } from "../../application/use-cases/user/userStripeBooking.use-case";
+import { UserAppointmentBookingViaStripeUseCase, UserSaveBookingAfterStripePaymentUseCase } from "../../application/user-use.case/userStripeBooking.use-case";
 
 const userRepositoryImpl = new UserRepositoryImpl();
 const paymentRepositoryImpl = new PaymentRepositoryImpl();

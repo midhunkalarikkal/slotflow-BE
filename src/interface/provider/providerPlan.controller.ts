@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { HandleError } from "../../infrastructure/error/error";
-import { ProviderFetchAllPlansUseCase } from "../../application/use-cases/provider/providerPlan.use-case";
+import { ProviderFetchAllPlansUseCase } from "../../application/provider-use.case/providerPlan.use-case";
 import { PlanRepositoryImpl } from "../../infrastructure/database/plan/plan.repository.impl";
 
 const planRepositoryImpl = new PlanRepositoryImpl();

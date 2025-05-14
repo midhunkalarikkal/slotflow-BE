@@ -1,13 +1,13 @@
 import { Request, Response } from 'express';
 import { appConfig } from '../../config/env';
 import { HandleError } from '../../infrastructure/error/error';
-import { LoginUseCase } from '../../application/use-cases/auth/login.use-case';
-import { RegisterUseCase } from '../../application/use-cases/auth/register.use-case';
-import { ResendOtpUseCase } from '../../application/use-cases/auth/resend-otp.use-case';
-import { VerifyOTPUseCase } from '../../application/use-cases/auth/verify-otp.use-case';
+import { LoginUseCase } from '../../application/auth-use.case/login.use-case';
+import { RegisterUseCase } from '../../application/auth-use.case/register.use-case';
+import { ResendOtpUseCase } from '../../application/auth-use.case/resend-otp.use-case';
+import { VerifyOTPUseCase } from '../../application/auth-use.case/verify-otp.use-case';
 import { UserRepositoryImpl } from '../../infrastructure/database/user/user.repository.impl';
-import { UpdatePasswordUseCase } from '../../application/use-cases/auth/updatePassword.use-case';
-import { CheckUserStatusUseCase } from '../../application/use-cases/auth/checkUserStatus.use-case';
+import { UpdatePasswordUseCase } from '../../application/auth-use.case/updatePassword.use-case';
+import { CheckUserStatusUseCase } from '../../application/auth-use.case/checkUserStatus.use-case';
 import { ProviderRepositoryImpl } from '../../infrastructure/database/provider/provider.repository.impl';
 
 const userRepositoryImpl = new UserRepositoryImpl();
@@ -39,7 +39,6 @@ export class AuthController {
 
   async register(req: Request, res: Response) {
     try {
-
       const { username, email, password, role } = req.body;
       if (!username || !email || !password || !role) throw new Error("Invalid request");
       

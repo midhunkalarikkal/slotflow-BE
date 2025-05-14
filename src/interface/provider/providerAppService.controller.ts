@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { HandleError } from "../../infrastructure/error/error";
 import { ServiceRepositoryImpl } from "../../infrastructure/database/appservice/service.repository.impl";
-import { ProviderFetchAllAppServicesUseCase } from "../../application/use-cases/provider/providerAppServices.use-case";
+import { ProviderFetchAllAppServicesUseCase } from "../../application/provider-use.case/providerAppServices.use-case";
 
 const serviceRepositoryImpl = new ServiceRepositoryImpl();
 const providerFetchAllServicesUseCase = new ProviderFetchAllAppServicesUseCase(serviceRepositoryImpl);

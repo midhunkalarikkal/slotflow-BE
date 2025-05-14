@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { HandleError } from "../../infrastructure/error/error";
 import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/provider.repository.impl";
 import { ServiceAvailabilityRepositoryImpl } from "../../infrastructure/database/serviceAvailability/serviceAvailability.repository.impl";
-import { ProviderAddServiceAvailabilitiesUseCase, ProviderFetchServiceAvailabilityUseCase } from "../../application/use-cases/provider/providerServiceAvailability.use-case";
+import { ProviderAddServiceAvailabilitiesUseCase, ProviderFetchServiceAvailabilityUseCase } from "../../application/provider-use.case/providerServiceAvailability.use-case";
 
 const providerRepositoryImpl = new ProviderRepositoryImpl();
 const serviceAvailabilityRepositoryImpl = new ServiceAvailabilityRepositoryImpl();

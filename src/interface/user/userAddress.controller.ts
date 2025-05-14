@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { HandleError } from "../../infrastructure/error/error";
 import { UserRepositoryImpl } from "../../infrastructure/database/user/user.repository.impl";
-import { UserAddAddressUseCase, UserFetchAddressUseCase } from "../../application/use-cases/user/userAddress.use-case";
+import { UserAddAddressUseCase, UserFetchAddressUseCase } from "../../application/user-use.case/userAddress.use-case";
 import { AddressRepositoryImpl } from "../../infrastructure/database/address/address.repository.impl";
 
 const userRepositoryImpl = new UserRepositoryImpl();

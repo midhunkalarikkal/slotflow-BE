@@ -1,3 +1,4 @@
+import { Types } from "mongoose";
 import { Request, Response } from "express";
 import { HandleError } from "../../infrastructure/error/error";
 import { ServiceRepositoryImpl } from "../../infrastructure/database/appservice/service.repository.impl";
@@ -30,7 +31,7 @@ class AdminServiceController {
 
     async addService(req: Request, res: Response) {
         try{
-            const { serviceName } = req.body as { serviceName: string };
+            const { serviceName } = req.body;
             if(!serviceName) throw new Error("Invalid request.");
             const result = await this.adminAddServiceUseCase.execute(serviceName);
             res.status(200).json(result);
@@ -42,10 +43,10 @@ class AdminServiceController {
     async changeServiceStatus(req: Request, res: Response) {
         try{
             const { serviceId } = req.params;
-            const { status } = req.query as { status: string };
-            if(!serviceId || !status) throw new Error("Invalid request.");
-            const statusValue = status === 'true';
-            const result = await this.adminChnageServiceStatusUseCase.execute(serviceId, statusValue);
+            const { isBlocked } = req.query;
+            if(!serviceId || !isBlocked) throw new Error("Invalid request.");
+            const blockedStatus = isBlocked === 'true';
+            const result = await this.adminChnageServiceStatusUseCase.execute({serviceId: new Types.ObjectId(serviceId as string), isBlocked : blockedStatus});
             res.status(200).json(result);
         }catch(error){
             HandleError.handle(error,res);

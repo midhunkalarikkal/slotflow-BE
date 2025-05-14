@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { HandleError } from "../../infrastructure/error/error";
 import { BookingRepositoryImpl } from "../../infrastructure/database/booking/booking.repository.impl";
 import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/provider.repository.impl";
-import { ProviderFetchBookingAppointmentsUseCase } from "../../application/use-cases/provider/providerBooking.use-case";
+import { ProviderFetchBookingAppointmentsUseCase } from "../../application/provider-use.case/providerBooking.use-case";
 
 const providerRepositoryImpl = new ProviderRepositoryImpl();
 const bookingRepositoryImpl = new BookingRepositoryImpl();

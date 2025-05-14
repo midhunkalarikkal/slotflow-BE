@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { HandleError } from "../../infrastructure/error/error";
 import { UserRepositoryImpl } from "../../infrastructure/database/user/user.repository.impl";
 import { AdminChangeUserStatusUseCase, AdminUserListUseCase } from "../../application/use-cases/admin/adminUser.use-case";
+import { Types } from "mongoose";
 
 const userRepositoryImpl = new UserRepositoryImpl();
 const adminUserListUseCase = new AdminUserListUseCase(userRepositoryImpl);
@@ -27,9 +28,10 @@ class AdminUserController {
 
     async changeUserStatus(req: Request, res: Response) {
         try{
-            const { userId, status } = req.body;
-            if(!userId || status === null) throw new Error("Invalid request");
-            const result = await this.adminChangeUserStatusUseCase.execute(userId, status);
+            const { userId, isBlocked } = req.body;
+            if(!userId || isBlocked === null) throw new Error("Invalid request");
+            const blockedStatus = isBlocked === "true";
+            const result = await this.adminChangeUserStatusUseCase.execute({userId : new Types.ObjectId(userId), isBlocked : blockedStatus});
             res.status(200).json(result);
         }catch(error){
             HandleError.handle(error, res);

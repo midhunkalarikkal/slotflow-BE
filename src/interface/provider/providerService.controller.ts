@@ -3,7 +3,7 @@ import { s3Client } from "../../config/aws_s3";
 import { HandleError } from "../../infrastructure/error/error";
 import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/provider.repository.impl";
 import { ProviderServiceRepositoryImpl } from "../../infrastructure/database/providerService/providerService.repository.impl";
-import { ProviderAddServiceDetailsUseCase, ProviderFetchServiceDetailsUseCase } from "../../application/use-cases/provider/providerService.use-case";
+import { ProviderAddServiceDetailsUseCase, ProviderFetchServiceDetailsUseCase } from "../../application/provider-use.case/providerService.use-case";
 
 const providerRepositoryImpl = new ProviderRepositoryImpl();
 const providerServiceRepositoryImpl = new ProviderServiceRepositoryImpl();

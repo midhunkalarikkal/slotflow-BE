@@ -8,6 +8,7 @@ import { ProviderServiceRepositoryImpl } from "../../infrastructure/database/pro
 import { ServiceAvailabilityRepositoryImpl } from "../../infrastructure/database/serviceAvailability/serviceAvailability.repository.impl";
 import { AdminApproveProviderUseCase, AdminChangeProviderStatusUseCase, AdminChangeProviderTrustTagUseCase, AdminProviderListUseCase } from "../../application/use-cases/admin/adminProvider/adminProvider.use-case";
 import { AdminFetchProviderAddressUseCase, AdminFetchProviderDetailsUseCase, AdminFetchProviderPaymentsUseCase, AdminfetchProviderServiceAvailabilityUseCase, AdminFetchProviderServiceUseCase, AdminFetchProviderSubscriptionsUseCase } from "../../application/use-cases/admin/adminProvider/adminProviderProfile.use-case";
+import { Types } from "mongoose";
 
 const providerRepositoryImpl = new ProviderRepositoryImpl();
 const addressRepositoryImpl = new AddressRepositoryImpl();
@@ -62,9 +63,9 @@ class AdminProviderController {
 
     async approveProvider(req: Request, res: Response) {
         try{
-            const { providerId } = req.body;
+            const { providerId } = req.body as { providerId : string };
             if(!providerId) throw new Error("Invalid request.");
-            const result = await this.adminApproveProviderUseCase.execute(providerId);
+            const result = await this.adminApproveProviderUseCase.execute({providerId : new Types.ObjectId(providerId as string)});
             res.status(200).json(result);
         }catch(error){
             HandleError.handle(error, res);
@@ -73,9 +74,9 @@ class AdminProviderController {
 
     async changeProviderStatus(req: Request, res: Response) {
         try{
-            const { providerId, status } = req.body;
-            if(!providerId || status === null) throw new Error("Invalid request.");
-            const result = await this.adminChangeProviderStatusUseCase.execute(providerId, status);
+            const { providerId, isBlocked } = req.body;
+            if(!providerId || isBlocked === null) throw new Error("Invalid request.");
+            const result = await this.adminChangeProviderStatusUseCase.execute({providerId : new Types.ObjectId(providerId as string), isBlocked});
             res.status(200).json(result);
         }catch(error){
             HandleError.handle(error, res);
@@ -86,7 +87,7 @@ class AdminProviderController {
         try{
             const { providerId, trustedBySlotflow } = req.body;
             if(!providerId || trustedBySlotflow === null || undefined) throw new Error("Invalid request.");
-            const result = await this.adminChangeProviderTrustTagUseCase.execute(providerId, trustedBySlotflow);
+            const result = await this.adminChangeProviderTrustTagUseCase.execute({providerId : new Types.ObjectId(providerId as string), trustedBySlotflow});
             res.status(200).json(result);
         }catch (error) {
             HandleError.handle(error,res);
@@ -97,7 +98,7 @@ class AdminProviderController {
         try{
             const { providerId } = req.params;
             if(!providerId) throw new Error("Invalid request.");
-            const result = await this.adminFetchProviderDetailsUseCase.execute(providerId);
+            const result = await this.adminFetchProviderDetailsUseCase.execute({providerId : new Types.ObjectId(providerId)});
             res.status(200).json(result);
         }catch(error){
             HandleError.handle(error,res);
@@ -108,7 +109,7 @@ class AdminProviderController {
         try{
             const { providerId } = req.params;
             if(!providerId) throw new Error("Invalid request.");
-            const result = await this.adminFetchProviderAddressUseCase.execute(providerId);
+            const result = await this.adminFetchProviderAddressUseCase.execute({providerId : new Types.ObjectId(providerId as string)});
             res.status(200).json(result);
         }catch(error){
             HandleError.handle(error,res);
@@ -119,7 +120,7 @@ class AdminProviderController {
         try{
             const { providerId } = req.params;
             if(!providerId) throw new Error("Invalid request.");
-            const result = await this.adminFetchProviderServiceUseCase.execute(providerId);
+            const result = await this.adminFetchProviderServiceUseCase.execute({providerId : new Types.ObjectId(providerId as string)});
             res.status(200).json(result);
         }catch(error){
             HandleError.handle(error,res);
@@ -131,7 +132,7 @@ class AdminProviderController {
             const { providerId } = req.params;
             const date = new Date(req.query.date as string);
             if(!providerId || !date) throw new Error("Invalid request.");
-            const result = await this.adminFetchProviderServiceAvailabilityUseCase.execute(providerId, date);
+            const result = await this.adminFetchProviderServiceAvailabilityUseCase.execute({providerId : new Types.ObjectId(providerId as string), date});
             res.status(200).json(result);
         }catch(error){
             HandleError.handle(error, res);
@@ -142,7 +143,7 @@ class AdminProviderController {
         try{
             const { providerId } = req.params;
             if(!providerId) throw new Error("Invalid request.");
-            const result = await this.adminFetchProviderSubscriptionsUseCase.execute(providerId);
+            const result = await this.adminFetchProviderSubscriptionsUseCase.execute({providerId : new Types.ObjectId(providerId as string)});
             res.status(200).json(result);
         }catch (error) {
             HandleError.handle(error,res);
@@ -153,7 +154,7 @@ class AdminProviderController {
         try{
             const { providerId } = req.params;
             if(!providerId) throw new Error("Invalid request.");
-            const result = await this.adminFetchProviderPaymentsUseCase.execute(providerId);
+            const result = await this.adminFetchProviderPaymentsUseCase.execute({providerId : new Types.ObjectId(providerId as string)});
             res.status(200).json(result);
         }catch (error) {
             HandleError.handle(error,res);

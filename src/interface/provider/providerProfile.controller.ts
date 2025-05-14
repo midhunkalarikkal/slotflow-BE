@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { s3Client } from "../../config/aws_s3";
 import { HandleError } from "../../infrastructure/error/error";
 import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/provider.repository.impl";
-import { ProviderFetchProfileDetailsUseCase, ProviderUpdateProfileImageUseCase } from "../../application/use-cases/provider/providerProfile.use-case";
+import { ProviderFetchProfileDetailsUseCase, ProviderUpdateProfileImageUseCase } from "../../application/provider-use.case/providerProfile.use-case";
 
 const providerRepositoryImpl = new ProviderRepositoryImpl();
 const providerFetchProfileDetailsUseCase = new ProviderFetchProfileDetailsUseCase(providerRepositoryImpl);

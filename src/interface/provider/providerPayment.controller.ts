@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { HandleError } from "../../infrastructure/error/error";
-import { ProviderFetchAllPaymentsUseCase } from "../../application/use-cases/provider/providerPayment.use-case";
+import { ProviderFetchAllPaymentsUseCase } from "../../application/provider-use.case/providerPayment.use-case";
 import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/provider.repository.impl";
 import { PaymentRepositoryImpl } from "../../infrastructure/database/payment/payment.repository.impl";
 
