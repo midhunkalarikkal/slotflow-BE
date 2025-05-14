@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { HandleError } from "../../infrastructure/error/error";
 import { UserRepositoryImpl } from "../../infrastructure/database/user/user.repository.impl";
-import { AdminChangeUserStatusUseCase, AdminUserListUseCase } from "../../application/use-cases/admin/adminUser.use-case";
+import { AdminChangeUserStatusUseCase, AdminUserListUseCase } from "../../application/admin-use.case/adminUser.use-case";
 import { Types } from "mongoose";
 
 const userRepositoryImpl = new UserRepositoryImpl();

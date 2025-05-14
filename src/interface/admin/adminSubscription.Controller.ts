@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { HandleError } from "../../infrastructure/error/error";
-import { AdminFetchAllSubscriptionsUseCase, AdminFetchSubscriptionDetailsUseCase } from "../../application/use-cases/admin/adminSubscription.use-case";
 import { SubscriptionRepositoryImpl } from "../../infrastructure/database/subscription/subscription.repository.impl";
+import { AdminFetchAllSubscriptionsUseCase, AdminFetchSubscriptionDetailsUseCase } from "../../application/admin-use.case/adminSubscription.use-case";
 
 const subscriptionRepositoryImpl = new SubscriptionRepositoryImpl();
 const adminFetchAllSubscriptionsUseCase = new AdminFetchAllSubscriptionsUseCase(subscriptionRepositoryImpl);

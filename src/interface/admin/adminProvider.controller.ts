@@ -1,3 +1,4 @@
+import { Types } from "mongoose";
 import { Request, Response } from "express";
 import { HandleError } from "../../infrastructure/error/error";
 import { AddressRepositoryImpl } from "../../infrastructure/database/address/address.repository.impl";
@@ -6,9 +7,8 @@ import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/p
 import { SubscriptionRepositoryImpl } from "../../infrastructure/database/subscription/subscription.repository.impl";
 import { ProviderServiceRepositoryImpl } from "../../infrastructure/database/providerService/providerService.repository.impl";
 import { ServiceAvailabilityRepositoryImpl } from "../../infrastructure/database/serviceAvailability/serviceAvailability.repository.impl";
-import { AdminApproveProviderUseCase, AdminChangeProviderStatusUseCase, AdminChangeProviderTrustTagUseCase, AdminProviderListUseCase } from "../../application/use-cases/admin/adminProvider/adminProvider.use-case";
-import { AdminFetchProviderAddressUseCase, AdminFetchProviderDetailsUseCase, AdminFetchProviderPaymentsUseCase, AdminfetchProviderServiceAvailabilityUseCase, AdminFetchProviderServiceUseCase, AdminFetchProviderSubscriptionsUseCase } from "../../application/use-cases/admin/adminProvider/adminProviderProfile.use-case";
-import { Types } from "mongoose";
+import { AdminApproveProviderUseCase, AdminChangeProviderStatusUseCase, AdminChangeProviderTrustTagUseCase, AdminProviderListUseCase } from "../../application/admin-use.case/adminProvider/adminProvider.use-case";
+import { AdminFetchProviderAddressUseCase, AdminFetchProviderDetailsUseCase, AdminFetchProviderPaymentsUseCase, AdminfetchProviderServiceAvailabilityUseCase, AdminFetchProviderServiceUseCase, AdminFetchProviderSubscriptionsUseCase } from "../../application/admin-use.case/adminProvider/adminProviderProfile.use-case";
 
 const providerRepositoryImpl = new ProviderRepositoryImpl();
 const addressRepositoryImpl = new AddressRepositoryImpl();

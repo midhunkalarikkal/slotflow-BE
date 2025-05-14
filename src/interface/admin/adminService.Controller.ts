@@ -2,7 +2,7 @@ import { Types } from "mongoose";
 import { Request, Response } from "express";
 import { HandleError } from "../../infrastructure/error/error";
 import { ServiceRepositoryImpl } from "../../infrastructure/database/appservice/service.repository.impl";
-import { AdminAddServiceUseCase, AdminChnageServiceStatusUseCase, AdminServiceListUseCase } from "../../application/use-cases/admin/adminService.use-case";
+import { AdminAddServiceUseCase, AdminChnageServiceStatusUseCase, AdminServiceListUseCase } from "../../application/admin-use.case/adminService.use-case";
 
 const serviceRepositoryImpl = new ServiceRepositoryImpl();
 const adminServiceListUseCase = new AdminServiceListUseCase(serviceRepositoryImpl)

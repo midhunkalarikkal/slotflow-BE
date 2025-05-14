@@ -1,8 +1,8 @@
+import { Types } from "mongoose";
 import { Request, Response } from "express";
 import { HandleError } from "../../infrastructure/error/error";
 import { PlanRepositoryImpl } from "../../infrastructure/database/plan/plan.repository.impl";
-import { AdminChangePlanStatusUseCase, AdminCreatePlanUseCase, AdminPlanListUseCase } from "../../application/use-cases/admin/adminPlan.use-case";
-import { Types } from "mongoose";
+import { AdminChangePlanStatusUseCase, AdminCreatePlanUseCase, AdminPlanListUseCase } from "../../application/admin-use.case/adminPlan.use-case";
 
 const planRepositoryImpl = new PlanRepositoryImpl();
 const adminPlanListUseCase = new AdminPlanListUseCase(planRepositoryImpl);

@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { HandleError } from "../../infrastructure/error/error";
 import { PaymentRepositoryImpl } from "../../infrastructure/database/payment/payment.repository.impl";
-import { AdminFetchAllPaymentsUseCase } from "../../application/use-cases/admin/adminPayment.use-case";
+import { AdminFetchAllPaymentsUseCase } from "../../application/admin-use.case/adminPayment.use-case";
 
 const paymentRepositoryImpl = new PaymentRepositoryImpl();
 const adminFetchAllPaymentsUseCase = new AdminFetchAllPaymentsUseCase(paymentRepositoryImpl);
