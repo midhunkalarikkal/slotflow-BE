@@ -38,8 +38,11 @@ export class UserProviderController {
         try{
             const userId = req.user.userOrProviderId;
             const selectedServices = req.params.selectedServices;
-            if(!userId || !selectedServices) throw new Error("Invalid request.");
-            const serviceIds = selectedServices.split(",");
+            let serviceIds : string [] = [];
+            if(selectedServices) { 
+                serviceIds = selectedServices.split(",");
+            }
+            if(!userId) throw new Error("Invalid request.");
             const result = await this.userFetchServiceProvidersUseCase.execute( userId, serviceIds );
             res.status(200).json(result);
         }catch (error) {

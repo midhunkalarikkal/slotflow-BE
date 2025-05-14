@@ -24,7 +24,6 @@ export class UserAddressController {
             const userId = req.user.userOrProviderId;
             if(!userId) throw new Error("Invalid request.");
             const result = await this.userFetchAddressUseCase.execute(userId);
-            console.log("result : ",result);
             res.status(200).json(result);
         }catch(error){
             HandleError.handle(error,res);

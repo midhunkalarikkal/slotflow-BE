@@ -46,52 +46,55 @@ export class ProviderServiceRepositoryImpl implements IProviderServiceRepository
 
     async findProvidersUsingServiceCategoryIds(serviceCategoryIds: Types.ObjectId[]): Promise<Array<FindProvidersUsingServiceCategoryIdsResProps> | []> {
         try {
-            console.log("serviceCategoryIds : ", serviceCategoryIds);
-            const providers = await ProviderServiceModel.aggregate([
-                {
-                    $match: {
-                        serviceCategory: { $in: serviceCategoryIds }
-                    }
-                },
-                {
-                    $lookup: {
-                        from: "providers",
-                        localField: "providerId",
-                        foreignField: "_id",
-                        as: "provider"
-                    }
-                },
-                {
-                    $unwind: "$provider"
-                },
-                {
-                    $lookup: {
-                      from: "services",
-                      localField: "serviceCategory",
-                      foreignField: "_id",
-                      as: "category"
-                    }
-                  },
-                  { $unwind: "$category" },
-                {
-                    $project: {
-                        service: {
-                            serviceCategory: "$serviceCategory",
-                            serviceName: "$serviceName",
-                            servicePrice: "$servicePrice",
-                            categoryName: "$category.serviceName"
-                        },
-                        provider: {
-                            _id: '$provider._id',
-                            username: '$provider.username',
-                            profileImage: '$provider.profileImage',
-                            trustedBySlotflow: '$provider.trustedBySlotflow'
-                        }
+            const pipeline: any[] = [];
+
+        if (serviceCategoryIds.length > 0) {
+            pipeline.push({
+                $match: {
+                    serviceCategory: { $in: serviceCategoryIds }
+                }
+            });
+        }
+
+        pipeline.push(
+            {
+                $lookup: {
+                    from: "providers",
+                    localField: "providerId",
+                    foreignField: "_id",
+                    as: "provider"
+                }
+            },
+            { $unwind: "$provider" },
+            {
+                $lookup: {
+                    from: "services",
+                    localField: "serviceCategory",
+                    foreignField: "_id",
+                    as: "category"
+                }
+            },
+            { $unwind: "$category" },
+            {
+                $project: {
+                    service: {
+                        serviceCategory: "$serviceCategory",
+                        serviceName: "$serviceName",
+                        servicePrice: "$servicePrice",
+                        categoryName: "$category.serviceName"
+                    },
+                    provider: {
+                        _id: '$provider._id',
+                        username: '$provider.username',
+                        profileImage: '$provider.profileImage',
+                        trustedBySlotflow: '$provider.trustedBySlotflow'
                     }
                 }
-            ]);
-            console.log("Providers : ", providers);
-            return providers;
+            }
+        );
+
+        const providers = await ProviderServiceModel.aggregate(pipeline);
+        return providers;
         } catch (error) {
             throw new Error("Provider Ids fetching error");
         }
