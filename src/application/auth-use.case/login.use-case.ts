@@ -4,32 +4,18 @@ import { User } from "../../domain/entities/user.entity";
 import { JWTService } from "../../infrastructure/security/jwt";
 import { Provider } from "../../domain/entities/provider.entity";
 import { Validator } from "../../infrastructure/validator/validator";
-import { CommonResponse } from "../../infrastructure/dtos/common.dto";
 import { PasswordHasher } from "../../infrastructure/security/password-hashing";
 import { UserRepositoryImpl } from "../../infrastructure/database/user/user.repository.impl";
+import { LoginUseCaseRequestPayload, LoginUseCaseResponse } from "../../infrastructure/dtos/auth.dto";
 import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/provider.repository.impl";
 
 
-interface LoginResProps extends CommonResponse {
-    authUser: { 
-        username: string, 
-        profileImage: string | null, 
-        role: string, 
-        token: string, 
-        isLoggedIn: boolean, 
-        address?: boolean, 
-        serviceDetails?: boolean, 
-        serviceAvailability?: boolean, 
-        approved?: boolean 
-    }
-}
-
-
 export class LoginUseCase {
-    constructor(private userRepository: UserRepositoryImpl, private providerRepository: ProviderRepositoryImpl) { }
+    constructor(private userRepositoryImpl: UserRepositoryImpl, private providerRepositoryImpl: ProviderRepositoryImpl) { }
 
-    async execute(email: string, password: string, role: string): Promise<LoginResProps> {
-
+    async execute(data: LoginUseCaseRequestPayload): Promise<LoginUseCaseResponse> {
+        const { email, password, role } = data;
+        
         if (!email || !password || !role) throw new Error("Invalid request.");
         Validator.validateEmail(email);
         Validator.validatePassword(password);
@@ -37,9 +23,9 @@ export class LoginUseCase {
         let userOrProvider: User | Provider | null = null;
 
         if (role === "USER") {
-            userOrProvider = await this.userRepository.findUserByEmail(email);
+            userOrProvider = await this.userRepositoryImpl.findUserByEmail(email);
         } else if (role === "PROVIDER") {
-            userOrProvider = await this.providerRepository.findProviderByEmail(email);
+            userOrProvider = await this.providerRepositoryImpl.findProviderByEmail(email);
         } else if (role === "ADMIN") {
             if (email !== adminConfig.adminEmail || password !== adminConfig.adminPassword) {
                 throw new Error("Invalid credentials.");

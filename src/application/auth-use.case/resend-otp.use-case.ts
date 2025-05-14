@@ -5,6 +5,7 @@ import { CommonResponse } from '../../infrastructure/dtos/common.dto';
 import { OTPService } from '../../infrastructure/services/otp.service';
 import { UserRepositoryImpl } from '../../infrastructure/database/user/user.repository.impl';
 import { ProviderRepositoryImpl } from '../../infrastructure/database/provider/provider.repository.impl';
+import { ResendOtpUseCaseRequestPayload } from '../../infrastructure/dtos/auth.dto';
 
 
 interface ResendOtpResProps extends CommonResponse {
@@ -17,10 +18,11 @@ interface ResendOtpResProps extends CommonResponse {
 
 export class ResendOtpUseCase {
 
-  constructor(private userRepository: UserRepositoryImpl, private providerRepository: ProviderRepositoryImpl) { }
+  constructor(private userRepositoryImpl: UserRepositoryImpl, private providerRepositoryImpl: ProviderRepositoryImpl) { }
 
-  async execute(role: string, verificationToken?: string, email?: string): Promise<ResendOtpResProps> {
-
+  async execute(data: ResendOtpUseCaseRequestPayload): Promise<ResendOtpResProps> {
+    const { role, verificationToken, email } = data;
+    
     if(!role || (!verificationToken && !email)) throw new Error("Invalid request.");
     if(email) Validator.validateEmail(email);
 
@@ -28,18 +30,18 @@ export class ResendOtpUseCase {
 
     if (email && role) {
       if (role === "USER") {
-        userOrProvider = await this.userRepository.findUserByEmail(email);
+        userOrProvider = await this.userRepositoryImpl.findUserByEmail(email);
       } else if (role === "PROVIDER") {
-        userOrProvider = await this.providerRepository.findProviderByEmail(email);
+        userOrProvider = await this.providerRepositoryImpl.findProviderByEmail(email);
       } else {
         throw new Error("Invalid request.");
       }
 
     } else if (verificationToken && role) {
       if (role === "USER") {
-        userOrProvider = await this.userRepository.verifyUser(verificationToken);
+        userOrProvider = await this.userRepositoryImpl.verifyUser(verificationToken);
       } else if (role === "PROVIDER") {
-        userOrProvider = await this.providerRepository.verifyProvider(verificationToken);
+        userOrProvider = await this.providerRepositoryImpl.verifyProvider(verificationToken);
       } else {
         throw new Error("Invalid request.");
       }

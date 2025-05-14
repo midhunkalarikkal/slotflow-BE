@@ -1,19 +1,20 @@
 import { UserRepositoryImpl } from "../../infrastructure/database/user/user.repository.impl";
-import { AdminChangeUserIsBlockedStatusRequestPayload, AdminChangeUserStatusResProps, AdminUsersListResProps } from "../../infrastructure/dtos/admin.dto";
+import { AdminChangeUserIsBlockedStatusRequestPayload, AdminChangeUserStatusResponse, AdminUsersListResponse } from "../../infrastructure/dtos/admin.dto";
 
 export class AdminUserListUseCase {
     constructor(private userRepository: UserRepositoryImpl) { }
 
-    async execute(): Promise<AdminUsersListResProps> {
+    async execute(): Promise<AdminUsersListResponse> {
         const users = await this.userRepository.findAllUsers();
         return { success: true, message: "Fetched users.", users };
     }
 }
 
+
 export class AdminChangeUserStatusUseCase {
     constructor(private userRepository: UserRepositoryImpl) { }
 
-    async execute({userId, isBlocked}: AdminChangeUserIsBlockedStatusRequestPayload): Promise<AdminChangeUserStatusResProps> {
+    async execute({userId, isBlocked}: AdminChangeUserIsBlockedStatusRequestPayload): Promise<AdminChangeUserStatusResponse> {
         if (!userId || isBlocked === null) throw new Error("Invalid request");
         const user = await this.userRepository.findUserById(userId);
         if(!user) throw new Error("No user found.");

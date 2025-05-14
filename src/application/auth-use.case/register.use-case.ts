@@ -3,27 +3,21 @@ import { User } from '../../domain/entities/user.entity';
 import { JWTService } from '../../infrastructure/security/jwt';
 import { Provider } from '../../domain/entities/provider.entity';
 import { Validator } from '../../infrastructure/validator/validator';
-import { CommonResponse } from '../../infrastructure/dtos/common.dto';
 import { OTPService } from '../../infrastructure/services/otp.service';
 import { PasswordHasher } from '../../infrastructure/security/password-hashing';
 import { UserRepositoryImpl } from '../../infrastructure/database/user/user.repository.impl';
 import { ProviderRepositoryImpl } from '../../infrastructure/database/provider/provider.repository.impl';
+import { RegisterUseCaseRequestPayload, RegisterUseCaseResponse } from '../../infrastructure/dtos/auth.dto';
 
-interface RegisterResProps extends CommonResponse {
-  authUser: {
-    verificationToken: string, 
-    role: string, 
-    token: string
-  }
-}
 
 export class RegisterUseCase {
 
-  constructor(private userRepository: UserRepositoryImpl, private providerRepository: ProviderRepositoryImpl) { }
+  constructor(private userRepositoryImpl: UserRepositoryImpl, private providerRepositoryImpl: ProviderRepositoryImpl) { }
 
-  async execute(username: string, email: string, password: string, role: string): Promise<RegisterResProps> {
-
+  async execute(data: RegisterUseCaseRequestPayload): Promise<RegisterUseCaseResponse> {
+    const { username, email, password, role} = data;
     if(!username || !email || !password || !role) throw new Error("Invalid request");
+    
     Validator.validateUsername(username);
     Validator.validateEmail(email);
     Validator.validatePassword(password);
@@ -31,10 +25,10 @@ export class RegisterUseCase {
     let userOrProvider: Partial<Provider> | Partial<User> | null;
 
     if (role === "USER") {
-      userOrProvider = await this.userRepository.findUserByEmail(email);
+      userOrProvider = await this.userRepositoryImpl.findUserByEmail(email);
       if (userOrProvider?.isEmailVerified) throw new Error("Email already exist.");
     } else if (role === "PROVIDER") {
-      userOrProvider = await this.providerRepository.findProviderByEmail(email);
+      userOrProvider = await this.providerRepositoryImpl.findProviderByEmail(email);
       if (userOrProvider?.isEmailVerified) throw new Error("Email already exist.");
     } else {
       throw new Error("Invalid request.");
@@ -54,20 +48,20 @@ export class RegisterUseCase {
       userOrProvider.verificationToken = verificationToken;
       userOrProvider.password = hashedPassword;
       if (role === "USER") {
-        await this.userRepository.updateUser(userOrProvider as User);
+        await this.userRepositoryImpl.updateUser(userOrProvider as User);
       } else if (role === "PROVIDER") {
-        await this.providerRepository.updateProvider(userOrProvider as Provider);
+        await this.providerRepositoryImpl.updateProvider(userOrProvider as Provider);
       }
     } else {
       if (role === "USER") {
-       await this.userRepository.createUser({
+       await this.userRepositoryImpl.createUser({
           username: username,
           email: email,
           password: hashedPassword,
           verificationToken: verificationToken,
         });
       } else if (role === "PROVIDER") {
-        await this.providerRepository.createProvider({
+        await this.providerRepositoryImpl.createProvider({
           username: username,
           email: email,
           password: hashedPassword,

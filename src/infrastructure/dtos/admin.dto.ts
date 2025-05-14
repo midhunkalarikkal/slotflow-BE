@@ -10,10 +10,11 @@ import { ProviderService } from "../../domain/entities/providerService.entity";
 import { FontendAvailabilityForResponse } from "../../domain/entities/serviceAvailability.entity";
 import { FindAllSubscriptionsResProps, findSubscriptionFullDetailsResProps } from "../../domain/repositories/ISubscription.repository";
 
+
 // **** used in adminUser.use-case **** \\
 
 // admin fetch all users for listing response props
-export interface AdminUsersListResProps extends CommonResponse {
+export interface AdminUsersListResponse extends CommonResponse {
     users: Array<Pick<User, "_id" | "username" | "email" | "isBlocked" | "isEmailVerified">>
 }
 
@@ -24,7 +25,7 @@ export type AdminChangeUserIsBlockedStatusRequestPayload = {
     isBlocked: User["isBlocked"];
 }
 // admin change user block status response interface
-export interface AdminChangeUserStatusResProps extends CommonResponse {
+export interface AdminChangeUserStatusResponse extends CommonResponse {
     updatedUser: Pick<User, "_id" | "username" | "email" | "isBlocked" | "isEmailVerified">;
 }
 
