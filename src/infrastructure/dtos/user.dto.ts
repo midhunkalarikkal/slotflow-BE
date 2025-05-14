@@ -39,12 +39,21 @@ export interface UserCancelBookingUseCaseResProps extends CommonResponse {
 
 // **** used in userProfile.use-case **** \\
 
-// user fetch profile details
+// user fetch profile use case request payload interface
+export interface UserFetchProfileUseCaseRequestPayload {
+    userId: User["_id"];
+}
+// user fetch profile details use case response interface
 export interface UserFetchProfileDetails extends CommonResponse {
     profileDetails: Pick<User, "username" | "email" | "isBlocked" | "isEmailVerified" | "phone" | "createdAt"> | {};
 }
 
-// user update profile image
+// user update profile image use case request payload interface 
+export interface UsrUpdateProfileImageUseCaseRequestPayload {
+    userId: User["_id"],
+    file: Express.Multer.File
+}
+// user update profile image use case response interface
 export interface UserUpdateProfileImageResProps extends CommonResponse, Pick<User, "profileImage"> { };
 
 

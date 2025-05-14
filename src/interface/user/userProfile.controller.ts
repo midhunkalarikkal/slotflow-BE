@@ -3,6 +3,7 @@ import { s3Client } from "../../config/aws_s3";
 import { HandleError } from "../../infrastructure/error/error";
 import { UserRepositoryImpl } from "../../infrastructure/database/user/user.repository.impl";
 import { UserFetchProfileDetailsUseCase, UserUpdateProfileImageUseCase } from "../../application/user-use.case/userProfile.use-Case";
+import { Types } from "mongoose";
 
 
 const userRepositoryImpl = new UserRepositoryImpl();
@@ -22,7 +23,7 @@ export class UserProfileController {
         try{
             const userId = req.user.userOrProviderId;
             if(!userId) throw new Error("Invalid request.");
-            const result = await this.userFetchProfileDetailsUseCase.execute(userId);
+            const result = await this.userFetchProfileDetailsUseCase.execute({userId: new Types.ObjectId(userId)});
             res.status(200).json(result);
         }catch(error){
             HandleError.handle(error, res);
@@ -34,7 +35,7 @@ export class UserProfileController {
             const userId = req.user.userOrProviderId;
             const file = req.file;
             if(!userId || !file) throw new Error("Invalid request.");
-            const result = await this.userUpdateProfileImageUseCase.execute(userId, file);
+            const result = await this.userUpdateProfileImageUseCase.execute({userId: new Types.ObjectId(userId), file});
             res.status(200).json(result);
         }catch(error){
             HandleError.handle(error, res);

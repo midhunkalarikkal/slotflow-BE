@@ -5,30 +5,32 @@ import { aws_s3Config } from "../../config/env";
 import { generateSignedUrl } from "../../config/aws_s3";
 import { extractS3Key } from "../../infrastructure/helpers/helper";
 import { UserRepositoryImpl } from "../../infrastructure/database/user/user.repository.impl";
-import { UserFetchProfileDetails, UserUpdateProfileImageResProps } from "../../infrastructure/dtos/user.dto";
+import { UserFetchProfileDetails, UserFetchProfileUseCaseRequestPayload, UserUpdateProfileImageResProps, UsrUpdateProfileImageUseCaseRequestPayload } from "../../infrastructure/dtos/user.dto";
 
 
 export class UserFetchProfileDetailsUseCase {
-    constructor(private userRepository: UserRepositoryImpl) { }
+    constructor(private userRepositoryImpl: UserRepositoryImpl) { }
 
-    async execute(userId: string): Promise<UserFetchProfileDetails> {
+    async execute(data: UserFetchProfileUseCaseRequestPayload): Promise<UserFetchProfileDetails> {
+        const { userId } = data;
         if (!userId) throw new Error("Invalid request.");
-        const user = await this.userRepository.findUserById(new Types.ObjectId(userId));
+        const user = await this.userRepositoryImpl.findUserById(userId);
         if (!user) throw new Error("User not found.");
-        const { _id, password, profileImage, updatedAt, addressId, bookingsId, verificationToken, ...data } = user;
-        return { success: true, message: "User profile details fetched.", profileDetails: data };
+        const { _id, password, profileImage, updatedAt, addressId, bookingsId, verificationToken, ...rest } = user;
+        return { success: true, message: "User profile details fetched.", profileDetails: rest };
     }
 }
 
 export class UserUpdateProfileImageUseCase {
     constructor(
-        private userRepository: UserRepositoryImpl,
+        private userRepositoryImpl: UserRepositoryImpl,
         private s3: S3Client,
     ) { }
 
-    async execute(userId: string, file: Express.Multer.File): Promise<UserUpdateProfileImageResProps> {
+    async execute(data: UsrUpdateProfileImageUseCaseRequestPayload): Promise<UserUpdateProfileImageResProps> {
+        const { userId, file} = data;
         if (!userId || !file) throw new Error("Invalid request.");
-        const user = await this.userRepository.findUserById(new Types.ObjectId(userId));
+        const user = await this.userRepositoryImpl.findUserById(userId);
         if (!user) throw new Error("User not found.");
         try {
             const params = {
@@ -47,7 +49,7 @@ export class UserUpdateProfileImageUseCase {
             if (!s3UploadResponse) throw new Error("Image uploading error, please try again");
 
             user.profileImage = s3UploadResponse.Location ?? "";
-            const updatedUser = await this.userRepository.updateUser(user);
+            const updatedUser = await this.userRepositoryImpl.updateUser(user);
             if (!updatedUser) throw new Error("Profile image returning failed.");
 
             const s3Key = await extractS3Key(updatedUser.profileImage);
