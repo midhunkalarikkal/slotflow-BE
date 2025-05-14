@@ -19,7 +19,7 @@ export interface IAddress extends Document {
 const addressSchema = new Schema<IAddress>({
     userId: { type: Schema.Types.ObjectId, required: true, unique: true },
     addressLine: { type: String, required: true, minlength: 10, maxLength: 25 },
-    phone: { type: String, required: true },
+    phone: { type: String, required: true, },
     place: { type: String, required: true, minlength: 3, maxlength: 25 },
     city: { type: String, required: true, minlength: 3, maxlength: 25 },
     district: { type: String, required: true, minlength: 3, maxlength: 25 },

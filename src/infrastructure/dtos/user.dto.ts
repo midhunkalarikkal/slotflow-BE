@@ -11,10 +11,21 @@ import { FontendAvailabilityForResponse } from "../../domain/entities/serviceAva
 
 // **** used in userAddress.use-case **** \\
 
-// user fetch address
-export interface UserFetchAddressResProps extends CommonResponse {
+// user fetch user address use case request payload interface
+export interface UserFetchUserAddressUseCaseRequestPayload {
+    userId: User["_id"];
+}
+// user fetch user address use case response interface
+export interface UserFetchAddressUseCaseResponse extends CommonResponse {
     address: Pick<Address, "addressLine" | "phone" | "place" | "city" | "district" | "pincode" | "state" | "country" | "googleMapLink"> | {};
 }
+
+
+// user add new address use case request payload interface
+type AddressRequestPayload = Pick<Address, "addressLine" | "city" | "country" | "district" | "googleMapLink" | "phone" | "place" | "pincode" | "state"> 
+export interface UserAddAddressUseCaseRequestPayload extends AddressRequestPayload{
+    userId: User["_id"]
+} 
 
 
 
