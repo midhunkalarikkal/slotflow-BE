@@ -73,7 +73,12 @@ export interface UserUpdateProfileImageResProps extends CommonResponse, Pick<Use
 
 // **** used in userProvider.use-case **** \\
 
-// user fetch service providers for dashboard
+// user fetch service providers use case request payload interface
+export interface UserFetchServiceProvidersUseCaseRequestPayload {
+    userId: User["_id"];
+    serviceIds: ProviderService["_id"][]
+}
+// user fetch service providers use case response interface
 export interface FindProvidersUsingServiceCategoryIdsResProps {
     _id: Types.ObjectId,
     provider: {
@@ -89,31 +94,56 @@ export interface FindProvidersUsingServiceCategoryIdsResProps {
         categoryName: string
     }
 }
-export interface UserFetchServiceProvidersResProps extends CommonResponse {
+export interface UserFetchServiceProvidersUseCaseResponse extends CommonResponse {
     providers: Array<FindProvidersUsingServiceCategoryIdsResProps>
 }
 
-// user fetch provider details
-export interface UserFetchServiceProviderDetailsResProps extends CommonResponse {
+
+// user fetch provider details use case request payload interface
+export interface UserFetchServiceProviderDetailsUseCaseRequestPayload {
+    userId: User["_id"];
+    providerId: Provider["_id"];
+}
+// user fetch provider details use case response interface
+export interface UserFetchServiceProviderDetailsUseCaseResponse extends CommonResponse {
     provider: Pick<Provider, "_id" | "username" | "email" | "profileImage" | "trustedBySlotflow" | "phone">
 }
 
-// user fetch provider address
-export interface UserFetchServiceProviderAddressResProps extends CommonResponse {
+
+// user fetch provider address use case request payload interface
+export interface UserFetchServiceProviderAddressUseCaseRequestPayload {
+    userId: User["_id"];
+    providerId: Provider["_id"];
+}
+// user fetch provider address use case response interface
+export interface UserFetchServiceProviderAddressUseCaseResponse extends CommonResponse {
     address: Pick<Address, "userId" | "addressLine" | "phone" | "place" | "city" | "district" | "pincode" | "state" | "country" | "googleMapLink">
 }
 
-// user fetch provider service
+
+// user fetch provider service use case request payload interface
+export interface UserFetchServiceproviderServiceUsecaseRequestPayload {
+    userId: User["_id"];
+    providerId: Provider["_id"];
+}
+// user fetch provider service use case response interface
 type FindProviderServiceProps = Omit<ProviderService, "serviceCategory">;
 export interface FindProviderServiceResProps extends FindProviderServiceProps {
     serviceCategory: Pick<Service, "serviceName">
 }
-export interface UserFetchProviderServiceResProps extends CommonResponse {
+export interface UserFetchProviderServiceUseCaseResponse extends CommonResponse {
     service: FindProviderServiceResProps | {};
 }
 
-// user fetch provider servide availability
-export interface UserFetchProviderServiceAvailabilityResProps extends CommonResponse {
+
+// user fetch provider service availability use case request payload interface
+export interface UserFetchProviderServiceAvailabilityUseCaseRequestPayload {
+    userId: User["_id"];
+    providerId: Provider["_id"];
+    date: Date
+}
+// user fetch provider servide availability use case response interface
+export interface UserFetchProviderServiceAvailabilityUseCaseResponse extends CommonResponse {
     availability: FontendAvailabilityForResponse | {};
 }
 
@@ -122,6 +152,7 @@ export interface UserFetchProviderServiceAvailabilityResProps extends CommonResp
 
 
 // **** used in userPayment.use-case **** \\
+
 
 // user fetch all payments response props
 export interface UserFetchAllPaymentsResponseProps extends CommonResponse {

@@ -6,22 +6,35 @@ import { AddressRepositoryImpl } from "../../infrastructure/database/address/add
 import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/provider.repository.impl";
 import { ProviderServiceRepositoryImpl } from "../../infrastructure/database/providerService/providerService.repository.impl";
 import { ServiceAvailabilityRepositoryImpl } from "../../infrastructure/database/serviceAvailability/serviceAvailability.repository.impl";
-import { FindProviderServiceResProps, FindProvidersUsingServiceCategoryIdsResProps, UserFetchProviderServiceAvailabilityResProps, UserFetchProviderServiceResProps, UserFetchServiceProviderAddressResProps, UserFetchServiceProviderDetailsResProps, UserFetchServiceProvidersResProps } from "../../infrastructure/dtos/user.dto";
+import { 
+  FindProviderServiceResProps, 
+  FindProvidersUsingServiceCategoryIdsResProps, 
+  UserFetchProviderServiceAvailabilityUseCaseResponse, 
+  UserFetchProviderServiceUseCaseResponse, 
+  UserFetchServiceProviderAddressUseCaseRequestPayload, 
+  UserFetchServiceProviderAddressUseCaseResponse, 
+  UserFetchServiceProviderDetailsUseCaseRequestPayload, 
+  UserFetchServiceProviderDetailsUseCaseResponse, 
+  UserFetchServiceproviderServiceUsecaseRequestPayload, 
+  UserFetchServiceProvidersUseCaseResponse, 
+  UserFetchServiceProvidersUseCaseRequestPayload, 
+  UserFetchProviderServiceAvailabilityUseCaseRequestPayload
+} from "../../infrastructure/dtos/user.dto";
 
 export class UserFetchServiceProvidersUseCase {
   constructor(
-    private userRepository: UserRepositoryImpl,
-    private providerServiceRepository: ProviderServiceRepositoryImpl,
+    private userRepositoryImpl: UserRepositoryImpl,
+    private providerServiceRepositoryImpl: ProviderServiceRepositoryImpl,
   ) { }
 
-  async execute(userId: string, serviceIds: string[]): Promise<UserFetchServiceProvidersResProps> {
+  async execute(data: UserFetchServiceProvidersUseCaseRequestPayload): Promise<UserFetchServiceProvidersUseCaseResponse> {
+    const { userId, serviceIds } = data;
     if (!userId || !serviceIds) throw new Error("Invalid request.");
 
-    const user = await this.userRepository.findUserById(new Types.ObjectId(userId));
+    const user = await this.userRepositoryImpl.findUserById(new Types.ObjectId(userId));
     if (!user) throw new Error("No user found");
 
-    const convertedServiceIds = serviceIds.map((id) => new Types.ObjectId(id));
-    const providers = await this.providerServiceRepository.findProvidersUsingServiceCategoryIds(convertedServiceIds);
+    const providers = await this.providerServiceRepositoryImpl.findProvidersUsingServiceCategoryIds(serviceIds);
     if (!providers) throw new Error("Providers fetching error.");
 
     const updatedproviders: FindProvidersUsingServiceCategoryIdsResProps[] = await Promise.all(
@@ -42,19 +55,21 @@ export class UserFetchServiceProvidersUseCase {
   }
 }
 
+
 export class UserFetchServiceProviderProfileDetailsUseCase {
   constructor(
-    private userRepository: UserRepositoryImpl,
-    private providerRepository: ProviderRepositoryImpl,
+    private userRepositoryImpl: UserRepositoryImpl,
+    private providerRepositoryImpl: ProviderRepositoryImpl,
   ) { }
 
-  async execute(userId: string, providerId: string): Promise<UserFetchServiceProviderDetailsResProps> {
+  async execute(data: UserFetchServiceProviderDetailsUseCaseRequestPayload): Promise<UserFetchServiceProviderDetailsUseCaseResponse> {
+    const { userId, providerId } = data;
     if (!userId || !providerId) throw new Error("Invalid request");
 
-    const user = await this.userRepository.findUserById(new Types.ObjectId(userId));
+    const user = await this.userRepositoryImpl.findUserById(new Types.ObjectId(userId));
     if (!user) throw new Error("No user found");
 
-    const provider = await this.providerRepository.findProviderById(new Types.ObjectId(providerId));
+    const provider = await this.providerRepositoryImpl.findProviderById(new Types.ObjectId(providerId));
     if (!provider) throw new Error("No provider found");
 
     if (provider.profileImage) {
@@ -69,40 +84,44 @@ export class UserFetchServiceProviderProfileDetailsUseCase {
   }
 }
 
+
 export class UserFetchServiceProviderAddressUseCase {
   constructor(
-    private userRepository: UserRepositoryImpl,
-    private addressRepository: AddressRepositoryImpl,
+    private userRepositoryImpl: UserRepositoryImpl,
+    private addressRepositoryImpl: AddressRepositoryImpl,
   ) { }
 
-  async execute(userId: string, providerId: string): Promise<UserFetchServiceProviderAddressResProps> {
+  async execute(data: UserFetchServiceProviderAddressUseCaseRequestPayload): Promise<UserFetchServiceProviderAddressUseCaseResponse> {
+    const { userId, providerId} = data;
     if (!userId || !providerId) throw new Error("Invalid request");
 
-    const user = await this.userRepository.findUserById(new Types.ObjectId(userId));
+    const user = await this.userRepositoryImpl.findUserById(new Types.ObjectId(userId));
     if (!user) throw new Error("No user found");
 
-    const address = await this.addressRepository.findAddressByUserId(new Types.ObjectId(providerId));
+    const address = await this.addressRepositoryImpl.findAddressByUserId(new Types.ObjectId(providerId));
     if (!address) throw new Error("No address found");
 
-    let { createdAt, updatedAt, _id, ...data } = address;
+    let { createdAt, updatedAt, _id, ...rest } = address;
 
-    return { success: true, message: "Service provider address fetched", address: data }
+    return { success: true, message: "Service provider address fetched", address: rest }
   }
 }
 
+
 export class UserFetchServiceProviderServiceDetailsUseCase {
   constructor(
-    private userRepository: UserRepositoryImpl,
-    private providerServiceRepository: ProviderServiceRepositoryImpl,
+    private userRepositoryImpl: UserRepositoryImpl,
+    private providerServiceRepositoryImpl: ProviderServiceRepositoryImpl,
   ) { }
 
-  async execute(userId: string, providerId: string): Promise<UserFetchProviderServiceResProps> {
+  async execute(data: UserFetchServiceproviderServiceUsecaseRequestPayload): Promise<UserFetchProviderServiceUseCaseResponse> {
+    const { userId, providerId } = data;
     if (!userId || !providerId) throw new Error("Invalid request");
 
-    const user = await this.userRepository.findUserById(new Types.ObjectId(userId));
+    const user = await this.userRepositoryImpl.findUserById(new Types.ObjectId(userId));
     if (!user) throw new Error("No user found");
 
-    const serviceData = await this.providerServiceRepository.findProviderServiceByProviderId(new Types.ObjectId(providerId));
+    const serviceData = await this.providerServiceRepositoryImpl.findProviderServiceByProviderId(new Types.ObjectId(providerId));
 
     function isServiceData(obj: any): obj is FindProviderServiceResProps {
       return obj && typeof obj === 'object' && '_id' in obj;
@@ -118,19 +137,21 @@ export class UserFetchServiceProviderServiceDetailsUseCase {
   }
 }
 
+
 export class UserFetchServiceProviderServiceAvailabilityUseCase {
     constructor(
-        private userRepository: UserRepositoryImpl,
-        private serviceAvailabilityRepository: ServiceAvailabilityRepositoryImpl,
+        private userRepositoryImpl: UserRepositoryImpl,
+        private serviceAvailabilityRepositoryImpl: ServiceAvailabilityRepositoryImpl,
     ) { }
 
-    async execute(userId: string,providerId: string, date: Date): Promise<UserFetchProviderServiceAvailabilityResProps> {
+    async execute(data: UserFetchProviderServiceAvailabilityUseCaseRequestPayload): Promise<UserFetchProviderServiceAvailabilityUseCaseResponse> {
+      const { userId, providerId, date } = data;
         if (!userId || !providerId || !date) throw new Error("Invalid request.");
 
-        const user = await this.userRepository.findUserById(new Types.ObjectId(userId));
+        const user = await this.userRepositoryImpl.findUserById(new Types.ObjectId(userId));
         if (!user) throw new Error("No user found");
 
-        const availability = await this.serviceAvailabilityRepository.findServiceAvailabilityByProviderId(new Types.ObjectId(providerId), date);
+        const availability = await this.serviceAvailabilityRepositoryImpl.findServiceAvailabilityByProviderId(new Types.ObjectId(providerId), date);
         if (availability == null) return { success: true, message: "Service availability fetched successfully.", availability: {} };
 
         return { success: true, message: "Service availability fetched successfully.", availability };
