@@ -9,24 +9,31 @@ import { BookingRepositoryImpl } from "../../infrastructure/database/booking/boo
 import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/provider.repository.impl";
 import { ProviderServiceRepositoryImpl } from "../../infrastructure/database/providerService/providerService.repository.impl";
 import { ServiceAvailabilityRepositoryImpl } from "../../infrastructure/database/serviceAvailability/serviceAvailability.repository.impl";
+import { 
+    UserAppointmentBookingViaStripeUseCaseResponse, 
+    UserSaveAppoinmentBookingUseCaseRequestPayload, 
+    UserAppointmentBookingViaStripeUseCaseRequestPayload, 
+} from "../../infrastructure/dtos/user.dto";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
+
 export class UserAppointmentBookingViaStripeUseCase {
     constructor(
-        private providerRepository: ProviderRepositoryImpl,
-        private providerServiceRepository: ProviderServiceRepositoryImpl,
-        private serviceAvailabilityRepository: ServiceAvailabilityRepositoryImpl,
-        private bookingRepository: BookingRepositoryImpl,
+        private providerRepositoryImpl: ProviderRepositoryImpl,
+        private providerServiceRepositoryImpl: ProviderServiceRepositoryImpl,
+        private serviceAvailabilityRepositoryImpl: ServiceAvailabilityRepositoryImpl,
+        private bookingRepositoryImpl: BookingRepositoryImpl,
     ) { }
 
-    async execute(userId: string, providerId: string, slotId: string, selectedServiceMode: string, date: string): Promise<{ success: boolean, message: string, sessionId: string }> {
+    async execute(data: UserAppointmentBookingViaStripeUseCaseRequestPayload): Promise<UserAppointmentBookingViaStripeUseCaseResponse> {
+        const { userId, providerId, slotId, selectedServiceMode, date } = data;
         if (!userId || !providerId || !slotId || !selectedServiceMode || !date) throw new Error("Invalid request");
 
-        const provider = await this.providerRepository.findProviderById(new Types.ObjectId(providerId));
+        const provider = await this.providerRepositoryImpl.findProviderById(providerId);
         if (!provider) throw new Error("No provider found");
 
-        const providerService = await this.providerServiceRepository.findProviderServiceByProviderId(new Types.ObjectId(providerId));
+        const providerService = await this.providerServiceRepositoryImpl.findProviderServiceByProviderId(providerId);
         if (!providerService) throw new Error("No service found");
 
         function isServiceData(obj: any): obj is FindProviderServiceResProps {
@@ -35,15 +42,15 @@ export class UserAppointmentBookingViaStripeUseCase {
 
         if (!isServiceData(providerService)) throw new Error("No service data found");
 
-        const providerServiceAvailability = await this.serviceAvailabilityRepository.findServiceAvailabilityByProviderId(new Types.ObjectId(providerId), new Date(date));
+        const providerServiceAvailability = await this.serviceAvailabilityRepositoryImpl.findServiceAvailabilityByProviderId(providerId, date);
         if (!providerServiceAvailability) throw new Error("No availability found");
 
-        const selectedSlot = providerServiceAvailability.slots.filter((slot) => slot._id.toString() === slotId);
+        const selectedSlot = providerServiceAvailability.slots.filter((slot) => slot._id === slotId);
         if (!selectedSlot || selectedSlot.length === 0) throw new Error("Not slot found");
 
         if (!selectedSlot[0].available) throw new Error("This slot is not available for today");
 
-        const existBooking = await this.bookingRepository.findBookingByUserId(new Types.ObjectId(userId), providerServiceAvailability.day, new Date(date), selectedSlot[0].time);
+        const existBooking = await this.bookingRepositoryImpl.findBookingByUserId(userId, providerServiceAvailability.day, date, selectedSlot[0].time);
         if (existBooking && existBooking.length > 0) throw new Error("You have already an appointment on the same time");
 
         const session = await stripe.checkout.sessions.create({
@@ -63,10 +70,10 @@ export class UserAppointmentBookingViaStripeUseCase {
             success_url: `http://localhost:5173/user/payment-success/?session_id={CHECKOUT_SESSION_ID}`,
             cancel_url: `http://localhost:5173/user/payment-failed/`,
             metadata: {
-                providerId: providerId,
+                providerId: providerId.toString(),
                 selectedDay: providerServiceAvailability.day,
-                slotId: slotId,
-                appointmentDate: date,
+                slotId: slotId.toString(),
+                appointmentDate: date.toString(),
                 selectedServiceMode: selectedServiceMode,
                 initialAmount: providerService.servicePrice * 100,
                 totalAmount: providerService.servicePrice * 100,
@@ -78,18 +85,20 @@ export class UserAppointmentBookingViaStripeUseCase {
 
 }
 
+
 export class UserSaveBookingAfterStripePaymentUseCase {
     constructor(
-        private userRepository: UserRepositoryImpl,
-        private paymentRepository: PaymentRepositoryImpl,
-        private bookingRepository: BookingRepositoryImpl,
-        private serviceAvailabilityRepository: ServiceAvailabilityRepositoryImpl,
+        private userRepositoryImpl: UserRepositoryImpl,
+        private paymentRepositoryImpl: PaymentRepositoryImpl,
+        private bookingRepositoryImpl: BookingRepositoryImpl,
+        private serviceAvailabilityRepositoryImpl: ServiceAvailabilityRepositoryImpl,
     ) { }
 
-    async execute(userId: string, sessionId: string): Promise<CommonResponse> {
+    async execute(data: UserSaveAppoinmentBookingUseCaseRequestPayload): Promise<CommonResponse> {
+        const { userId, sessionId } = data;
         if (!userId || !sessionId) throw new Error("Invalid request");
 
-        const user = await this.userRepository.findUserById(new Types.ObjectId(userId));
+        const user = await this.userRepositoryImpl.findUserById(new Types.ObjectId(userId));
         if (!user) throw new Error("No user found");
 
         const session = await stripe.checkout.sessions.retrieve(sessionId);
@@ -107,7 +116,7 @@ export class UserSaveBookingAfterStripePaymentUseCase {
 
         if (!providerId || !selectedDay || !slotId || !selectedServiceMode || !initialAmount || !totalAmount || !paymentStatus || !paymentType || !dateString || !paymentIntent) throw new Error("Unexpected error, please try again");
 
-        const providerServiceAvailability = await this.serviceAvailabilityRepository.findServiceAvailabilityByProviderId(new Types.ObjectId(providerId), new Date(dateString));
+        const providerServiceAvailability = await this.serviceAvailabilityRepositoryImpl.findServiceAvailabilityByProviderId(new Types.ObjectId(providerId), new Date(dateString));
         if (!providerServiceAvailability) throw new Error("No availability found");
 
         const selectedSlot = providerServiceAvailability.slots.filter((slot) => slot._id.toString() === slotId);
@@ -119,7 +128,7 @@ export class UserSaveBookingAfterStripePaymentUseCase {
         mongoSession.startTransaction();
 
         try {
-            const payment = await this.paymentRepository.createPaymentForBooking({
+            const payment = await this.paymentRepositoryImpl.createPaymentForBooking({
                 transactionId: paymentIntent.toString(),
                 paymentStatus: paymentStatus,
                 paymentMethod: paymentType,
@@ -133,7 +142,7 @@ export class UserSaveBookingAfterStripePaymentUseCase {
 
             if (!payment) throw new Error("Unexpected error, payment saving error.");
 
-            const newBooking = await this.bookingRepository.createBooking({
+            const newBooking = await this.bookingRepositoryImpl.createBooking({
                 serviceProviderId: new Types.ObjectId(providerId),
                 userId: new Types.ObjectId(userId),
                 appointmentDate: new Date(dateString),

@@ -7,7 +7,7 @@ import { Service } from "../../domain/entities/service.entity";
 import { Payment } from "../../domain/entities/payment.entity";
 import { Provider } from "../../domain/entities/provider.entity";
 import { ProviderService } from "../../domain/entities/providerService.entity";
-import { FontendAvailabilityForResponse } from "../../domain/entities/serviceAvailability.entity";
+import { FontendAvailabilityForResponse, TimeSlotForFrontendResponse } from "../../domain/entities/serviceAvailability.entity";
 
 // **** used in userAddress.use-case **** \\
 
@@ -33,13 +33,43 @@ export interface UserAddAddressUseCaseRequestPayload extends AddressRequestPaylo
 
 // **** used in userBooking.use-case **** \\
 
-// user fetch bookings
+// user appointment booking via stripe creating session id use case request payload
+export interface UserAppointmentBookingViaStripeUseCaseRequestPayload {
+    userId: User["_id"];
+    providerId: Provider["_id"]; 
+    slotId: TimeSlotForFrontendResponse["_id"]; 
+    selectedServiceMode: string; 
+    date: Date
+}
+// user appointment booking via stripe creating session id use case response
+export interface UserAppointmentBookingViaStripeUseCaseResponse extends CommonResponse {
+    sessionId: string;
+}
+
+
+// use save appointment booking after stripe payment use case request payload
+export interface UserSaveAppoinmentBookingUseCaseRequestPayload {
+    userId: User["_id"];
+    sessionId: string;
+}
+
+
+// user fetch bookings use case request payload interface
+export interface UserFetchAppointmentBookingsUseCaseRequestPayload {
+    userId: User["_id"];
+}
+// user fetch bookings use case response interface
 type FindAllBookingsResponseProps = Pick<Booking, "_id" | "appointmentDate" | "appointmentMode" | "appointmentStatus" | "appointmentTime" | "createdAt" | "paymentId">;
-export interface UserFetchAllBookingsResponseProps extends CommonResponse {
+export interface UserFetchAllBookingsUseCaseResponse extends CommonResponse {
     bookings: Array<FindAllBookingsResponseProps>
 }
 
-// user cancel booking
+// user can cel booking use case request payload interface
+export interface UserCancelBookingUseCaseRequestPayload {
+    userId: User["_id"];
+    bookingId: Booking["_id"];
+}
+// user cancel booking use case response interface
 export interface UserCancelBookingUseCaseResProps extends CommonResponse {
     updatedBooking : Pick<Booking, "_id" | "appointmentDate" | "appointmentMode" | "appointmentStatus" | "appointmentTime" | "createdAt">;
 }
@@ -153,8 +183,11 @@ export interface UserFetchProviderServiceAvailabilityUseCaseResponse extends Com
 
 // **** used in userPayment.use-case **** \\
 
-
-// user fetch all payments response props
-export interface UserFetchAllPaymentsResponseProps extends CommonResponse {
+// user fetch all payments use case request payload interface
+export interface UserFetchAllPaymentsUseCaseRequestPayload {
+    userId: User["_id"];
+}
+// user fetch all payments use case response interface
+export interface UserFetchAllPaymentsUseCaseResponse extends CommonResponse {
     payments: Array<Pick<Payment, "paymentStatus" | "paymentMethod" | "paymentGateway" | "paymentFor" | "discountAmount" | "totalAmount" | "createdAt" | "_id">> | [];
 }

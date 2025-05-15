@@ -4,39 +4,48 @@ import { AppointmentStatus } from "../../domain/entities/booking.entity";
 import { UserRepositoryImpl } from "../../infrastructure/database/user/user.repository.impl";
 import { BookingRepositoryImpl } from "../../infrastructure/database/booking/booking.repository.impl";
 import { PaymentRepositoryImpl } from "../../infrastructure/database/payment/payment.repository.impl";
-import { UserCancelBookingUseCaseResProps, UserFetchAllBookingsResponseProps } from "../../infrastructure/dtos/user.dto";
+import { 
+    UserCancelBookingUseCaseResProps, 
+    UserFetchAllBookingsUseCaseResponse, 
+    UserCancelBookingUseCaseRequestPayload, 
+    UserFetchAppointmentBookingsUseCaseRequestPayload 
+} from "../../infrastructure/dtos/user.dto";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
+
 export class UserFetchBookingsUseCase {
     constructor(
-        private bookingRepository: BookingRepositoryImpl
+        private bookingRepositoryImpl: BookingRepositoryImpl
     ) { }
 
-    async execute(userId: string): Promise<UserFetchAllBookingsResponseProps> {
+    async execute(data: UserFetchAppointmentBookingsUseCaseRequestPayload): Promise<UserFetchAllBookingsUseCaseResponse> {
+        const { userId } = data;
         if (!userId) throw new Error("Invalid request");
 
-        const bookings = await this.bookingRepository.findAllBookingsUsingUserId(new Types.ObjectId(userId));
+        const bookings = await this.bookingRepositoryImpl.findAllBookingsUsingUserId(userId);
         if (!bookings) throw new Error("Bookings fetching error");
 
         return { success: true, message: "Bookings fetched", bookings }
     }
 }
 
+
 export class UserCancelBookingUseCase {
     constructor(
-        private userRepository: UserRepositoryImpl,
-        private bookingRepository: BookingRepositoryImpl,
-        private paymentRepository: PaymentRepositoryImpl,
+        private userRepositoryImpl: UserRepositoryImpl,
+        private bookingRepositoryImpl: BookingRepositoryImpl,
+        private paymentRepositoryImpl: PaymentRepositoryImpl,
     ) { }
 
-    async execute(userId: string, bookingId: string): Promise<UserCancelBookingUseCaseResProps> {
+    async execute(data: UserCancelBookingUseCaseRequestPayload): Promise<UserCancelBookingUseCaseResProps> {
+        const { userId, bookingId } = data;
         if (!userId || !bookingId) throw new Error("Invalid request");
 
-        const user = await this.userRepository.findUserById(new Types.ObjectId(userId));
+        const user = await this.userRepositoryImpl.findUserById(new Types.ObjectId(userId));
         if (!user) throw new Error("No user found");
 
-        const booking = await this.bookingRepository.findBookingById(new Types.ObjectId(bookingId));
+        const booking = await this.bookingRepositoryImpl.findBookingById(new Types.ObjectId(bookingId));
         if (!booking) throw new Error("No booking found");
 
         if (booking.appointmentStatus === "Cancelled") {
@@ -48,7 +57,7 @@ export class UserCancelBookingUseCase {
         }
 
         if (!booking.paymentId) throw new Error("No payment id found");
-        const payment = await this.paymentRepository.findAllPaymentById(new Types.ObjectId(booking.paymentId));
+        const payment = await this.paymentRepositoryImpl.findAllPaymentById(new Types.ObjectId(booking.paymentId));
         if (!payment) throw new Error("No payment found for this booking");
 
         const mongooseSession = await mongoose.startSession();
@@ -57,7 +66,7 @@ export class UserCancelBookingUseCase {
         try {
 
             booking.appointmentStatus = AppointmentStatus.Cancelled;
-            const updateBooking = await this.bookingRepository.updateBooking(booking);
+            const updateBooking = await this.bookingRepositoryImpl.updateBooking(booking);
             if (!updateBooking) throw new Error("Booking status updating error");
 
             if (payment.paymentGateway === "Stripe") {
@@ -81,7 +90,7 @@ export class UserCancelBookingUseCase {
 
                 if (!refund) throw new Error("Refund processinga failed");
 
-                const updatedPayment = await this.paymentRepository.updateForCancelBookingRefund({
+                const updatedPayment = await this.paymentRepositoryImpl.updateForCancelBookingRefund({
                     _id: payment._id,
                     transactionId: payment.transactionId,
                     paymentStatus: "Refunded",

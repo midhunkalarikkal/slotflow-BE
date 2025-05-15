@@ -24,7 +24,7 @@ router.get('/getServiceProviderAddress/:providerId', authMiddleware, userProvide
 router.get('/getServiceProviderServiceDetails/:providerId', authMiddleware, userProviderController.fetchServiceProviderServiceDetails);
 router.get('/getServiceProviderServiceAvailability/:providerId', authMiddleware, userProviderController.fetchServiceProviderServiceAvailability);
 
-router.post('/createBookingCheckoutSession', authMiddleware, userBookingController.bookingViaStripe);
+router.post('/createBookingCheckoutSession', authMiddleware, userBookingController.createSessionIdForbookingViaStripe);
 router.post('/saveAppointmentBooking', authMiddleware, userBookingController.saveBookingAfterStripePayment);
 
 router.get('/getBookings', authMiddleware, userBookingController.fetchBookings);

@@ -1,9 +1,14 @@
 import { Types } from "mongoose";
 import { Validator } from "../../infrastructure/validator/validator";
 import { CommonResponse } from "../../infrastructure/dtos/common.dto";
-import { UserAddAddressUseCaseRequestPayload, UserFetchAddressUseCaseResponse, UserFetchUserAddressUseCaseRequestPayload } from "../../infrastructure/dtos/user.dto";
 import { UserRepositoryImpl } from "../../infrastructure/database/user/user.repository.impl";
 import { AddressRepositoryImpl } from "../../infrastructure/database/address/address.repository.impl";
+import { 
+    UserFetchAddressUseCaseResponse, 
+    UserAddAddressUseCaseRequestPayload, 
+    UserFetchUserAddressUseCaseRequestPayload, 
+} from "../../infrastructure/dtos/user.dto";
+
 
 export class UserFetchAddressUseCase {
     constructor(
@@ -23,6 +28,7 @@ export class UserFetchAddressUseCase {
         return { success: true, message: "User address fetched.", address: rest }
     }
 }
+
 
 export class UserAddAddressUseCase {
     constructor(

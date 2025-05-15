@@ -1,12 +1,13 @@
+import { Types } from "mongoose";
 import { Request, Response } from "express";
 import { s3Client } from "../../config/aws_s3";
 import { HandleError } from "../../infrastructure/error/error";
 import { UserRepositoryImpl } from "../../infrastructure/database/user/user.repository.impl";
 import { UserFetchProfileDetailsUseCase, UserUpdateProfileImageUseCase } from "../../application/user-use.case/userProfile.use-Case";
-import { Types } from "mongoose";
 
 
 const userRepositoryImpl = new UserRepositoryImpl();
+
 const userFetchProfileDetailsUseCase = new UserFetchProfileDetailsUseCase(userRepositoryImpl);
 const userUpdateProfileImageUseCase = new UserUpdateProfileImageUseCase(userRepositoryImpl, s3Client);
 

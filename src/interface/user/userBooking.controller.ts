@@ -1,13 +1,15 @@
+import { Types } from "mongoose";
 import { Request, Response } from "express";
 import { HandleError } from "../../infrastructure/error/error";
 import { UserRepositoryImpl } from "../../infrastructure/database/user/user.repository.impl";
-import { UserCancelBookingUseCase, UserFetchBookingsUseCase } from "../../application/user-use.case/userBooking.use-case";
 import { PaymentRepositoryImpl } from "../../infrastructure/database/payment/payment.repository.impl";
 import { BookingRepositoryImpl } from "../../infrastructure/database/booking/booking.repository.impl";
 import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/provider.repository.impl";
+import { UserCancelBookingUseCase, UserFetchBookingsUseCase } from "../../application/user-use.case/userBooking.use-case";
 import { ProviderServiceRepositoryImpl } from "../../infrastructure/database/providerService/providerService.repository.impl";
 import { ServiceAvailabilityRepositoryImpl } from "../../infrastructure/database/serviceAvailability/serviceAvailability.repository.impl";
 import { UserAppointmentBookingViaStripeUseCase, UserSaveBookingAfterStripePaymentUseCase } from "../../application/user-use.case/userStripeBooking.use-case";
+import { UserCancelBookingZodSchema, UserCreateSessionIdForbookingViaStripeZodSchema, UserSaveBookingAfterStripePaymentZodSchema } from "../../infrastructure/zod/user.zod";
 
 const userRepositoryImpl = new UserRepositoryImpl();
 const paymentRepositoryImpl = new PaymentRepositoryImpl();
@@ -15,30 +17,62 @@ const bookingRepositoryImpl = new BookingRepositoryImpl();
 const proviserRepositoryImpl = new ProviderRepositoryImpl();
 const providerServiceRepositoryImpl = new ProviderServiceRepositoryImpl();
 const serviceAvailabilityRepositoryImpl = new ServiceAvailabilityRepositoryImpl();
-const userAppointmentBookingViaStrpieUseCase = new UserAppointmentBookingViaStripeUseCase(proviserRepositoryImpl, providerServiceRepositoryImpl, serviceAvailabilityRepositoryImpl, bookingRepositoryImpl);
-const userSaveBookingAfterStripePaymentUseCase = new UserSaveBookingAfterStripePaymentUseCase(userRepositoryImpl, paymentRepositoryImpl, bookingRepositoryImpl, serviceAvailabilityRepositoryImpl);
+
 const userFetchBookingsUseCase = new UserFetchBookingsUseCase(bookingRepositoryImpl);
 const userCancelBookingUseCase = new UserCancelBookingUseCase(userRepositoryImpl, bookingRepositoryImpl, paymentRepositoryImpl);
+const userSaveBookingAfterStripePaymentUseCase = new UserSaveBookingAfterStripePaymentUseCase(userRepositoryImpl, paymentRepositoryImpl, bookingRepositoryImpl, serviceAvailabilityRepositoryImpl);
+const userAppointmentBookingViaStrpieUseCase = new UserAppointmentBookingViaStripeUseCase(proviserRepositoryImpl, providerServiceRepositoryImpl, serviceAvailabilityRepositoryImpl, bookingRepositoryImpl);
 
 export class UserBookingController {
     constructor(
-        private userAppointmentBookingViaStripeUseCase : UserAppointmentBookingViaStripeUseCase,
-        private userSaveBookingAfterStripePaymentUseCase: UserSaveBookingAfterStripePaymentUseCase,
         private userFetchBookingsUseCase: UserFetchBookingsUseCase,
         private userCancelBookingUseCase: UserCancelBookingUseCase,
+        private userAppointmentBookingViaStripeUseCase : UserAppointmentBookingViaStripeUseCase,
+        private userSaveBookingAfterStripePaymentUseCase: UserSaveBookingAfterStripePaymentUseCase,
     ) { 
-        this.bookingViaStripe = this.bookingViaStripe.bind(this);
-        this.saveBookingAfterStripePayment = this.saveBookingAfterStripePayment.bind(this);
         this.fetchBookings = this.fetchBookings.bind(this);
         this.cancelBooking = this.cancelBooking.bind(this);
+        this.createSessionIdForbookingViaStripe = this.createSessionIdForbookingViaStripe.bind(this);
+        this.saveBookingAfterStripePayment = this.saveBookingAfterStripePayment.bind(this);
     }
-    
-    async bookingViaStripe(req: Request, res: Response) {
+
+    async fetchBookings(req: Request, res: Response) {
         try {
             const userId = req.user.userOrProviderId;
-            const { providerId, slotId, date, selectedServiceMode } = req.body;
+            if(!userId) throw new Error("Invalid request");
+            const result = await this.userFetchBookingsUseCase.execute({userId: new Types.ObjectId(userId)});
+            res.status(200).json(result);
+        } catch(error) {
+            HandleError.handle(error, res);
+        }
+    }
+
+    async cancelBooking(req: Request, res:Response) {
+        try {
+            const userId = req.user.userOrProviderId;
+            const validateData = UserCancelBookingZodSchema.parse(req.body);
+            const { bookingId } = validateData;
+            if(!userId || !bookingId) throw new Error("Invalid request");
+            const result = await this.userCancelBookingUseCase.execute({userId: new Types.ObjectId(userId), bookingId: new Types.ObjectId(bookingId)});
+            res.status(200).json(result);
+        }catch(error) {
+            HandleError.handle(error, res);
+        }
+    }
+    
+    async createSessionIdForbookingViaStripe(req: Request, res: Response) {
+        try {
+            const userId = req.user.userOrProviderId;
+            const validateData = UserCreateSessionIdForbookingViaStripeZodSchema.parse(req.body);
+            const { providerId, slotId, date, selectedServiceMode } = validateData;
             if(!userId || !providerId || !slotId || !selectedServiceMode || !date) throw new Error("Invalid request");
-            const result = await this.userAppointmentBookingViaStripeUseCase.execute(userId, providerId, slotId, selectedServiceMode, date);
+            const result = await this.userAppointmentBookingViaStripeUseCase.execute({
+                userId: new Types.ObjectId(userId), 
+                providerId: new Types.ObjectId(providerId), 
+                slotId: new Types.ObjectId(slotId), 
+                selectedServiceMode, 
+                date: new Date(date),
+            });
             res.status(200).json(result);
         }catch (error) {
             HandleError.handle(error, res);
@@ -48,40 +82,23 @@ export class UserBookingController {
     async saveBookingAfterStripePayment(req: Request, res: Response) {
         try {
             const userId = req.user.userOrProviderId;
-            const { sessionId } = req.body;
+            const validateData = UserSaveBookingAfterStripePaymentZodSchema.parse(req.body);
+            const { sessionId } = validateData;
             if(!userId || !sessionId) throw new Error("Invalid request");
-            const result = await this.userSaveBookingAfterStripePaymentUseCase.execute(userId, sessionId);
+            const result = await this.userSaveBookingAfterStripePaymentUseCase.execute({userId: new Types.ObjectId(userId), sessionId});
             res.status(200).json(result);
         } catch (error) {
             HandleError.handle(error, res);
         }
     }
-
-    async fetchBookings(req: Request, res: Response) {
-        try {
-            const userId = req.user.userOrProviderId;
-            if(!userId) throw new Error("Invalid request");
-            const result = await this.userFetchBookingsUseCase.execute(userId);
-            res.status(200).json(result);
-        } catch(error) {
-            HandleError.handle(error, res);
-        }
-    }
-
-    async cancelBooking(req: Request, res:Response) {
-        try {
-            console.log("cancel booking");
-            const userId = req.user.userOrProviderId;
-            const { bookingId } = req.params;
-            console.log("bookingId : ",bookingId);
-            if(!userId || !bookingId) throw new Error("Invalid request");
-            const result = await this.userCancelBookingUseCase.execute(userId, bookingId);
-            res.status(200).json(result);
-        }catch(error) {
-            HandleError.handle(error, res);
-        }
-    }
+    
 }
 
-const userBookingController = new UserBookingController( userAppointmentBookingViaStrpieUseCase, userSaveBookingAfterStripePaymentUseCase, userFetchBookingsUseCase, userCancelBookingUseCase );
+const userBookingController = new UserBookingController(
+    userFetchBookingsUseCase, 
+    userCancelBookingUseCase, 
+    userAppointmentBookingViaStrpieUseCase, 
+    userSaveBookingAfterStripePaymentUseCase, 
+);
+
 export { userBookingController };

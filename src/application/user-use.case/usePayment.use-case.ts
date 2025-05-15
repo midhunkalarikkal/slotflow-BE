@@ -1,21 +1,25 @@
-import { Types } from "mongoose";
-import { UserFetchAllPaymentsResponseProps } from "../../infrastructure/dtos/user.dto";
 import { UserRepositoryImpl } from "../../infrastructure/database/user/user.repository.impl";
 import { PaymentRepositoryImpl } from "../../infrastructure/database/payment/payment.repository.impl";
+import { 
+    UserFetchAllPaymentsUseCaseRequestPayload, 
+    UserFetchAllPaymentsUseCaseResponse 
+} from "../../infrastructure/dtos/user.dto";
+
 
 export class UserFetchAllPaymentsUseCase {
     constructor(
-        private userRepository: UserRepositoryImpl,
-        private paymentRepository: PaymentRepositoryImpl,
+        private userRepositoryImpl: UserRepositoryImpl,
+        private paymentRepositoryImpl: PaymentRepositoryImpl,
     ) { }
 
-    async execute(userId: string): Promise<UserFetchAllPaymentsResponseProps> {
+    async execute(data: UserFetchAllPaymentsUseCaseRequestPayload): Promise<UserFetchAllPaymentsUseCaseResponse> {
+        const { userId } = data;
         if (!userId) throw new Error("Invalid request");
 
-        const provider = await this.userRepository.findUserById(new Types.ObjectId(userId));
+        const provider = await this.userRepositoryImpl.findUserById(userId);
         if (!provider) throw new Error("No user found.");
 
-        const payments = await this.paymentRepository.findAllPaymentsByUserId(new Types.ObjectId(userId));
+        const payments = await this.paymentRepositoryImpl.findAllPaymentsByUserId(userId);
         if (!payments) throw new Error("Payments fetching error.");
 
         return { success: true, message: "Payments fetched", payments };

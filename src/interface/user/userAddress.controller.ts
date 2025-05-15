@@ -1,16 +1,16 @@
+import { Types } from "mongoose";
 import { Request, Response } from "express";
 import { HandleError } from "../../infrastructure/error/error";
-import { UserRepositoryImpl } from "../../infrastructure/database/user/user.repository.impl";
-import { UserAddAddressUseCase, UserFetchAddressUseCase } from "../../application/user-use.case/userAddress.use-case";
-import { AddressRepositoryImpl } from "../../infrastructure/database/address/address.repository.impl";
-import { Types } from "mongoose";
 import { UserAddAddressZodSchema } from "../../infrastructure/zod/user.zod";
+import { UserRepositoryImpl } from "../../infrastructure/database/user/user.repository.impl";
+import { AddressRepositoryImpl } from "../../infrastructure/database/address/address.repository.impl";
+import { UserAddAddressUseCase, UserFetchAddressUseCase } from "../../application/user-use.case/userAddress.use-case";
 
 const userRepositoryImpl = new UserRepositoryImpl();
 const addressRepositoryImpl = new AddressRepositoryImpl();
 
-const userFetchAddressUseCase = new UserFetchAddressUseCase(userRepositoryImpl, addressRepositoryImpl);
 const userAddAddressUseCase = new UserAddAddressUseCase(userRepositoryImpl, addressRepositoryImpl);
+const userFetchAddressUseCase = new UserFetchAddressUseCase(userRepositoryImpl, addressRepositoryImpl);
 
 export class UserAddressController {
     constructor(

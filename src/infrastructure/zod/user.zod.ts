@@ -1,9 +1,6 @@
 import { z } from "zod";
 
-const UserProviderControllerCommonZodSchema = z.object({
-    providerId: z.string().regex(/^[a-f\d]{24}$/i)
-});
-
+// **** user address controller **** \\
 const UserAddAddressZodSchema = z.object({
     addressLine: z.string().min(10).max(25),
     phone: z.string(),
@@ -16,6 +13,12 @@ const UserAddAddressZodSchema = z.object({
     googleMapLink: z.string(),
 });
 
+
+// **** user provider controller **** \\
+const UserProviderControllerCommonZodSchema = z.object({
+    providerId: z.string().regex(/^[a-f\d]{24}$/i)
+});
+
 const UserFetchAllProvidersZodSchema = z.object({
     selectedServices: z.string().optional(),
 })
@@ -25,4 +28,30 @@ const UserFetchServiceAvailabilityQuerySchema = z.object({
         { message: "Invalid date format" }),
 });
 
-export { UserAddAddressZodSchema, UserProviderControllerCommonZodSchema,UserFetchAllProvidersZodSchema, UserFetchServiceAvailabilityQuerySchema };
+
+// **** user booking controller **** \\
+const UserCreateSessionIdForbookingViaStripeZodSchema = z.object({
+    providerId: z.string().regex(/^[a-f\d]{24}$/i),
+    slotId: z.string().regex(/^[a-f\d]{24}$/i),
+    date: z.string().refine(val => !isNaN(Date.parse(val)),
+        { message: "Invalid date format" }),
+    selectedServiceMode: z.string(),
+});
+
+const UserSaveBookingAfterStripePaymentZodSchema = z.object({
+    sessionId: z.string(),
+});
+
+const UserCancelBookingZodSchema = z.object({
+    bookingId: z.string().regex(/^[a-f\d]{24}$/i),
+});
+
+export { 
+    UserAddAddressZodSchema, 
+    UserProviderControllerCommonZodSchema, 
+    UserFetchAllProvidersZodSchema, 
+    UserFetchServiceAvailabilityQuerySchema, 
+    UserCreateSessionIdForbookingViaStripeZodSchema ,
+    UserSaveBookingAfterStripePaymentZodSchema,
+    UserCancelBookingZodSchema
+};
