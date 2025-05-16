@@ -13,19 +13,19 @@ import { FindAllSubscriptionsResProps, findSubscriptionFullDetailsResProps } fro
 
 // **** used in adminUser.use-case **** \\
 
-// admin fetch all users for listing response props
-export interface AdminUsersListResponse extends CommonResponse {
+// admin fetch all users for listing use case response interface 
+export interface AdminUsersListUseCaseResponse extends CommonResponse {
     users: Array<Pick<User, "_id" | "username" | "email" | "isBlocked" | "isEmailVerified">>
 }
 
 
-// admin chage user isBlocked status request payload type
-export type AdminChangeUserIsBlockedStatusRequestPayload = {
+// admin chage user isBlocked status use case request payload interface  
+export interface AdminChangeUserIsBlockedStatusUseCaseRequestPayload {
     userId: User["_id"];
     isBlocked: User["isBlocked"];
 }
-// admin change user block status response interface
-export interface AdminChangeUserStatusResponse extends CommonResponse {
+// admin change user block status use case response interface
+export interface AdminChangeUserStatusUseCaseResponse extends CommonResponse {
     updatedUser: Pick<User, "_id" | "username" | "email" | "isBlocked" | "isEmailVerified">;
 }
 
@@ -35,13 +35,17 @@ export interface AdminChangeUserStatusResponse extends CommonResponse {
 
 // **** used in adminSubscription.use-case **** \\
 
-// Admin fetch all subscriptions response props
-export interface AdminFetchAllSubscriptionsResProps extends CommonResponse {
+// Admin fetch all subscriptions use case response interface 
+export interface AdminFetchAllSubscriptionsUseCaseResponse extends CommonResponse {
     subscriptions: Array<FindAllSubscriptionsResProps>
 }
 
-// admin fetch subscription details response props
-export interface AdminFetchSubscriptionDetailsResProps extends CommonResponse {
+// admin fetch subscription details use case request payload interface 
+export interface AdminFetchSubscriptionDetailsUseCaseRequestPayload {
+    subscriptionId: Subscription["_id"];
+}
+// admin fetch subscription details use case response interface 
+export interface AdminFetchSubscriptionDetailsUseCaseResponse extends CommonResponse {
     subscriptionDetails: findSubscriptionFullDetailsResProps | {};
 }
 
@@ -51,27 +55,29 @@ export interface AdminFetchSubscriptionDetailsResProps extends CommonResponse {
 
 // **** used in adminService.use-case **** \\
 
-// admin fetch all services response props
-export interface AdminServiceListResProps extends CommonResponse {
+// admin fetch all services use case response interface 
+export interface AdminServiceListUseCaseResponse extends CommonResponse {
     services: Array<Pick<Service, "_id" | "serviceName" | "isBlocked">>;
 }
 
 
-// admin add new service request payload type
-export type AdminAddServiceRequestPayload = Pick<Service, "serviceName">;
-// admin add new service response interface
-export interface AdminAddServiceResProps extends CommonResponse {
+// admin add new service use case request payload interface
+export interface AdminAddServiceUseCaseRequestPayload {
+    serviceName: Service["serviceName"];
+} 
+// admin add new service use case response interface
+export interface AdminAddServiceUseCaseResponse extends CommonResponse {
     service: Pick<Service, "_id" | "serviceName" | "isBlocked">;
 }
 
 
-// admin change service isBlocked status request payload type
-export type AdminChnageServiceIsBlockedStatusRequestPayload = {
+// admin change service isBlocked status use case request payload interface
+export interface AdminChnageServiceIsBlockedStatusUseCaseRequestPayload {
     serviceId: Service["_id"];
     isBlocked: Service["isBlocked"];
 }
-// admin change service block status response interface
-export interface AdminChangeServiceStatusResProps extends CommonResponse {
+// admin change service block status use case response interface
+export interface AdminChangeServiceStatusUseCaseResponse extends CommonResponse {
     updatedService: Pick<Service, "_id" | "serviceName" | "isBlocked">;
 }
 
@@ -81,27 +87,27 @@ export interface AdminChangeServiceStatusResProps extends CommonResponse {
 
 // **** used in adminPlan.use-case **** \\
 
-// admin list all plans response props
-export interface AdminPlanListResProps extends CommonResponse {
+// admin list all plans use case response interface 
+export interface AdminPlanListUseCaseResponse extends CommonResponse {
     plans: Array<Pick<Plan, "_id" | "planName" | "isBlocked">>;
 }
 
 
 // admin create new plan request payload type 
-export type AdminAddNewPlanRequestPayload = Pick<Plan, "planName" | "description" | "price" | "features" | "maxBookingPerMonth" | "adVisibility">;
-// admin create new plan response props
-export interface AdminCreatePlanResProps extends CommonResponse {
+export type AdminAddNewPlanUseCaseRequestPayload = Pick<Plan, "planName" | "description" | "price" | "features" | "maxBookingPerMonth" | "adVisibility">;
+// admin create new plan use case response interface 
+export interface AdminCreatePlanUseCaseResponse extends CommonResponse {
     plan: Pick<Plan, "_id" | "planName" | "isBlocked">;
 }
 
 
 // admin change plan block status request payload type
-export type AdminChangePlanIsBlockedStatusRequestPayload = {
+export type AdminChangePlanIsBlockedStatusUseCaseRequestPayload = {
     planId: Plan["_id"];
-    status: Plan["isBlocked"]
+    isBlocked: Plan["isBlocked"]
 }
-// admin change plan block status response interface
-export interface AdminChangePlanStatusResProps extends CommonResponse {
+// admin change plan block status use case response interface
+export interface AdminChangePlanStatusUseCaseResponse extends CommonResponse {
     updatedPlan: Pick<Plan, "_id" | "planName" | "isBlocked">;
 }
 
@@ -111,9 +117,9 @@ export interface AdminChangePlanStatusResProps extends CommonResponse {
 
 // **** used in adminPayment.use-case **** \\
 
-// admin fetch all payments response props
+// admin fetch all payments use case response interface 
 type FetchAllPayments = Pick<Payment, "createdAt" | "totalAmount" | "paymentFor" | "paymentGateway" | "paymentStatus" | "paymentMethod">;
-export interface AdminFetchAllPaymentsResProps extends CommonResponse {
+export interface AdminFetchAllPaymentsUseCaseResponse extends CommonResponse {
     payments: Array<FetchAllPayments>
 }
 
@@ -123,40 +129,40 @@ export interface AdminFetchAllPaymentsResProps extends CommonResponse {
 
 // **** used in adminProvider.use-case **** \\
 
-// admin list all providers response props
-export interface AdminProviderListResProps extends CommonResponse {
+// admin list all providers use case response interface 
+export interface AdminProviderListUseCaseResponse extends CommonResponse {
     providers: Array<Pick<Provider, "_id" | "username" | "email" | "isBlocked" | "isAdminVerified" | "trustedBySlotflow">>;
 }
 
 
-// admin approve provider isAdminVerified request payload type
-export type AdminApproveProviderRequestPayload =  {
+// admin approve provider isAdminVerified use case request payload interface
+export interface AdminApproveProviderUseCaseRequestPayload  {
     providerId: Provider["_id"];
 }
-// admin approve provider isAdminVerified response props
-export interface AdminApproveProviderRespRops extends CommonResponse {
+// admin approve provider isAdminVerified use case response interface 
+export interface AdminApproveProviderUseCaseResponse extends CommonResponse {
     updatedProvider: Pick<Provider, "_id" | "username" | "email" | "isBlocked" | "isAdminVerified" | "trustedBySlotflow">;
 }
 
 
-// admin change provider block status request payload type
-export type AdminChangeProviderStatusRequestPaylod =  {
+// admin change provider block status use case request payload interface
+export interface AdminChangeProviderStatusUseCaseRequestPaylod {
     providerId: Provider["_id"];
     isBlocked: Provider["isBlocked"];
 }
-// admin change provider block status response props
-export interface AdminChangeProviderStatusResProps extends CommonResponse {
+// admin change provider block status use case response interface 
+export interface AdminChangeProviderStatusUseCaseResponse extends CommonResponse {
     updatedProvider: Pick<Provider, "_id" | "username" | "email" | "isBlocked" | "isAdminVerified" | "trustedBySlotflow">;
 }
 
 
-// admin change provider trustedBySlotflow status request payload type
-export type AdminChangeProviderTrustTagRequestPayload =  {
+// admin change provider trustedBySlotflow status use case request payload interface
+export interface AdminChangeProviderTrustTagUseCaseRequestPayload  {
     providerId: Provider["_id"];
     trustedBySlotflow: Provider["trustedBySlotflow"];
 };
-// admin change provider trustedBySlotflow status response props
-export interface AdminChangeProviderTrustTagResProps extends CommonResponse {
+// admin change provider trustedBySlotflow status use case response interface 
+export interface AdminChangeProviderTrustTagUseCaseResponse extends CommonResponse {
     updatedProvider: Pick<Provider, "_id" | "username" | "email" | "isBlocked" | "isAdminVerified" | "trustedBySlotflow">;
 }
 

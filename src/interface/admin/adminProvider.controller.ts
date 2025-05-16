@@ -9,23 +9,25 @@ import { ProviderServiceRepositoryImpl } from "../../infrastructure/database/pro
 import { ServiceAvailabilityRepositoryImpl } from "../../infrastructure/database/serviceAvailability/serviceAvailability.repository.impl";
 import { AdminApproveProviderUseCase, AdminChangeProviderStatusUseCase, AdminChangeProviderTrustTagUseCase, AdminProviderListUseCase } from "../../application/admin-use.case/adminProvider/adminProvider.use-case";
 import { AdminFetchProviderAddressUseCase, AdminFetchProviderDetailsUseCase, AdminFetchProviderPaymentsUseCase, AdminfetchProviderServiceAvailabilityUseCase, AdminFetchProviderServiceUseCase, AdminFetchProviderSubscriptionsUseCase } from "../../application/admin-use.case/adminProvider/adminProviderProfile.use-case";
+import { AdminApproveProviderZodSchema, AdminChangeProviderStatusZodSchema, AdminChangeProviderTrustedTagZodSchema, AdminDateZodSchema, AdminProviderIdZodSchema } from "../../infrastructure/zod/admin.zod";
 
-const providerRepositoryImpl = new ProviderRepositoryImpl();
 const addressRepositoryImpl = new AddressRepositoryImpl();
-const providerServiceRepositoryImpl = new ProviderServiceRepositoryImpl();
-const serviceAvailabilityImpl = new ServiceAvailabilityRepositoryImpl();
-const subscriptionRepositoryImpl = new SubscriptionRepositoryImpl();
 const paymentRepositoryImpl = new PaymentRepositoryImpl();
+const providerRepositoryImpl = new ProviderRepositoryImpl();
+const subscriptionRepositoryImpl = new SubscriptionRepositoryImpl();
+const serviceAvailabilityImpl = new ServiceAvailabilityRepositoryImpl();
+const providerServiceRepositoryImpl = new ProviderServiceRepositoryImpl();
+
 const adminProviderListUseCase = new AdminProviderListUseCase(providerRepositoryImpl);
 const adminApproveProviderUseCase = new AdminApproveProviderUseCase(providerRepositoryImpl);
 const adminChangeProviderStatusUseCase = new AdminChangeProviderStatusUseCase(providerRepositoryImpl);
-const adminChangeProviderTrustTagUseCase = new AdminChangeProviderTrustTagUseCase(providerRepositoryImpl);
 const adminFetchProviderDetailsUseCase = new AdminFetchProviderDetailsUseCase(providerRepositoryImpl);
+const adminChangeProviderTrustTagUseCase = new AdminChangeProviderTrustTagUseCase(providerRepositoryImpl);
 const adminFetchProviderAddressUseCase = new AdminFetchProviderAddressUseCase(providerRepositoryImpl, addressRepositoryImpl);
-const adminFetchProviderServiceUseCase = new AdminFetchProviderServiceUseCase(providerRepositoryImpl, providerServiceRepositoryImpl);
-const adminFetchProviderServiceAvailabilityUseCase = new AdminfetchProviderServiceAvailabilityUseCase(providerRepositoryImpl, serviceAvailabilityImpl);
-const adminFetchProviderSubscriptionsUseCase = new AdminFetchProviderSubscriptionsUseCase(providerRepositoryImpl,subscriptionRepositoryImpl);
 const adminFetchProviderPaymentsUseCase = new AdminFetchProviderPaymentsUseCase(providerRepositoryImpl,paymentRepositoryImpl)
+const adminFetchProviderServiceUseCase = new AdminFetchProviderServiceUseCase(providerRepositoryImpl, providerServiceRepositoryImpl);
+const adminFetchProviderSubscriptionsUseCase = new AdminFetchProviderSubscriptionsUseCase(providerRepositoryImpl,subscriptionRepositoryImpl);
+const adminFetchProviderServiceAvailabilityUseCase = new AdminfetchProviderServiceAvailabilityUseCase(providerRepositoryImpl, serviceAvailabilityImpl);
 
 class AdminProviderController {
     constructor(
@@ -63,7 +65,8 @@ class AdminProviderController {
 
     async approveProvider(req: Request, res: Response) {
         try{
-            const { providerId } = req.body as { providerId : string };
+            const validateData = AdminApproveProviderZodSchema.parse(req.body);
+            const { providerId } = validateData;
             if(!providerId) throw new Error("Invalid request.");
             const result = await this.adminApproveProviderUseCase.execute({providerId : new Types.ObjectId(providerId as string)});
             res.status(200).json(result);
@@ -74,9 +77,11 @@ class AdminProviderController {
 
     async changeProviderStatus(req: Request, res: Response) {
         try{
-            const { providerId, isBlocked } = req.body;
+            const validateData = AdminChangeProviderStatusZodSchema.parse(req.body);
+            const { providerId, isBlocked } = validateData;
+            const status = isBlocked === "true";
             if(!providerId || isBlocked === null) throw new Error("Invalid request.");
-            const result = await this.adminChangeProviderStatusUseCase.execute({providerId : new Types.ObjectId(providerId as string), isBlocked});
+            const result = await this.adminChangeProviderStatusUseCase.execute({providerId : new Types.ObjectId(providerId), isBlocked: status });
             res.status(200).json(result);
         }catch(error){
             HandleError.handle(error, res);
@@ -85,9 +90,11 @@ class AdminProviderController {
 
     async changeProviderTrustedTag(req: Request, res: Response) {
         try{
-            const { providerId, trustedBySlotflow } = req.body;
+            const validateData = AdminChangeProviderTrustedTagZodSchema.parse(req.body);
+            const { providerId, trustedBySlotflow } = validateData;
+            const trustStatus = trustedBySlotflow === "true";
             if(!providerId || trustedBySlotflow === null || undefined) throw new Error("Invalid request.");
-            const result = await this.adminChangeProviderTrustTagUseCase.execute({providerId : new Types.ObjectId(providerId as string), trustedBySlotflow});
+            const result = await this.adminChangeProviderTrustTagUseCase.execute({providerId : new Types.ObjectId(providerId), trustedBySlotflow: trustStatus });
             res.status(200).json(result);
         }catch (error) {
             HandleError.handle(error,res);
@@ -109,7 +116,7 @@ class AdminProviderController {
         try{
             const { providerId } = req.params;
             if(!providerId) throw new Error("Invalid request.");
-            const result = await this.adminFetchProviderAddressUseCase.execute({providerId : new Types.ObjectId(providerId as string)});
+            const result = await this.adminFetchProviderAddressUseCase.execute({providerId : new Types.ObjectId(providerId)});
             res.status(200).json(result);
         }catch(error){
             HandleError.handle(error,res);
@@ -118,9 +125,10 @@ class AdminProviderController {
 
     async fetchProviderService(req:Request, res:Response) {
         try{
-            const { providerId } = req.params;
+            const validateParams = AdminProviderIdZodSchema.parse(req.params);
+            const { providerId } = validateParams;
             if(!providerId) throw new Error("Invalid request.");
-            const result = await this.adminFetchProviderServiceUseCase.execute({providerId : new Types.ObjectId(providerId as string)});
+            const result = await this.adminFetchProviderServiceUseCase.execute({providerId : new Types.ObjectId(providerId)});
             res.status(200).json(result);
         }catch(error){
             HandleError.handle(error,res);
@@ -129,10 +137,12 @@ class AdminProviderController {
 
     async fetchProviderServiceAvailability(req:Request, res: Response) {
         try{
-            const { providerId } = req.params;
-            const date = new Date(req.query.date as string);
+            const validateParams = AdminProviderIdZodSchema.parse(req.params);
+            const { providerId } = validateParams;
+            const validateQuery = AdminDateZodSchema.parse(req.query);
+            const  {date } = validateQuery;
             if(!providerId || !date) throw new Error("Invalid request.");
-            const result = await this.adminFetchProviderServiceAvailabilityUseCase.execute({providerId : new Types.ObjectId(providerId as string), date});
+            const result = await this.adminFetchProviderServiceAvailabilityUseCase.execute({providerId : new Types.ObjectId(providerId), date: new Date(date) });
             res.status(200).json(result);
         }catch(error){
             HandleError.handle(error, res);
@@ -141,9 +151,10 @@ class AdminProviderController {
 
     async fetchProviderSubscriptions(req: Request, res: Response) {
         try{
-            const { providerId } = req.params;
+            const validateParams = AdminProviderIdZodSchema.parse(req.params);
+            const { providerId } = validateParams;
             if(!providerId) throw new Error("Invalid request.");
-            const result = await this.adminFetchProviderSubscriptionsUseCase.execute({providerId : new Types.ObjectId(providerId as string)});
+            const result = await this.adminFetchProviderSubscriptionsUseCase.execute({providerId : new Types.ObjectId(providerId)});
             res.status(200).json(result);
         }catch (error) {
             HandleError.handle(error,res);
@@ -152,9 +163,10 @@ class AdminProviderController {
 
     async fetchProviderPayments(req: Request, res: Response) {
         try{
-            const { providerId } = req.params;
+            const validateParams = AdminProviderIdZodSchema.parse(req.params);
+            const { providerId } = validateParams;
             if(!providerId) throw new Error("Invalid request.");
-            const result = await this.adminFetchProviderPaymentsUseCase.execute({providerId : new Types.ObjectId(providerId as string)});
+            const result = await this.adminFetchProviderPaymentsUseCase.execute({providerId : new Types.ObjectId(providerId)});
             res.status(200).json(result);
         }catch (error) {
             HandleError.handle(error,res);

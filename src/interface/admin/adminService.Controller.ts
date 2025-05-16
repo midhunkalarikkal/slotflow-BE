@@ -3,8 +3,10 @@ import { Request, Response } from "express";
 import { HandleError } from "../../infrastructure/error/error";
 import { ServiceRepositoryImpl } from "../../infrastructure/database/appservice/service.repository.impl";
 import { AdminAddServiceUseCase, AdminChnageServiceStatusUseCase, AdminServiceListUseCase } from "../../application/admin-use.case/adminService.use-case";
+import { AdminAddServiceXZodSchema, AdminChangeServiceStatusParamsZodSchema, AdminChangeServiceStatusQueryZodSchema } from "../../infrastructure/zod/admin.zod";
 
 const serviceRepositoryImpl = new ServiceRepositoryImpl();
+
 const adminServiceListUseCase = new AdminServiceListUseCase(serviceRepositoryImpl)
 const adminAddServiceUseCase = new AdminAddServiceUseCase(serviceRepositoryImpl)
 const adminChnageServiceStatusUseCase = new AdminChnageServiceStatusUseCase(serviceRepositoryImpl)
@@ -31,9 +33,10 @@ class AdminServiceController {
 
     async addService(req: Request, res: Response) {
         try{
-            const { serviceName } = req.body;
+            const validateData = AdminAddServiceXZodSchema.parse(req.body);
+            const { serviceName } = validateData;
             if(!serviceName) throw new Error("Invalid request.");
-            const result = await this.adminAddServiceUseCase.execute(serviceName);
+            const result = await this.adminAddServiceUseCase.execute({serviceName});
             res.status(200).json(result);
         }catch(error){
             HandleError.handle(error,res);
@@ -42,11 +45,13 @@ class AdminServiceController {
 
     async changeServiceStatus(req: Request, res: Response) {
         try{
-            const { serviceId } = req.params;
-            const { isBlocked } = req.query;
+            const validateParams = AdminChangeServiceStatusParamsZodSchema.parse(req.params);
+            const validateQuery = AdminChangeServiceStatusQueryZodSchema.parse(req.query);
+            const { serviceId } = validateParams;
+            const { isBlocked } = validateQuery;
             if(!serviceId || !isBlocked) throw new Error("Invalid request.");
             const blockedStatus = isBlocked === 'true';
-            const result = await this.adminChnageServiceStatusUseCase.execute({serviceId: new Types.ObjectId(serviceId as string), isBlocked : blockedStatus});
+            const result = await this.adminChnageServiceStatusUseCase.execute({serviceId: new Types.ObjectId(serviceId), isBlocked : blockedStatus});
             res.status(200).json(result);
         }catch(error){
             HandleError.handle(error,res);

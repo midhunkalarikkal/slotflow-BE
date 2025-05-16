@@ -1,53 +1,76 @@
 import { Types } from "mongoose";
 import { PlanRepositoryImpl } from "../../infrastructure/database/plan/plan.repository.impl";
-import { AdminAddNewPlanRequestPayload, AdminChangePlanIsBlockedStatusRequestPayload, AdminChangePlanStatusResProps, AdminCreatePlanResProps, AdminPlanListResProps } from "../../infrastructure/dtos/admin.dto";
+import { 
+    AdminPlanListUseCaseResponse, 
+    AdminCreatePlanUseCaseResponse, 
+    AdminAddNewPlanUseCaseRequestPayload, 
+    AdminChangePlanStatusUseCaseResponse, 
+    AdminChangePlanIsBlockedStatusUseCaseRequestPayload, 
+} from "../../infrastructure/dtos/admin.dto";
+import { Validator } from "../../infrastructure/validator/validator";
 
 
 export class AdminPlanListUseCase {
-    constructor(private planRepository: PlanRepositoryImpl) { }
+    constructor(private planRepositoryImpl: PlanRepositoryImpl) { }
 
-    async execute(): Promise<AdminPlanListResProps> {
-        const plans = await this.planRepository.findAllPlans();
+    async execute(): Promise<AdminPlanListUseCaseResponse> {
+        const plans = await this.planRepositoryImpl.findAllPlans();
         if (!plans) throw new Error("Plans fetching error");
         return { success: true, message: "Plans fetched", plans };
     }
 }
 
-export class AdminCreatePlanUseCase {
-    constructor(private planRepository: PlanRepositoryImpl) { }
 
-    async execute({planName, description, price, features, maxBookingPerMonth, adVisibility} : AdminAddNewPlanRequestPayload): Promise<AdminCreatePlanResProps> {
+export class AdminCreatePlanUseCase {
+    constructor(private planRepositoryImpl: PlanRepositoryImpl) { }
+
+    async execute(data : AdminAddNewPlanUseCaseRequestPayload): Promise<AdminCreatePlanUseCaseResponse> {
+        const {planName, description, price, features, maxBookingPerMonth, adVisibility} = data;
+
+        Validator.validatePlanName(planName);
+        Validator.validatePlanDescription(description);
+        Validator.validatePlanPrice(price);
+        Validator.validatePlanFeatures(features);
+        Validator.validatePlanMaxBookingPerMonth(maxBookingPerMonth);
+        Validator.validateBooleanValue(adVisibility, "adVisibility");
+
         if (!planName || !description || price < 0 || !features || maxBookingPerMonth < 0) throw new Error("Invalid plan data.");
-        const existingPlan = await this.planRepository.findPlanByNameOrPrice({planName, price});
+        const existingPlan = await this.planRepositoryImpl.findPlanByNameOrPrice({planName, price});
         const responseText: string = existingPlan?.planName === planName ? "name" : "price"
         if(existingPlan) throw new Error(`Plan with same ${responseText} already exists.`);
-        const newPlan = await this.planRepository.createPlan({ planName, description, price, features, maxBookingPerMonth, adVisibility, isBlocked: false,});
+        const newPlan = await this.planRepositoryImpl.createPlan({ planName, description, price, features, maxBookingPerMonth, adVisibility, isBlocked: false,});
         if(!newPlan) throw new Error("Plan adding failed, please try again.");
-        const data = {
+        const planData = {
             _id: newPlan._id,
             planName: newPlan.planName,
             isBlocked: newPlan.isBlocked,
         }
-        return { success: true, message: "Plan created successfully.", plan: data };
+        return { success: true, message: "Plan created successfully.", plan: planData };
     }
 
 }
 
-export class AdminChangePlanStatusUseCase {
-    constructor(private planRepository: PlanRepositoryImpl) { }
 
-    async execute({planId, status}: AdminChangePlanIsBlockedStatusRequestPayload): Promise<AdminChangePlanStatusResProps> {
+export class AdminChangePlanStatusUseCase {
+    constructor(private planRepositoryImpl: PlanRepositoryImpl) { }
+
+    async execute(data: AdminChangePlanIsBlockedStatusUseCaseRequestPayload): Promise<AdminChangePlanStatusUseCaseResponse> {
+        const {planId, isBlocked} = data;
+
+        Validator.validateObjectId(planId, "PlanId");
+        Validator.validateBooleanValue(isBlocked, "isBlocked");
+        
         if(!planId || status === null) throw new Error("Invalid request");
-        const existingPlan = await this.planRepository.findPlanById(new Types.ObjectId(planId));
+        const existingPlan = await this.planRepositoryImpl.findPlanById(new Types.ObjectId(planId));
         if(!existingPlan) throw new Error("Plan does not exists.");
-        existingPlan.isBlocked = status;
-        const updatedPlan = await this.planRepository.updatePlan(new Types.ObjectId(planId), existingPlan);
+        existingPlan.isBlocked = isBlocked;
+        const updatedPlan = await this.planRepositoryImpl.updatePlan(new Types.ObjectId(planId), existingPlan);
         if(!updatedPlan) throw new Error("Plan status changing failed.");
-        const data = {
+        const updatedPlanDatadata = {
             _id: updatedPlan._id,
             planName: updatedPlan.planName,
             isBlocked: updatedPlan.isBlocked,
         }
-        return { success: true, message: `Plan ${status ? "Blocked" : "Unblocked"} successfully.`, updatedPlan: data}
+        return { success: true, message: `Plan ${status ? "Blocked" : "Unblocked"} successfully.`, updatedPlan: updatedPlanDatadata }
     }
 }

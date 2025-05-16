@@ -4,6 +4,7 @@ import { PaymentRepositoryImpl } from "../../infrastructure/database/payment/pay
 import { AdminFetchAllPaymentsUseCase } from "../../application/admin-use.case/adminPayment.use-case";
 
 const paymentRepositoryImpl = new PaymentRepositoryImpl();
+
 const adminFetchAllPaymentsUseCase = new AdminFetchAllPaymentsUseCase(paymentRepositoryImpl);
 
 export class AdminPaymentController {

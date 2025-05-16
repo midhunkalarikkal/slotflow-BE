@@ -1,42 +1,59 @@
-import { Types } from "mongoose";
 import { ServiceRepositoryImpl } from "../../infrastructure/database/appservice/service.repository.impl";
-import { AdminAddServiceRequestPayload, AdminAddServiceResProps, AdminChangeServiceStatusResProps, AdminChnageServiceIsBlockedStatusRequestPayload, AdminServiceListResProps } from "../../infrastructure/dtos/admin.dto";
+import { AdminAddServiceUseCaseRequestPayload, AdminAddServiceUseCaseResponse, AdminChangeServiceStatusUseCaseResponse, AdminChnageServiceIsBlockedStatusUseCaseRequestPayload, AdminServiceListUseCaseResponse } from "../../infrastructure/dtos/admin.dto";
+import { Validator } from "../../infrastructure/validator/validator";
 
 export class AdminServiceListUseCase {
-    constructor(private seriveRepository: ServiceRepositoryImpl) { }
+    constructor(
+        private seriveRepositoryImpl: ServiceRepositoryImpl
+    ) { }
 
-    async execute(): Promise<AdminServiceListResProps> {
-        const services = await this.seriveRepository.findAllServices();
+    async execute(): Promise<AdminServiceListUseCaseResponse> {
+        const services = await this.seriveRepositoryImpl.findAllServices();
         if (!services) throw new Error("Fetching error, please try again.");
         return { success: true, message: "Fetched providers.", services };
     }
 }
 
-export class AdminAddServiceUseCase {
-    constructor(private seriveRepository: ServiceRepositoryImpl) { }
 
-    async execute({serviceName}: AdminAddServiceRequestPayload): Promise<AdminAddServiceResProps> {
+export class AdminAddServiceUseCase {
+    constructor(
+        private seriveRepositoryImpl: ServiceRepositoryImpl
+    ) { }
+
+    async execute(data: AdminAddServiceUseCaseRequestPayload): Promise<AdminAddServiceUseCaseResponse> {
+        const { serviceName } = data;
+
+        Validator.validateAppServiceName(serviceName);
+
         if(!serviceName) throw new Error("Invalid request.");
-        const existService = await this.seriveRepository.findServiceByName(serviceName);
+        const existService = await this.seriveRepositoryImpl.findServiceByName(serviceName);
         if (existService) throw new Error("Service already exist.");
-        const service = await this.seriveRepository.createService(serviceName);
+        const service = await this.seriveRepositoryImpl.createService(serviceName);
         if (!service) throw new Error("Service adding error, please try again.");
-        const { createdAt, updatedAt, ...data} = service
-        return { success: true, message: "Service added successfully.", service: data };
+        const { createdAt, updatedAt, ...rest} = service
+        return { success: true, message: "Service added successfully.", service: rest };
     }
 }
 
-export class AdminChnageServiceStatusUseCase {
-    constructor(private seriveRepository: ServiceRepositoryImpl) { }
 
-    async execute({serviceId, isBlocked}: AdminChnageServiceIsBlockedStatusRequestPayload): Promise<AdminChangeServiceStatusResProps> {
+export class AdminChnageServiceStatusUseCase {
+    constructor(
+        private seriveRepositoryImpl: ServiceRepositoryImpl
+    ) { }
+
+    async execute(data: AdminChnageServiceIsBlockedStatusUseCaseRequestPayload): Promise<AdminChangeServiceStatusUseCaseResponse> {
+        const {serviceId, isBlocked} = data;
+        
+        Validator.validateObjectId(serviceId);
+        Validator.validateBooleanValue(isBlocked, "isBlocked");
+
         if(!serviceId || isBlocked === null) throw new Error("Invalid request.");
-        const existingService = await this.seriveRepository.findServiceById(serviceId);
+        const existingService = await this.seriveRepositoryImpl.findServiceById(serviceId);
         if(!existingService) throw new Error("No service found.");
         existingService.isBlocked = isBlocked;
-        const updatedService = await this.seriveRepository.updateService(serviceId, existingService);
+        const updatedService = await this.seriveRepositoryImpl.updateService(serviceId, existingService);
         if (!updatedService) throw new Error("Service status changing error.");
-        const { createdAt, updatedAt, ...data } = updatedService;
-        return { success: true, message: `Service ${status ? "Blocked" : "Unblocked"} successfully.`, updatedService: data }
+        const { createdAt, updatedAt, ...rest } = updatedService;
+        return { success: true, message: `Service ${status ? "Blocked" : "Unblocked"} successfully.`, updatedService: rest }
     }
 }

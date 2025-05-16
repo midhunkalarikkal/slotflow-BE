@@ -1,8 +1,9 @@
+import { Types } from "mongoose";
 import { Request, Response } from "express";
 import { HandleError } from "../../infrastructure/error/error";
+import { AdminChangeUserStatusZOdSchema } from "../../infrastructure/zod/admin.zod";
 import { UserRepositoryImpl } from "../../infrastructure/database/user/user.repository.impl";
 import { AdminChangeUserStatusUseCase, AdminUserListUseCase } from "../../application/admin-use.case/adminUser.use-case";
-import { Types } from "mongoose";
 
 const userRepositoryImpl = new UserRepositoryImpl();
 const adminUserListUseCase = new AdminUserListUseCase(userRepositoryImpl);
@@ -28,7 +29,8 @@ class AdminUserController {
 
     async changeUserStatus(req: Request, res: Response) {
         try{
-            const { userId, isBlocked } = req.body;
+            const validateData = AdminChangeUserStatusZOdSchema.parse(req.body);
+            const { userId, isBlocked } = validateData;
             if(!userId || isBlocked === null) throw new Error("Invalid request");
             const blockedStatus = isBlocked === "true";
             const result = await this.adminChangeUserStatusUseCase.execute({userId : new Types.ObjectId(userId), isBlocked : blockedStatus});

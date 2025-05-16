@@ -1,3 +1,4 @@
+import { Types } from 'mongoose';
 import validator from 'validator';
 
 export class Validator {
@@ -48,21 +49,21 @@ export class Validator {
     static validatePlace(place: string): void {
         if (!place || place.trim().length < 2) throw new Error("Place is required and should have at least 2 characters.");
         if (place.trim().length > 50) throw new Error("Place should have less than 50 characters.");
-        if(!/^[a-zA-Z\s]+$/.test(place)) throw new Error("Place should only contain alphabets and spaces");
+        if (!/^[a-zA-Z\s]+$/.test(place)) throw new Error("Place should only contain alphabets and spaces");
     }
 
     // City
     static validateCity(city: string): void {
         if (!city || city.trim().length < 2) throw new Error("City is required and should have at least 2 characters.");
         if (city.trim().length > 50) throw new Error("City should have less than 50 characters.");
-        if(!/^[a-zA-Z\s]+$/.test(city)) throw new Error("City should only contain alphabets and spaces");
+        if (!/^[a-zA-Z\s]+$/.test(city)) throw new Error("City should only contain alphabets and spaces");
     }
 
     // District
     static validateDistrict(district: string): void {
         if (!district || district.trim().length < 2) throw new Error("District is required and should have at least 2 characters.");
         if (district.trim().length > 50) throw new Error("District should have less than 50 characters.");
-        if(!/^[a-zA-Z\s]+$/.test(district)) throw new Error("District should only contain alphabets and spaces");
+        if (!/^[a-zA-Z\s]+$/.test(district)) throw new Error("District should only contain alphabets and spaces");
     }
 
     // Pincode
@@ -74,24 +75,24 @@ export class Validator {
     static validateState(state: string): void {
         if (!state || state.trim().length < 2) throw new Error("State is required and should have at least 2 characters.");
         if (state.trim().length > 50) throw new Error("State should have less than 50 characters.");
-        if(!/^[a-zA-Z\s]+$/.test(state)) throw new Error("State should only contain alphabets and spaces");
+        if (!/^[a-zA-Z\s]+$/.test(state)) throw new Error("State should only contain alphabets and spaces");
     }
 
     // Country
     static validateCountry(country: string): void {
         if (!country || country.trim().length < 2) throw new Error("Country is required and should have at least 2 characters.");
         if (country.trim().length > 50) throw new Error("Country should have less than 50 characters.");
-        if(!/^[a-zA-Z\s]+$/.test(country)) throw new Error("Country should only contain alphabets and spaces");
+        if (!/^[a-zA-Z\s]+$/.test(country)) throw new Error("Country should only contain alphabets and spaces");
     }
 
     // Google Map Link
     static validateGoogleMapLink(googleMapLink: string): void {
         if (!validator.isURL(googleMapLink)) throw new Error("Invalid Google Map link.");
-        if(!googleMapLink.startsWith("https://maps.app.goo.gl/")) throw new Error("Invalid google map url.");
+        if (!googleMapLink.startsWith("https://maps.app.goo.gl/")) throw new Error("Invalid google map url.");
     }
 
 
-    
+
 
 
     // Provider service 
@@ -146,9 +147,9 @@ export class Validator {
         if (!time || time.trim().length === 0) {
             throw new Error(`${fieldName} is required.`);
         }
-    
+
         const timePattern = /^(0?[1-9]|1[0-2]):[0-5][0-9]\s?(AM|PM)$/i;
-    
+
         if (!timePattern.test(time.trim())) {
             throw new Error(
                 `Invalid ${fieldName}. ${fieldName} must be in HH:MM AM/PM format (12-hour).`
@@ -172,11 +173,11 @@ export class Validator {
 
     static validateModes(modes: string[]): void {
         const validModes = ["online", "offline"];
-    
+
         if (!modes) {
             throw new Error("Modes is required.");
         }
-    
+
         if (Array.isArray(modes)) {
             if (modes.length === 0) {
                 throw new Error("Modes array cannot be empty.");
@@ -186,6 +187,76 @@ export class Validator {
                     throw new Error("Invalid mode. Mode must be 'online' or 'offline'.");
                 }
             }
-        } 
+        }
+    }
+
+
+    // **** Plan validator
+    // Plan Name – only uppercase/lowercase letters, 4 to 20 characters
+    static validatePlanName(planName: string): void {
+        if (!planName || planName.trim().length === 0)
+            throw new Error("Plan name is required.");
+        if (!/^[a-zA-Z]{4,20}$/.test(planName.trim()))
+            throw new Error("Invalid plan name. Only alphabets are allowed, length between 4 and 20.");
+    }
+
+    // Description – allow alphabets, numbers, spaces, punctuation; 10 to 200 chars
+    static validatePlanDescription(description: string): void {
+        if (!description || description.trim().length === 0)
+            throw new Error("Description is required.");
+        if (description.length < 10 || description.length > 200)
+            throw new Error("Description must be between 10 and 200 characters.");
+        if (!/^[\w\d\s!"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~]{10,200}$/.test(description.trim()))
+            throw new Error("Invalid description. Contains unsupported characters.");
+    }
+
+    // Price – number between 0 and 100000
+    static validatePlanPrice(price: number): void {
+        if (typeof price !== "number" || isNaN(price))
+            throw new Error("Price must be a number.");
+        if (price < 0 || price > 100000)
+            throw new Error("Price must be between 0 and 100000.");
+    }
+
+    // Features – non-empty array of strings
+    static validatePlanFeatures(features: string[]): void {
+        if (!Array.isArray(features) || features.length === 0)
+            throw new Error("At least one feature is required.");
+        for (const feature of features) {
+            if (typeof feature !== "string" || feature.trim().length === 0)
+                throw new Error("Each feature must be a non-empty string.");
+        }
+    }
+
+    // Max Booking Per Month – number between 0 and 10000
+    static validatePlanMaxBookingPerMonth(maxBookingPerMonth: number): void {
+        if (typeof maxBookingPerMonth !== "number" || isNaN(maxBookingPerMonth))
+            throw new Error("Max booking per month must be a number.");
+        if (maxBookingPerMonth < 0 || maxBookingPerMonth > 10000)
+            throw new Error("Max booking per month must be between 0 and 10000.");
+    }
+
+
+
+    // **** admin app service
+    static validateAppServiceName(serviceName: string): void {
+        if (!serviceName || serviceName.trim().length === 0) throw new Error("Service name is required.");
+        if (!/^[A-Za-z ]{4,25}$/.test(serviceName.trim())) throw new Error("Invalid service name. Service name should contain only alphabets and spaces and be between 4 and 25 characters.");
+    }
+
+
+    // **** Common validations
+    static validateBooleanValue(value: boolean, label: string): void {
+        if (typeof value !== "boolean")
+            throw new Error(`${label} must be a boolean.`);
+    }
+
+    static validateObjectId(id: any, label = "ID"): void {
+        if (
+            !Types.ObjectId.isValid(id) ||
+            new Types.ObjectId(id).toString() !== id.toString()
+        ) {
+            throw new Error(`Invalid ${label}. Must be a valid ObjectId.`);
+        }
     }
 }
