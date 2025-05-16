@@ -1,7 +1,7 @@
-import { Types } from "mongoose";
-import { ProviderFetchAllPaymentUseCaseRequestPayload, ProviderFetchAllPaymentUseCaseResponse } from "../../infrastructure/dtos/provider.dto";
+import { Validator } from "../../infrastructure/validator/validator";
 import { PaymentRepositoryImpl } from "../../infrastructure/database/payment/payment.repository.impl";
 import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/provider.repository.impl";
+import { ProviderFetchAllPaymentUseCaseRequestPayload, ProviderFetchAllPaymentUseCaseResponse } from "../../infrastructure/dtos/provider.dto";
 
 
 export class ProviderFetchAllPaymentsUseCase {
@@ -13,6 +13,8 @@ export class ProviderFetchAllPaymentsUseCase {
     async execute(data: ProviderFetchAllPaymentUseCaseRequestPayload): Promise<ProviderFetchAllPaymentUseCaseResponse> {
         const { providerId } = data;
         if(!providerId) throw new Error("Invalid request.");
+
+        Validator.validateObjectId(providerId, "providerId");
 
         const provider = await this.providerRepositoryImpl.findProviderById(providerId);
         if(!provider) throw new Error("No user found.");

@@ -1,3 +1,4 @@
+import { Validator } from "../../infrastructure/validator/validator";
 import { BookingRepositoryImpl } from "../../infrastructure/database/booking/booking.repository.impl";
 import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/provider.repository.impl";
 import { ProviderFetchBookingAppointmentsUseCaseRequestPayload, ProviderFetchBookingAppointmentsUseCaseResponse } from "../../infrastructure/dtos/provider.dto";
@@ -12,6 +13,8 @@ export class ProviderFetchBookingAppointmentsUseCase {
     async execute(data: ProviderFetchBookingAppointmentsUseCaseRequestPayload): Promise<ProviderFetchBookingAppointmentsUseCaseResponse> {
         const { providerId } = data;
         if(!providerId) throw new Error("Invalid request");
+
+        Validator.validateObjectId(providerId, "providerId");
         
         const provider = await this.providerRepositoryImpl.findProviderById(providerId);
         if(!provider) throw new Error("No user found");

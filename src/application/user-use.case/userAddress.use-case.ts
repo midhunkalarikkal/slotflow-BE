@@ -19,6 +19,9 @@ export class UserFetchAddressUseCase {
     async execute(data: UserFetchUserAddressUseCaseRequestPayload): Promise<UserFetchAddressUseCaseResponse> {
         const { userId } = data;
         if (!userId) throw new Error("Invalid request.");
+
+        Validator.validateObjectId(userId, "userId");
+
         const user = await this.userRepositoryImpl.findUserById(userId);
         if (!user) throw new Error("No user found.");
         const address = await this.addressRepositoryImpl.findAddressByUserId(userId);
@@ -40,6 +43,7 @@ export class UserAddAddressUseCase {
         const {userId, addressLine, phone, place, city, district, pincode, state, country, googleMapLink} = data;
         if (!userId || !addressLine || !phone || !place || !city || !district || !pincode || !state || !country || !googleMapLink) throw new Error("Invalid request.");
         
+        Validator.validateObjectId(userId, "userId");
         Validator.validateAddressLine(addressLine);
         Validator.validatePhone(phone);
         Validator.validatePlace(place);

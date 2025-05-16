@@ -21,6 +21,7 @@ export class RegisterUseCase {
     Validator.validateUsername(username);
     Validator.validateEmail(email);
     Validator.validatePassword(password);
+    Validator.validateRole(role);
 
     let userOrProvider: Partial<Provider> | Partial<User> | null;
 

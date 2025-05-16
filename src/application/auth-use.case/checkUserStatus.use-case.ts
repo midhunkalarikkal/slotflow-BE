@@ -1,16 +1,19 @@
 import { Types } from "mongoose";
-import { CommonResponse } from "../../infrastructure/dtos/common.dto";
+import { CheckUserStatusUseCaseRequestPayload, CheckUserStatusUseCaseResponse } from "../../infrastructure/dtos/auth.dto";
 import { UserRepositoryImpl } from "../../infrastructure/database/user/user.repository.impl";
 import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/provider.repository.impl";
+import { Validator } from "../../infrastructure/validator/validator";
 
-interface CheckUserStatusResProps extends CommonResponse {
-    status: number
-}
+
 
 export class CheckUserStatusUseCase {
     constructor(private userRepository: UserRepositoryImpl, private providerRepository: ProviderRepositoryImpl){}
 
-    async execute(id: string, role: string) : Promise<CheckUserStatusResProps> {
+    async execute(data: CheckUserStatusUseCaseRequestPayload) : Promise<CheckUserStatusUseCaseResponse> {
+        const { id, role } = data;
+
+        Validator.validateObjectId(id);
+        Validator.validateRole(role);
 
         if (role === "USER") {
             const user = await this.userRepository.findUserById(new Types.ObjectId(id));

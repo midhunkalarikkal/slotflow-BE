@@ -1,6 +1,12 @@
-import { ServiceRepositoryImpl } from "../../infrastructure/database/appservice/service.repository.impl";
-import { AdminAddServiceUseCaseRequestPayload, AdminAddServiceUseCaseResponse, AdminChangeServiceStatusUseCaseResponse, AdminChnageServiceIsBlockedStatusUseCaseRequestPayload, AdminServiceListUseCaseResponse } from "../../infrastructure/dtos/admin.dto";
 import { Validator } from "../../infrastructure/validator/validator";
+import { ServiceRepositoryImpl } from "../../infrastructure/database/appservice/service.repository.impl";
+import { 
+    AdminAddServiceUseCaseResponse, 
+    AdminServiceListUseCaseResponse, 
+    AdminAddServiceUseCaseRequestPayload, 
+    AdminChangeServiceStatusUseCaseResponse, 
+    AdminChnageServiceIsBlockedStatusUseCaseRequestPayload, 
+} from "../../infrastructure/dtos/admin.dto";
 
 export class AdminServiceListUseCase {
     constructor(
@@ -22,10 +28,10 @@ export class AdminAddServiceUseCase {
 
     async execute(data: AdminAddServiceUseCaseRequestPayload): Promise<AdminAddServiceUseCaseResponse> {
         const { serviceName } = data;
+        if(!serviceName) throw new Error("Invalid request.");
 
         Validator.validateAppServiceName(serviceName);
 
-        if(!serviceName) throw new Error("Invalid request.");
         const existService = await this.seriveRepositoryImpl.findServiceByName(serviceName);
         if (existService) throw new Error("Service already exist.");
         const service = await this.seriveRepositoryImpl.createService(serviceName);
@@ -43,11 +49,11 @@ export class AdminChnageServiceStatusUseCase {
 
     async execute(data: AdminChnageServiceIsBlockedStatusUseCaseRequestPayload): Promise<AdminChangeServiceStatusUseCaseResponse> {
         const {serviceId, isBlocked} = data;
+        if(!serviceId || isBlocked === null) throw new Error("Invalid request.");
         
-        Validator.validateObjectId(serviceId);
+        Validator.validateObjectId(serviceId, "serviceId");
         Validator.validateBooleanValue(isBlocked, "isBlocked");
 
-        if(!serviceId || isBlocked === null) throw new Error("Invalid request.");
         const existingService = await this.seriveRepositoryImpl.findServiceById(serviceId);
         if(!existingService) throw new Error("No service found.");
         existingService.isBlocked = isBlocked;

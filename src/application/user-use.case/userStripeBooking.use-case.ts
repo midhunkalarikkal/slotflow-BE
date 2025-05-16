@@ -14,6 +14,7 @@ import {
     UserSaveAppoinmentBookingUseCaseRequestPayload, 
     UserAppointmentBookingViaStripeUseCaseRequestPayload, 
 } from "../../infrastructure/dtos/user.dto";
+import { Validator } from "../../infrastructure/validator/validator";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
@@ -29,6 +30,12 @@ export class UserAppointmentBookingViaStripeUseCase {
     async execute(data: UserAppointmentBookingViaStripeUseCaseRequestPayload): Promise<UserAppointmentBookingViaStripeUseCaseResponse> {
         const { userId, providerId, slotId, selectedServiceMode, date } = data;
         if (!userId || !providerId || !slotId || !selectedServiceMode || !date) throw new Error("Invalid request");
+
+        Validator.validateObjectId(userId, "userId");
+        Validator.validateObjectId(providerId, "providerId");
+        Validator.validateObjectId(slotId, "slotId");
+        Validator.validateServiceMode(selectedServiceMode);
+        Validator.validateDate(date);
 
         const provider = await this.providerRepositoryImpl.findProviderById(providerId);
         if (!provider) throw new Error("No provider found");
@@ -97,6 +104,9 @@ export class UserSaveBookingAfterStripePaymentUseCase {
     async execute(data: UserSaveAppoinmentBookingUseCaseRequestPayload): Promise<CommonResponse> {
         const { userId, sessionId } = data;
         if (!userId || !sessionId) throw new Error("Invalid request");
+
+        Validator.validateObjectId(userId, "userId");
+        Validator.validateStripeSessionId(sessionId);
 
         const user = await this.userRepositoryImpl.findUserById(new Types.ObjectId(userId));
         if (!user) throw new Error("No user found");

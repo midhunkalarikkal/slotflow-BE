@@ -167,56 +167,56 @@ export interface AdminChangeProviderTrustTagUseCaseResponse extends CommonRespon
 }
 
 
-// admin fetch a specific provider details request payload type
-export type AdminFetchProviderDetailsRequestPayload = {
+// admin fetch a specific provider details use case request payload interface
+export interface AdminFetchProviderDetailsUseCaseRequestPayload {
     providerId: Provider["_id"];
 }
-// admin fetch a specific provider details response interface
-export interface AdminFetchProviderDetailsResProps extends CommonResponse {
+// admin fetch a specific provider details use case response interface
+export interface AdminFetchProviderDetailsUseCaseResponse extends CommonResponse {
     provider: Pick<Provider, "_id" | "username" | "email" | "isBlocked" | "isEmailVerified" | "isAdminVerified" | "phone" | "profileImage" | "trustedBySlotflow" | "createdAt"> | {};
 }
 
 
-// admin fetch a specific provider address details request payload type
-export type AdminFetchProviderAddressRequestPayload = {
+// admin fetch a specific provider address details use case request payload interface
+export interface AdminFetchProviderAddressUseCaseRequestPayload {
     providerId: Provider["_id"];
 }
-// admin fetch a specific provider address details response interface
-export interface AdminFetchProviderAddressResProps extends CommonResponse {
+// admin fetch a specific provider address details use case response interface
+export interface AdminFetchProviderAddressUseCaseResponse extends CommonResponse {
     address: Pick<Address, "userId" | "addressLine" | "phone" | "place" | "city" | "district" | "pincode" | "state" | "country" | "googleMapLink"> | {};
 }
 
 
-// admin fetch provider service details request payload type
-export type AdminFetchProviderServiceResRequestPayload = {
+// admin fetch provider service details use case request payload interface
+export type AdminFetchProviderServiceUseCaseRequestPayload = {
     providerId: Provider["_id"];
 }
-// admin fetch provider service details response props
+// admin fetch provider service details use case response interface 
 type FindProviderServiceProps = Omit<ProviderService, "serviceCategory">;
 export interface FindProviderServiceResProps extends FindProviderServiceProps {
     serviceCategory: Pick<Service, "serviceName">
 }
-export interface AdminFetchProviderServiceResProps extends CommonResponse {
+export interface AdminFetchProviderServiceUseCaseResponse extends CommonResponse {
     service: FindProviderServiceResProps | {};
 }
 
 
-// admin fetch provider service availability details request payload type
-export type AdminFetchProviderServiceAvailabilityRequestPayload = {
+// admin fetch provider service availability details use case request payload interface
+export interface AdminFetchProviderServiceAvailabilityUseCaseRequestPayload {
     providerId: Provider["_id"];
     date: Date
 }
-// admin fetch provider service availability details response interface
-export interface AdminFetchProviderServiceAvailabilityResProps extends CommonResponse {
+// admin fetch provider service availability details use case response interface
+export interface AdminFetchProviderServiceAvailabilityUseCaseResponse extends CommonResponse {
     availability: FontendAvailabilityForResponse | {};
 }
 
 
-// admin fetch provider subscriptions request payload type
-export type AdminFetchProviderSubscriptionsRequestPayload = {
+// admin fetch provider subscriptions use case request payload interface
+export interface AdminFetchProviderSubscriptionsUseCaseRequestPayload {
     providerId: Provider["_id"];
 }
-// admin fetch provider subscriptions response interface
+// admin fetch provider subscriptions use case response interface
 type SubscripionsResProps = Pick<Subscription, "startDate" | "endDate" | "subscriptionStatus">;
 interface AdminFetchProviderSubscriptions extends SubscripionsResProps {
     subscriptionPlanId?: {
@@ -224,16 +224,16 @@ interface AdminFetchProviderSubscriptions extends SubscripionsResProps {
         planName: string;
     };
 }
-export interface AdminFetchProviderSubscriptionsResProps extends CommonResponse {
+export interface AdminFetchProviderSubscriptionsUseCaseResponse extends CommonResponse {
     subscriptions: AdminFetchProviderSubscriptions[] | [];
 }
 
 
-// admin fetch provider payments request payload type
-export type AdminFetchProviderPaymentsRequestPayload = {
+// admin fetch provider payments use case request payload interface
+export interface AdminFetchProviderPaymentsUseCaseRequestPayload {
     providerId: Provider["_id"];
 }
-// admin fetch provider payments response interface
-export interface AdminFetchProviderPaymentsResProps extends CommonResponse {
+// admin fetch provider payments use case response interface
+export interface AdminFetchProviderPaymentsUseCaseResponse extends CommonResponse {
     payments: Array<Pick<Payment, "paymentStatus" | "paymentMethod" | "paymentGateway" | "paymentFor" | "discountAmount" | "totalAmount" | "createdAt" | "_id">> | [];
 }

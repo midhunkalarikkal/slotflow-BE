@@ -21,14 +21,16 @@ export class ProviderAddServiceDetailsUseCase {
 
     async execute(data: ProviderAddServiceDetailsUseCaseRequestPayload): Promise<CommonResponse> {
         const { providerId, serviceCategory, serviceName, serviceDescription, servicePrice, providerAdhaar, providerExperience, file } = data;
-
         if(!providerId || !serviceCategory || !serviceName || !serviceDescription || !servicePrice || !providerAdhaar || !providerExperience || !file) throw new Error("Invalid Request.");
         
+        Validator.validateObjectId(providerId, "providerId");
+        Validator.validateObjectId(serviceCategory, "serviceCategoryId");
         Validator.validateServiceName(serviceName);
         Validator.validateServiceDescription(serviceDescription);
         Validator.validateServicePrice(Number(servicePrice));   
         Validator.validateProviderAdhaar(providerAdhaar);
         Validator.validateProviderExperience(providerExperience);
+        Validator.validateFile(file);
         
         const provider = await this.providerRepositoryImpl.findProviderById(providerId);
         if(!provider) throw new Error("Please logout and try again.");
@@ -74,6 +76,8 @@ export class ProviderFetchServiceDetailsUseCase {
     async execute(data: ProviderFetchProviderServiceUseCaseRequestPayload): Promise<ProviderFetchProviderServiceUseCaseResponse> {
         const { providerId } = data;
         if (!providerId) throw new Error("Invalid request.");
+
+        Validator.validateObjectId(providerId, "providerId");
 
         const service = await this.provderServiceRepositoryImpl.findProviderServiceByProviderId(new Types.ObjectId(providerId));
         if(service === null) return { success: true, message: "Provider service details not yet addedd", service: {} };

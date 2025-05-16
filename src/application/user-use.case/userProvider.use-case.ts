@@ -1,6 +1,7 @@
 import { Types } from "mongoose";
 import { generateSignedUrl } from "../../config/aws_s3";
 import { extractS3Key } from "../../infrastructure/helpers/helper";
+import { Validator } from "../../infrastructure/validator/validator";
 import { UserRepositoryImpl } from "../../infrastructure/database/user/user.repository.impl";
 import { AddressRepositoryImpl } from "../../infrastructure/database/address/address.repository.impl";
 import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/provider.repository.impl";
@@ -8,16 +9,16 @@ import { ProviderServiceRepositoryImpl } from "../../infrastructure/database/pro
 import { ServiceAvailabilityRepositoryImpl } from "../../infrastructure/database/serviceAvailability/serviceAvailability.repository.impl";
 import { 
   FindProviderServiceResProps, 
-  FindProvidersUsingServiceCategoryIdsResProps, 
-  UserFetchProviderServiceAvailabilityUseCaseResponse, 
   UserFetchProviderServiceUseCaseResponse, 
-  UserFetchServiceProviderAddressUseCaseRequestPayload, 
-  UserFetchServiceProviderAddressUseCaseResponse, 
-  UserFetchServiceProviderDetailsUseCaseRequestPayload, 
-  UserFetchServiceProviderDetailsUseCaseResponse, 
-  UserFetchServiceproviderServiceUsecaseRequestPayload, 
   UserFetchServiceProvidersUseCaseResponse, 
+  FindProvidersUsingServiceCategoryIdsResProps, 
+  UserFetchServiceProviderAddressUseCaseResponse, 
+  UserFetchServiceProviderDetailsUseCaseResponse, 
   UserFetchServiceProvidersUseCaseRequestPayload, 
+  UserFetchProviderServiceAvailabilityUseCaseResponse, 
+  UserFetchServiceProviderAddressUseCaseRequestPayload, 
+  UserFetchServiceProviderDetailsUseCaseRequestPayload, 
+  UserFetchServiceproviderServiceUsecaseRequestPayload, 
   UserFetchProviderServiceAvailabilityUseCaseRequestPayload
 } from "../../infrastructure/dtos/user.dto";
 
@@ -30,6 +31,8 @@ export class UserFetchServiceProvidersUseCase {
   async execute(data: UserFetchServiceProvidersUseCaseRequestPayload): Promise<UserFetchServiceProvidersUseCaseResponse> {
     const { userId, serviceIds } = data;
     if (!userId || !serviceIds) throw new Error("Invalid request.");
+
+    Validator.validateObjectId(userId, "userId");
 
     const user = await this.userRepositoryImpl.findUserById(new Types.ObjectId(userId));
     if (!user) throw new Error("No user found");
@@ -66,6 +69,9 @@ export class UserFetchServiceProviderProfileDetailsUseCase {
     const { userId, providerId } = data;
     if (!userId || !providerId) throw new Error("Invalid request");
 
+    Validator.validateObjectId(userId, "userId");
+    Validator.validateObjectId(providerId, "providerId");
+
     const user = await this.userRepositoryImpl.findUserById(new Types.ObjectId(userId));
     if (!user) throw new Error("No user found");
 
@@ -94,6 +100,9 @@ export class UserFetchServiceProviderAddressUseCase {
   async execute(data: UserFetchServiceProviderAddressUseCaseRequestPayload): Promise<UserFetchServiceProviderAddressUseCaseResponse> {
     const { userId, providerId} = data;
     if (!userId || !providerId) throw new Error("Invalid request");
+    
+    Validator.validateObjectId(userId, "userId");
+    Validator.validateObjectId(providerId, "providerId");
 
     const user = await this.userRepositoryImpl.findUserById(new Types.ObjectId(userId));
     if (!user) throw new Error("No user found");
@@ -117,6 +126,9 @@ export class UserFetchServiceProviderServiceDetailsUseCase {
   async execute(data: UserFetchServiceproviderServiceUsecaseRequestPayload): Promise<UserFetchProviderServiceUseCaseResponse> {
     const { userId, providerId } = data;
     if (!userId || !providerId) throw new Error("Invalid request");
+
+    Validator.validateObjectId(userId, "userId");
+    Validator.validateObjectId(providerId, "providerId");
 
     const user = await this.userRepositoryImpl.findUserById(new Types.ObjectId(userId));
     if (!user) throw new Error("No user found");
@@ -147,6 +159,10 @@ export class UserFetchServiceProviderServiceAvailabilityUseCase {
     async execute(data: UserFetchProviderServiceAvailabilityUseCaseRequestPayload): Promise<UserFetchProviderServiceAvailabilityUseCaseResponse> {
       const { userId, providerId, date } = data;
         if (!userId || !providerId || !date) throw new Error("Invalid request.");
+
+        Validator.validateObjectId(userId, "userId");
+        Validator.validateObjectId(providerId, "providerId");
+        Validator.validateDate(date);
 
         const user = await this.userRepositoryImpl.findUserById(new Types.ObjectId(userId));
         if (!user) throw new Error("No user found");

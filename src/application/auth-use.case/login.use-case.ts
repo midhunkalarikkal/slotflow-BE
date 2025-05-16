@@ -15,10 +15,11 @@ export class LoginUseCase {
 
     async execute(data: LoginUseCaseRequestPayload): Promise<LoginUseCaseResponse> {
         const { email, password, role } = data;
-        
         if (!email || !password || !role) throw new Error("Invalid request.");
+
         Validator.validateEmail(email);
         Validator.validatePassword(password);
+        Validator.validateRole(role);
 
         let userOrProvider: User | Provider | null = null;
 

@@ -1,12 +1,17 @@
 import dayjs from "dayjs";
 import Stripe from "stripe";
 import { startSession, Types } from "mongoose";
+import { Validator } from "../../infrastructure/validator/validator";
 import { CommonResponse } from "../../infrastructure/dtos/common.dto";
 import { PlanRepositoryImpl } from "../../infrastructure/database/plan/plan.repository.impl";
 import { PaymentRepositoryImpl } from "../../infrastructure/database/payment/payment.repository.impl";
 import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/provider.repository.impl";
 import { SubscriptionRepositoryImpl } from "../../infrastructure/database/subscription/subscription.repository.impl";
-import { ProviderSaveSubscriptionUseCaseRequestPayload, ProviderStripeSubscriptionCreateSessionIdUseCaseRequestPayload, ProviderStripeSubscriptionCreateSessionIdUseCaseResponse } from "../../infrastructure/dtos/provider.dto";
+import { 
+    ProviderSaveSubscriptionUseCaseRequestPayload, 
+    ProviderStripeSubscriptionCreateSessionIdUseCaseResponse, 
+    ProviderStripeSubscriptionCreateSessionIdUseCaseRequestPayload, 
+} from "../../infrastructure/dtos/provider.dto";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
@@ -19,8 +24,12 @@ export class ProviderStripeSubscriptionCreateSessionIdUseCase {
     
         async execute(data: ProviderStripeSubscriptionCreateSessionIdUseCaseRequestPayload): Promise<ProviderStripeSubscriptionCreateSessionIdUseCaseResponse> {
             const { providerId, planId, duration } = data;
-
             if (!providerId || !planId || !duration) throw new Error("Invalid request.");
+
+            Validator.validateObjectId(providerId, "providerId");
+            Validator.validateObjectId(planId, "planId");
+            Validator.validatePlanDuration(duration);
+
             let planDuration: number = parseInt(duration.trim().split(" ")[0]);
     
             const provider = await this.providerRepositoryImpl.findProviderById(providerId);
@@ -77,8 +86,10 @@ export class ProviderSaveSubscriptionUseCase {
 
     async execute(data: ProviderSaveSubscriptionUseCaseRequestPayload): Promise<CommonResponse> {
         const { providerId, sessionId } = data;
-
         if (!providerId || !sessionId) throw new Error("Invalid request.");
+
+        Validator.validateObjectId(providerId, "providerId");
+        Validator.validateStripeSessionId(sessionId);
 
         const provider = await this.providerRepositoryImpl.findProviderById(providerId);
         if (!provider) throw new Error("User not found.");

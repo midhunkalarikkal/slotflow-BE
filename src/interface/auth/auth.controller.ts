@@ -1,3 +1,4 @@
+import { Types } from 'mongoose';
 import { Request, Response } from 'express';
 import { appConfig } from '../../config/env';
 import { HandleError } from '../../infrastructure/error/error';
@@ -13,6 +14,7 @@ import { LoginZodSchema, OTPVerificationZodSchema, RegisterZodSchema, ResendOTPZ
 
 const userRepositoryImpl = new UserRepositoryImpl();
 const providerRepositoryImpl = new ProviderRepositoryImpl();
+
 const loginUseCase = new LoginUseCase(userRepositoryImpl, providerRepositoryImpl);
 const registerUseCase = new RegisterUseCase(userRepositoryImpl, providerRepositoryImpl);
 const verifyOTPUseCase = new VerifyOTPUseCase(userRepositoryImpl, providerRepositoryImpl);
@@ -137,7 +139,7 @@ export class AuthController {
   async checkUserStatus(req: Request, res: Response) {
     try {
       const user = req.user;
-      const result = await this.checkUserStatusUseCase.execute(user.userOrProviderId, user.role);
+      const result = await this.checkUserStatusUseCase.execute({id: new Types.ObjectId(user.userOrProviderId), role: user.role});
       res.status(result.status).json(result);
     } catch (error) {
       HandleError.handle(error, res);

@@ -126,6 +126,13 @@ export class Validator {
         if (!/^[\w\d !"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~]{1,100}$/.test(providerExperience.trim())) throw new Error("Invalid experience. Provider experience should contain alphanumeric characters, spaces, and special characters, and be between 1 and 100 characters.");
     }
 
+    static validateServiceMode(value: string): void {
+        const serviceModes = ["online", "offline"];
+        if (!serviceModes.includes(value)) {
+            throw new Error("Invalid service mode.");
+        }
+    }
+
 
 
 
@@ -236,6 +243,14 @@ export class Validator {
             throw new Error("Max booking per month must be between 0 and 10000.");
     }
 
+    // Plan duration
+    static validatePlanDuration(value: string): void {
+        const durations = ["1 Month", "2 Month", "3 Month", "6 Month", "12 Months"];
+        if (!durations.includes(value)) {
+            throw new Error("Invalid duration.");
+        }
+    }
+
 
 
     // **** admin app service
@@ -251,7 +266,7 @@ export class Validator {
             throw new Error(`${label} must be a boolean.`);
     }
 
-    static validateObjectId(id: any, label = "ID"): void {
+    static validateObjectId(id: Types.ObjectId, label = "ID"): void {
         if (
             !Types.ObjectId.isValid(id) ||
             new Types.ObjectId(id).toString() !== id.toString()
@@ -259,4 +274,47 @@ export class Validator {
             throw new Error(`Invalid ${label}. Must be a valid ObjectId.`);
         }
     }
+
+    static validateDate(value: Date): void {
+        if (!(value instanceof Date) || isNaN(value.getTime())) {
+            throw new Error("Invalid date");
+        }
+    }
+
+    static validateRole(value: string): void {
+        const roles = ["ADMIN", "USER", "PROVIDER"];
+        if (!roles.includes(value)) {
+            throw new Error("Invalid role. Must be one of: Admin, User, Provider.");
+        }
+    }
+
+    static validateFile(file: Express.Multer.File): void {
+        if (!file) {
+            throw new Error("File is required.");
+        }
+
+        const allowedMimeTypes = ['image/jpeg', 'image/png'];
+        const maxSizeInBytes = 5 * 1024 * 1024;
+
+        if (!allowedMimeTypes.includes(file.mimetype)) {
+            throw new Error(`Invalid file type. Allowed types are: ${allowedMimeTypes.join(", ")}`);
+        }
+
+        if (file.size > maxSizeInBytes) {
+            throw new Error(`File size exceeds the maximum limit of ${maxSizeInBytes / (1024 * 1024)} MB.`);
+        }
+    }
+
+    static validateStripeSessionId(value: string): void {
+        if (typeof value !== "string" || !value.trim()) {
+            throw new Error("Payment Intent ID must be a non-empty string.");
+        }
+
+        // Stripe Payment Intent ID pattern
+        const pattern = /^pi_[a-zA-Z0-9]+$/;
+        if (!pattern.test(value)) {
+            throw new Error("Invalid Stripe Payment Intent ID format.");
+        }
+    }
+
 }

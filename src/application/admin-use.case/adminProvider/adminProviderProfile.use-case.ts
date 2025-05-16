@@ -1,33 +1,55 @@
-import { Types } from "mongoose";
 import { generateSignedUrl } from "../../../config/aws_s3";
+import { Validator } from "../../../infrastructure/validator/validator";
 import { AddressRepositoryImpl } from "../../../infrastructure/database/address/address.repository.impl";
 import { PaymentRepositoryImpl } from "../../../infrastructure/database/payment/payment.repository.impl";
 import { ProviderRepositoryImpl } from "../../../infrastructure/database/provider/provider.repository.impl";
 import { SubscriptionRepositoryImpl } from "../../../infrastructure/database/subscription/subscription.repository.impl";
 import { ProviderServiceRepositoryImpl } from "../../../infrastructure/database/providerService/providerService.repository.impl";
 import { ServiceAvailabilityRepositoryImpl } from "../../../infrastructure/database/serviceAvailability/serviceAvailability.repository.impl";
-import { AdminFetchProviderAddressRequestPayload, AdminFetchProviderAddressResProps, AdminFetchProviderDetailsRequestPayload, AdminFetchProviderDetailsResProps, AdminFetchProviderPaymentsRequestPayload, AdminFetchProviderPaymentsResProps, AdminFetchProviderServiceAvailabilityRequestPayload, AdminFetchProviderServiceAvailabilityResProps, AdminFetchProviderServiceResProps, AdminFetchProviderServiceResRequestPayload, AdminFetchProviderSubscriptionsRequestPayload, AdminFetchProviderSubscriptionsResProps, FindProviderServiceResProps } from "../../../infrastructure/dtos/admin.dto";
+import { 
+    FindProviderServiceResProps, 
+    AdminFetchProviderServiceUseCaseResponse, 
+    AdminFetchProviderAddressUseCaseResponse, 
+    AdminFetchProviderDetailsUseCaseResponse, 
+    AdminFetchProviderPaymentsUseCaseResponse, 
+    AdminFetchProviderDetailsUseCaseRequestPayload, 
+    AdminFetchProviderAddressUseCaseRequestPayload, 
+    AdminFetchProviderServiceUseCaseRequestPayload, 
+    AdminFetchProviderSubscriptionsUseCaseResponse, 
+    AdminFetchProviderPaymentsUseCaseRequestPayload, 
+    AdminFetchProviderServiceAvailabilityUseCaseResponse, 
+    AdminFetchProviderSubscriptionsUseCaseRequestPayload, 
+    AdminFetchProviderServiceAvailabilityUseCaseRequestPayload, 
+} from "../../../infrastructure/dtos/admin.dto";
 
 
 export class AdminFetchProviderDetailsUseCase {
     constructor(private providerRepository: ProviderRepositoryImpl) { }
 
-    async execute({providerId}: AdminFetchProviderDetailsRequestPayload): Promise<AdminFetchProviderDetailsResProps> {
+    async execute(data: AdminFetchProviderDetailsUseCaseRequestPayload): Promise<AdminFetchProviderDetailsUseCaseResponse> {
+        const { providerId } = data;
         if (!providerId) throw new Error("Invalid request.");
-        const providerData = await this.providerRepository.findProviderById(new Types.ObjectId(providerId));
+
+        Validator.validateObjectId(providerId, "providerId");
+
+        const providerData = await this.providerRepository.findProviderById(providerId);
         if (providerData == null) return { success: true, message: "Provider details fetched", provider: {} };
         const { addressId, subscription, serviceId, serviceAvailabilityId, verificationToken, password, updatedAt, ...provider } = providerData;
         return { success: true, message: "Provider details fetched", provider };
     }
 }
 
+
 export class AdminFetchProviderAddressUseCase {
     constructor(
         private providerRepository: ProviderRepositoryImpl,
         private addressRepository: AddressRepositoryImpl,) { }
 
-    async execute({providerId}: AdminFetchProviderAddressRequestPayload): Promise<AdminFetchProviderAddressResProps> {
+    async execute(data: AdminFetchProviderAddressUseCaseRequestPayload): Promise<AdminFetchProviderAddressUseCaseResponse> {
+        const { providerId } = data;
         if (!providerId) throw new Error("Invalid request.");
+
+        Validator.validateObjectId(providerId, "providerId");
 
         const provider = await this.providerRepository.findProviderById(providerId);
         if(!provider) throw new Error("No user found.");
@@ -40,15 +62,18 @@ export class AdminFetchProviderAddressUseCase {
     }
 }
 
+
 export class AdminFetchProviderServiceUseCase {
     constructor(
         private providerRepository: ProviderRepositoryImpl,
         private providerServiceRepository: ProviderServiceRepositoryImpl,
     ) { }
 
-    async execute({providerId}: AdminFetchProviderServiceResRequestPayload): Promise<AdminFetchProviderServiceResProps> {
-        console.log("Fetching service details");
+    async execute(data: AdminFetchProviderServiceUseCaseRequestPayload): Promise<AdminFetchProviderServiceUseCaseResponse> {
+        const { providerId } = data;
         if (!providerId) throw new Error("Invalid request.");
+
+        Validator.validateObjectId(providerId, "providerId");
 
         const provider = await this.providerRepository.findProviderById(providerId);
         if(!provider) throw new Error("No user found.");
@@ -81,58 +106,70 @@ export class AdminFetchProviderServiceUseCase {
     }
 }
 
+
 export class AdminfetchProviderServiceAvailabilityUseCase {
     constructor(
-        private providerRepository: ProviderRepositoryImpl,
-        private serviceAvailabilityRepository: ServiceAvailabilityRepositoryImpl,
+        private providerRepositoryImpl: ProviderRepositoryImpl,
+        private serviceAvailabilityRepositoryImpl: ServiceAvailabilityRepositoryImpl,
     ) { }
 
-    async execute({providerId, date} : AdminFetchProviderServiceAvailabilityRequestPayload): Promise<AdminFetchProviderServiceAvailabilityResProps> {
-
+    async execute(data : AdminFetchProviderServiceAvailabilityUseCaseRequestPayload): Promise<AdminFetchProviderServiceAvailabilityUseCaseResponse> {
+        const { providerId, date } = data;
         if (!providerId || !date) throw new Error("Invalid request.");
 
-        const provider = await this.providerRepository.findProviderById(providerId);
+        Validator.validateObjectId(providerId, "providerId");
+        Validator.validateDate(date);
+
+        const provider = await this.providerRepositoryImpl.findProviderById(providerId);
         if(!provider) throw new Error("No user found.");
 
-        const availability = await this.serviceAvailabilityRepository.findServiceAvailabilityByProviderId(providerId, date);
+        const availability = await this.serviceAvailabilityRepositoryImpl.findServiceAvailabilityByProviderId(providerId, date);
         if (availability == null) return { success: true, message: "Service availability fetched successfully.", availability: {} };
 
         return { success: true, message: "Service availability fetched successfully.", availability };
     }
 }
 
+
 export class AdminFetchProviderSubscriptionsUseCase {
     constructor(
-        private providerRepository: ProviderRepositoryImpl,
-        private subscriptionRepository: SubscriptionRepositoryImpl,
+        private providerRepositoryImpl: ProviderRepositoryImpl,
+        private subscriptionRepositoryImpl: SubscriptionRepositoryImpl,
     ) { }
 
-    async execute({providerId}: AdminFetchProviderSubscriptionsRequestPayload): Promise<AdminFetchProviderSubscriptionsResProps> {
+    async execute(data: AdminFetchProviderSubscriptionsUseCaseRequestPayload): Promise<AdminFetchProviderSubscriptionsUseCaseResponse> {
+        const { providerId } = data;
         if(!providerId) throw new Error("Invalid request.");
 
-        const provider = await this.providerRepository.findProviderById(providerId);
+        Validator.validateObjectId(providerId, "providerId");
+
+        const provider = await this.providerRepositoryImpl.findProviderById(providerId);
         if(!provider) throw new Error("No user found.");
 
-        const subscriptions = await this.subscriptionRepository.findSubscriptionsByProviderId(providerId);
+        const subscriptions = await this.subscriptionRepositoryImpl.findSubscriptionsByProviderId(providerId);
         if(!subscriptions) throw new Error("Subscriptions fetching error.");
 
         return { success: true, message: "Subscriptions fetched successfully.", subscriptions };
     }
 }
 
+
 export class AdminFetchProviderPaymentsUseCase {
     constructor(
-        private providerRepository: ProviderRepositoryImpl,
-        private paymentRepository: PaymentRepositoryImpl,
+        private providerRepositoryImpl: ProviderRepositoryImpl,
+        private paymentRepositoryImpl: PaymentRepositoryImpl,
     ) { }
 
-    async execute({providerId}: AdminFetchProviderPaymentsRequestPayload): Promise<AdminFetchProviderPaymentsResProps> {
+    async execute(data: AdminFetchProviderPaymentsUseCaseRequestPayload): Promise<AdminFetchProviderPaymentsUseCaseResponse> {
+        const { providerId } = data;
         if(!providerId) throw new Error("Invalid request.");
 
-        const provider = await this.providerRepository.findProviderById(providerId);
+        Validator.validateObjectId(providerId, "providerId");
+
+        const provider = await this.providerRepositoryImpl.findProviderById(providerId);
         if(!provider) throw new Error("No user found.");
 
-        const payments = await this.paymentRepository.findAllPaymentsByProviderId(providerId);
+        const payments = await this.paymentRepositoryImpl.findAllPaymentsByProviderId(providerId);
         if(!payments) throw new Error("Payments fetching error.");
         
         return { success: true, message: "Payments fetched successfully.", payments };

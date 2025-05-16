@@ -1,6 +1,10 @@
 import { Validator } from "../../infrastructure/validator/validator";
 import { UserRepositoryImpl } from "../../infrastructure/database/user/user.repository.impl";
-import { AdminChangeUserIsBlockedStatusUseCaseRequestPayload, AdminChangeUserStatusUseCaseResponse, AdminUsersListUseCaseResponse } from "../../infrastructure/dtos/admin.dto";
+import { 
+    AdminUsersListUseCaseResponse, 
+    AdminChangeUserStatusUseCaseResponse, 
+    AdminChangeUserIsBlockedStatusUseCaseRequestPayload, 
+} from "../../infrastructure/dtos/admin.dto";
 
 export class AdminUserListUseCase {
     constructor(private userRepositoryImpl: UserRepositoryImpl) { }
@@ -17,11 +21,11 @@ export class AdminChangeUserStatusUseCase {
 
     async execute(data: AdminChangeUserIsBlockedStatusUseCaseRequestPayload): Promise<AdminChangeUserStatusUseCaseResponse> {
         const {userId, isBlocked} = data;
+        if (!userId || isBlocked === null) throw new Error("Invalid request");
 
-        Validator.validateObjectId(userId);
+        Validator.validateObjectId(userId, "userId");
         Validator.validateBooleanValue(isBlocked, "isBlocked");
 
-        if (!userId || isBlocked === null) throw new Error("Invalid request");
         const user = await this.userRepositoryImpl.findUserById(userId);
         if(!user) throw new Error("No user found.");
         user.isBlocked = isBlocked;

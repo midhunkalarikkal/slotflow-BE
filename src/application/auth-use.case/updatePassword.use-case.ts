@@ -16,6 +16,7 @@ export class UpdatePasswordUseCase {
         if(!role || !verificationToken || !password)throw new Error("Invalid Request");
 
         Validator.validatePassword(password);
+        Validator.validateRole(role);
 
         const hashedPassword = await PasswordHasher.hashPassword(password);
 

@@ -1,11 +1,16 @@
-import { Types } from "mongoose";
 import { S3Client } from "@aws-sdk/client-s3";
 import { Upload } from "@aws-sdk/lib-storage";
 import { aws_s3Config } from "../../config/env";
 import { generateSignedUrl } from "../../config/aws_s3";
 import { extractS3Key } from "../../infrastructure/helpers/helper";
+import { Validator } from "../../infrastructure/validator/validator";
 import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/provider.repository.impl";
-import { ProviderFetchProfileDetailsUseCaseRequestPayload, ProviderFetchProfileDetailsUseCaseResponse, ProviderUpdateprofileImageRequestPayload, ProviderUpdateprofileImageResponse } from "../../infrastructure/dtos/provider.dto";
+import { 
+    ProviderUpdateprofileImageResponse, 
+    ProviderUpdateprofileImageRequestPayload, 
+    ProviderFetchProfileDetailsUseCaseResponse, 
+    ProviderFetchProfileDetailsUseCaseRequestPayload, 
+} from "../../infrastructure/dtos/provider.dto";
 
 
 export class ProviderFetchProfileDetailsUseCase {
@@ -14,6 +19,9 @@ export class ProviderFetchProfileDetailsUseCase {
     async execute(data: ProviderFetchProfileDetailsUseCaseRequestPayload): Promise<ProviderFetchProfileDetailsUseCaseResponse> {
         const { providerId } = data;
         if (!providerId) throw new Error("Invalid request.");
+
+        Validator.validateObjectId(providerId, "providerId");
+
         const provider = await this.providerRepositoryImpl.findProviderById(providerId);
         if(provider === null) return { success: true, message: "Provider prfile not addedd.", profileDetails: {} };
         if (!provider) throw new Error("Provider profile fetching error.");
@@ -32,6 +40,9 @@ export class ProviderUpdateProfileImageUseCase {
     async execute(data: ProviderUpdateprofileImageRequestPayload): Promise<ProviderUpdateprofileImageResponse> {
         const { providerId, file } = data;
         if (!providerId || !file) throw new Error("Invalid request.");
+
+        Validator.validateObjectId(providerId, "providerId");
+        Validator.validateFile(file);
 
         const provider = await this.providerRepositoryImpl.findProviderById(providerId);
         if (!provider) throw new Error("No user found, please try again.");

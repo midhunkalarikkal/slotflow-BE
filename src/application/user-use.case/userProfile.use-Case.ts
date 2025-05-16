@@ -1,11 +1,16 @@
-import { Types } from "mongoose";
 import { S3Client } from "@aws-sdk/client-s3";
 import { Upload } from "@aws-sdk/lib-storage";
 import { aws_s3Config } from "../../config/env";
 import { generateSignedUrl } from "../../config/aws_s3";
 import { extractS3Key } from "../../infrastructure/helpers/helper";
+import { Validator } from "../../infrastructure/validator/validator";
 import { UserRepositoryImpl } from "../../infrastructure/database/user/user.repository.impl";
-import { UserFetchProfileDetails, UserFetchProfileUseCaseRequestPayload, UserUpdateProfileImageResProps, UsrUpdateProfileImageUseCaseRequestPayload } from "../../infrastructure/dtos/user.dto";
+import { 
+    UserFetchProfileDetails, 
+    UserUpdateProfileImageResProps, 
+    UserFetchProfileUseCaseRequestPayload, 
+    UsrUpdateProfileImageUseCaseRequestPayload, 
+} from "../../infrastructure/dtos/user.dto";
 
 
 export class UserFetchProfileDetailsUseCase {
@@ -14,6 +19,9 @@ export class UserFetchProfileDetailsUseCase {
     async execute(data: UserFetchProfileUseCaseRequestPayload): Promise<UserFetchProfileDetails> {
         const { userId } = data;
         if (!userId) throw new Error("Invalid request.");
+
+        Validator.validateObjectId(userId, "userId");
+        
         const user = await this.userRepositoryImpl.findUserById(userId);
         if (!user) throw new Error("User not found.");
         const { _id, password, profileImage, updatedAt, addressId, bookingsId, verificationToken, ...rest } = user;
@@ -30,6 +38,10 @@ export class UserUpdateProfileImageUseCase {
     async execute(data: UsrUpdateProfileImageUseCaseRequestPayload): Promise<UserUpdateProfileImageResProps> {
         const { userId, file} = data;
         if (!userId || !file) throw new Error("Invalid request.");
+
+        Validator.validateObjectId(userId, "userId");
+        Validator.validateFile(file);
+
         const user = await this.userRepositoryImpl.findUserById(userId);
         if (!user) throw new Error("User not found.");
         try {

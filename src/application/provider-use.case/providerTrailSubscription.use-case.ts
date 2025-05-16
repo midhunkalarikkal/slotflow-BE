@@ -5,6 +5,7 @@ import { PlanRepositoryImpl } from "../../infrastructure/database/plan/plan.repo
 import { ProviderTrialSubscriptionUseCaseRequestPayload } from "../../infrastructure/dtos/provider.dto";
 import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/provider.repository.impl";
 import { SubscriptionRepositoryImpl } from "../../infrastructure/database/subscription/subscription.repository.impl";
+import { Validator } from "../../infrastructure/validator/validator";
 
 export class ProviderTrialSubscriptionUseCase {
     constructor(
@@ -15,8 +16,10 @@ export class ProviderTrialSubscriptionUseCase {
 
     async execute(data: ProviderTrialSubscriptionUseCaseRequestPayload): Promise<CommonResponse> {
         const { providerId } = data;
-
         if (!providerId) throw new Error("Invalid request.");
+
+        Validator.validateObjectId(providerId, "providerId");
+        
         const provider = await this.providerRepositoryImpl.findProviderById(providerId);
         if (!provider) throw new Error("User not found.");
         

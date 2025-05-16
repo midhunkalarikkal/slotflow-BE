@@ -1,6 +1,10 @@
 import { Validator } from "../../infrastructure/validator/validator";
 import { SubscriptionRepositoryImpl } from "../../infrastructure/database/subscription/subscription.repository.impl";
-import { AdminFetchAllSubscriptionsUseCaseResponse, AdminFetchSubscriptionDetailsUseCaseRequestPayload, AdminFetchSubscriptionDetailsUseCaseResponse } from "../../infrastructure/dtos/admin.dto";
+import { 
+    AdminFetchAllSubscriptionsUseCaseResponse, 
+    AdminFetchSubscriptionDetailsUseCaseResponse, 
+    AdminFetchSubscriptionDetailsUseCaseRequestPayload, 
+} from "../../infrastructure/dtos/admin.dto";
 
 export class AdminFetchAllSubscriptionsUseCase {
     constructor(
@@ -21,10 +25,10 @@ export class AdminFetchSubscriptionDetailsUseCase {
 
     async execute(data: AdminFetchSubscriptionDetailsUseCaseRequestPayload): Promise<AdminFetchSubscriptionDetailsUseCaseResponse> {
         const { subscriptionId } = data;
-        
-        Validator.validateObjectId(subscriptionId);
-
         if(!subscriptionId) throw new Error("Invalid request.");
+        
+        Validator.validateObjectId(subscriptionId, "subscriptionId");
+
         const subscriptionDetails = await this.subscriptionRepositoryImpl.findSubscriptionFullDetails(subscriptionId);
         if (Object.keys(subscriptionDetails).length === 0) return { success: true, message: "Subscription details not found.", subscriptionDetails : {}};
         return { success: true, message: "Subscription details fetched successfully.", subscriptionDetails};

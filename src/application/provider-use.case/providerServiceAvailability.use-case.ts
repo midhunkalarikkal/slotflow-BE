@@ -4,7 +4,11 @@ import { CommonResponse } from "../../infrastructure/dtos/common.dto";
 import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/provider.repository.impl";
 import { FrontendAvailabilityForRequest, TimeSlot } from "../../domain/entities/serviceAvailability.entity";
 import { ServiceAvailabilityRepositoryImpl } from "../../infrastructure/database/serviceAvailability/serviceAvailability.repository.impl";
-import { ProviderAddServiceAvailabilityUseCaseRewuestPayload, ProviderFetchServiceAvailabilityUseCaseRequestPayload, ProviderFetchServiceAvailabilityUseCaseResponse } from "../../infrastructure/dtos/provider.dto";
+import { 
+    ProviderFetchServiceAvailabilityUseCaseResponse, 
+    ProviderAddServiceAvailabilityUseCaseRewuestPayload, 
+    ProviderFetchServiceAvailabilityUseCaseRequestPayload, 
+} from "../../infrastructure/dtos/provider.dto";
 
 export class ProviderAddServiceAvailabilitiesUseCase {
     constructor(
@@ -14,8 +18,9 @@ export class ProviderAddServiceAvailabilitiesUseCase {
 
     async execute(data: ProviderAddServiceAvailabilityUseCaseRewuestPayload): Promise<CommonResponse> {
         const { providerId, availabilities } = data;
-
         if(!providerId || !availabilities || availabilities.length  === 0) throw new Error("Invalid request.");
+
+        Validator.validateObjectId(providerId, "providerId");
 
         const convertedProviderId = new Types.ObjectId(providerId);
         const provider = await this.providerRepositoryImpl.findProviderById(new Types.ObjectId(providerId));
@@ -55,8 +60,11 @@ export class ProviderFetchServiceAvailabilityUseCase {
 
     async execute(data: ProviderFetchServiceAvailabilityUseCaseRequestPayload): Promise<ProviderFetchServiceAvailabilityUseCaseResponse> {
         const { providerId, date } = data;
-        
         if (!providerId || !date) throw new Error("Invalid request.");
+
+        Validator.validateObjectId(providerId, "providerId");
+        Validator.validateDate(date);
+
         const availability = await this.serviceAvailabilityRepositoryImpl.findServiceAvailabilityByProviderId(new Types.ObjectId(providerId), new Date(date));
         if(availability === null) return { success: true, message: "Provider service availability not yet added.", availability: {} };
         if (!availability) throw new Error("Provider service availability fetching error.");

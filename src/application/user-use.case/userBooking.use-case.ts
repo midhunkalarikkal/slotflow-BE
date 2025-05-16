@@ -1,5 +1,6 @@
 import Stripe from "stripe";
 import mongoose, { Types } from "mongoose";
+import { Validator } from "../../infrastructure/validator/validator";
 import { AppointmentStatus } from "../../domain/entities/booking.entity";
 import { UserRepositoryImpl } from "../../infrastructure/database/user/user.repository.impl";
 import { BookingRepositoryImpl } from "../../infrastructure/database/booking/booking.repository.impl";
@@ -23,6 +24,8 @@ export class UserFetchBookingsUseCase {
         const { userId } = data;
         if (!userId) throw new Error("Invalid request");
 
+        Validator.validateObjectId(userId, "userId");
+
         const bookings = await this.bookingRepositoryImpl.findAllBookingsUsingUserId(userId);
         if (!bookings) throw new Error("Bookings fetching error");
 
@@ -41,6 +44,9 @@ export class UserCancelBookingUseCase {
     async execute(data: UserCancelBookingUseCaseRequestPayload): Promise<UserCancelBookingUseCaseResProps> {
         const { userId, bookingId } = data;
         if (!userId || !bookingId) throw new Error("Invalid request");
+
+        Validator.validateObjectId(userId, "userId");
+        Validator.validateObjectId(bookingId, "bookingId");
 
         const user = await this.userRepositoryImpl.findUserById(new Types.ObjectId(userId));
         if (!user) throw new Error("No user found");

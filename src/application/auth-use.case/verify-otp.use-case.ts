@@ -11,9 +11,10 @@ export class VerifyOTPUseCase {
 
   async execute(data: OTPVerificationUseCaseRequestPayload): Promise<CommonResponse> {
     const { otp, verificationToken, role } = data;
-
     if(!otp || !verificationToken || !role) throw new Error("Invalid request.");
+    
     Validator.validateOtp(otp);
+    Validator.validateRole(role);
 
     const isValidOTP = OTPService.verifyOTP(verificationToken, otp);
     if (!isValidOTP) throw new Error("Invalid or expired OTP.");  

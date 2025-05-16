@@ -1,3 +1,4 @@
+import { Types } from "mongoose";
 import { User } from "../../domain/entities/user.entity";
 import { CommonResponse } from "./common.dto";
 
@@ -66,4 +67,16 @@ export interface UpdatePasswordUseCaseRequestPayload {
     role: string;
     verificationToken: string;
     password: string;
+}
+
+
+// **** Check status **** \\
+// check user status use case request payload interface
+export interface CheckUserStatusUseCaseRequestPayload {
+    id: Types.ObjectId;
+    role: string;
+}
+// check user status use case response interface
+export interface CheckUserStatusUseCaseResponse extends CommonResponse {
+    status: number;
 }

@@ -22,9 +22,10 @@ export class ResendOtpUseCase {
 
   async execute(data: ResendOtpUseCaseRequestPayload): Promise<ResendOtpResProps> {
     const { role, verificationToken, email } = data;
-    
     if(!role || (!verificationToken && !email)) throw new Error("Invalid request.");
+
     if(email) Validator.validateEmail(email);
+    Validator.validateRole(role);
 
     let userOrProvider: Provider | User | null = null;
 

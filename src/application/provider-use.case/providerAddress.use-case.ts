@@ -17,8 +17,8 @@ export class ProviderAddAddressUseCase {
 
     async execute(data: ProvideAddAddressUseCaseRequestPayload): Promise<CommonResponse> {
         const { providerId, addressLine, phone, place, city, district, pincode, state, country, googleMapLink } = data;
-        
         if(!providerId || !addressLine || !phone || !place || !city || !district || !pincode || !state || !country || !googleMapLink) throw new Error("Invalid request.");
+
         Validator.validateAddressLine(addressLine);
         Validator.validatePhone(phone);
         Validator.validatePlace(place);
@@ -51,6 +51,9 @@ export class ProviderFetchAddressUseCase {
 
     async execute(data: ProviderFetchAddressUseCaseRequestPayload): Promise<ProviderFetchAddressUseCaseResponse> {
         const { providerId } = data;
+
+        Validator.validateObjectId(providerId, "providerId");
+        
         if (!providerId) throw new Error("Invalid request.");
         const address = await this.addressRepositoryImpl.findAddressByUserId(providerId);
         if(address === null) return { success: true, message: "Provider address not yet addedd.", address: {} };

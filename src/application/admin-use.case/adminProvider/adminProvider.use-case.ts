@@ -29,10 +29,10 @@ export class AdminApproveProviderUseCase {
 
     async execute(data: AdminApproveProviderUseCaseRequestPayload): Promise<AdminApproveProviderUseCaseResponse> {
         const { providerId } = data;
+        if (!providerId) throw new Error("Invalid request");
 
         Validator.validateObjectId(providerId, "providerId");
 
-        if (!providerId) throw new Error("Invalid request");
         const provider = await this.providerRepositoryImpl.findProviderById(providerId);
         if (!provider) throw new Error("User not found.");
         if (provider.isAdminVerified) throw new Error("Provider is already verified.");
@@ -58,11 +58,11 @@ export class AdminChangeProviderStatusUseCase {
 
     async execute(data: AdminChangeProviderStatusUseCaseRequestPaylod): Promise<AdminChangeProviderStatusUseCaseResponse> {
         const { providerId, isBlocked } = data;
+        if (!providerId || isBlocked === null) throw new Error("Invalid request");
 
         Validator.validateObjectId(providerId, "providerId");
         Validator.validateBooleanValue(isBlocked, "isBlocked");
 
-        if (!providerId || isBlocked === null) throw new Error("Invalid request");
         const provider = await this.providerRepositoryImpl.findProviderById(providerId);
         if (!provider) throw new Error("User not found.");
         provider.isBlocked = isBlocked;
@@ -86,11 +86,11 @@ export class AdminChangeProviderTrustTagUseCase {
 
     async execute(data: AdminChangeProviderTrustTagUseCaseRequestPayload): Promise<AdminChangeProviderTrustTagUseCaseResponse> {
         const { providerId, trustedBySlotflow } = data;
+        if (!providerId || trustedBySlotflow === null) throw new Error("Invalid request");
 
         Validator.validateObjectId(providerId, "providerId");
         Validator.validateBooleanValue(trustedBySlotflow, "trustedBySlotflow");
 
-        if (!providerId || trustedBySlotflow === null) throw new Error("Invalid request");
         const provider = await this.providerRepositoryImpl.findProviderById(providerId);
         if (!provider) throw new Error("User not found.");
         provider.trustedBySlotflow = trustedBySlotflow;

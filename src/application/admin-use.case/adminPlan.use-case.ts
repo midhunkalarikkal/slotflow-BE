@@ -1,5 +1,5 @@
-import { Types } from "mongoose";
 import { PlanRepositoryImpl } from "../../infrastructure/database/plan/plan.repository.impl";
+import { Validator } from "../../infrastructure/validator/validator";
 import { 
     AdminPlanListUseCaseResponse, 
     AdminCreatePlanUseCaseResponse, 
@@ -7,7 +7,6 @@ import {
     AdminChangePlanStatusUseCaseResponse, 
     AdminChangePlanIsBlockedStatusUseCaseRequestPayload, 
 } from "../../infrastructure/dtos/admin.dto";
-import { Validator } from "../../infrastructure/validator/validator";
 
 
 export class AdminPlanListUseCase {
@@ -26,6 +25,7 @@ export class AdminCreatePlanUseCase {
 
     async execute(data : AdminAddNewPlanUseCaseRequestPayload): Promise<AdminCreatePlanUseCaseResponse> {
         const {planName, description, price, features, maxBookingPerMonth, adVisibility} = data;
+        if (!planName || !description || price < 0 || !features || maxBookingPerMonth < 0) throw new Error("Invalid plan data.");
 
         Validator.validatePlanName(planName);
         Validator.validatePlanDescription(description);
@@ -34,7 +34,6 @@ export class AdminCreatePlanUseCase {
         Validator.validatePlanMaxBookingPerMonth(maxBookingPerMonth);
         Validator.validateBooleanValue(adVisibility, "adVisibility");
 
-        if (!planName || !description || price < 0 || !features || maxBookingPerMonth < 0) throw new Error("Invalid plan data.");
         const existingPlan = await this.planRepositoryImpl.findPlanByNameOrPrice({planName, price});
         const responseText: string = existingPlan?.planName === planName ? "name" : "price"
         if(existingPlan) throw new Error(`Plan with same ${responseText} already exists.`);
@@ -56,15 +55,15 @@ export class AdminChangePlanStatusUseCase {
 
     async execute(data: AdminChangePlanIsBlockedStatusUseCaseRequestPayload): Promise<AdminChangePlanStatusUseCaseResponse> {
         const {planId, isBlocked} = data;
+        if(!planId || isBlocked === null) throw new Error("Invalid request");
 
         Validator.validateObjectId(planId, "PlanId");
         Validator.validateBooleanValue(isBlocked, "isBlocked");
         
-        if(!planId || status === null) throw new Error("Invalid request");
-        const existingPlan = await this.planRepositoryImpl.findPlanById(new Types.ObjectId(planId));
+        const existingPlan = await this.planRepositoryImpl.findPlanById(planId);
         if(!existingPlan) throw new Error("Plan does not exists.");
         existingPlan.isBlocked = isBlocked;
-        const updatedPlan = await this.planRepositoryImpl.updatePlan(new Types.ObjectId(planId), existingPlan);
+        const updatedPlan = await this.planRepositoryImpl.updatePlan(planId, existingPlan);
         if(!updatedPlan) throw new Error("Plan status changing failed.");
         const updatedPlanDatadata = {
             _id: updatedPlan._id,
