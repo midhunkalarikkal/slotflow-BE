@@ -109,8 +109,6 @@ export class Validator {
 
     // Service price
     static validateServicePrice(servicePrice: number): void {
-        console.log("servicePrice : ",servicePrice);
-        console.log("type of servicePrice : ",typeof servicePrice);
         if (servicePrice < 1 || servicePrice > 10000000) throw new Error("Invalid service price. Service price must be between 1 and 10000000.");
     }
 

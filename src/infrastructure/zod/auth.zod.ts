@@ -20,7 +20,7 @@ const ResendOTPZodSchema = z.object({
 });
 
 const LoginZodSchema = z.object({
-    email: z.string().email().optional(),
+    email: z.string().email(),
     password: z.string().min(8),
     role: z.enum(["USER", "PROVIDER"]),
 });

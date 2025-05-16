@@ -6,7 +6,7 @@ import { AddressRepositoryImpl } from "../../infrastructure/database/address/add
 import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/provider.repository.impl";
 import { ProviderServiceRepositoryImpl } from "../../infrastructure/database/providerService/providerService.repository.impl";
 import { ServiceAvailabilityRepositoryImpl } from "../../infrastructure/database/serviceAvailability/serviceAvailability.repository.impl";
-import { UserProviderControllerCommonZodSchema, UserFetchServiceAvailabilityQuerySchema, UserFetchAllProvidersZodSchema } from "../../infrastructure/zod/user.zod";
+import { UserProviderControllerCommonZodSchema, UserFetchAllProvidersZodSchema } from "../../infrastructure/zod/user.zod";
 import { 
     UserFetchServiceProvidersUseCase, 
     UserFetchServiceProviderAddressUseCase, 
@@ -14,6 +14,7 @@ import {
     UserFetchServiceProviderProfileDetailsUseCase, 
     UserFetchServiceProviderServiceAvailabilityUseCase, 
 } from "../../application/user-use.case/userProvider.use-case";
+import { DateOnlyZodSchema } from "../../infrastructure/zod/common.zod";
 
 const userRepositoryImpl = new UserRepositoryImpl();
 const addressRepositoryImpl = new AddressRepositoryImpl();
@@ -103,7 +104,7 @@ export class UserProviderController {
         try {
             const userId = req.user.userOrProviderId;
             const validateParams = UserProviderControllerCommonZodSchema.parse(req.params);
-            const validateQuery = UserFetchServiceAvailabilityQuerySchema.parse(req.query);
+            const validateQuery = DateOnlyZodSchema.parse(req.query);
             const { providerId } = validateParams;
             const { date } = validateQuery;
             if (!userId || !providerId || !date) throw new Error("Invalid request");

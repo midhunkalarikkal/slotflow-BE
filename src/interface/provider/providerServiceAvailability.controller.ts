@@ -3,6 +3,8 @@ import { HandleError } from "../../infrastructure/error/error";
 import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/provider.repository.impl";
 import { ServiceAvailabilityRepositoryImpl } from "../../infrastructure/database/serviceAvailability/serviceAvailability.repository.impl";
 import { ProviderAddServiceAvailabilitiesUseCase, ProviderFetchServiceAvailabilityUseCase } from "../../application/provider-use.case/providerServiceAvailability.use-case";
+import { Types } from "mongoose";
+import { DateOnlyZodSchema } from "../../infrastructure/zod/common.zod";
 
 const providerRepositoryImpl = new ProviderRepositoryImpl();
 const serviceAvailabilityRepositoryImpl = new ServiceAvailabilityRepositoryImpl();
@@ -24,7 +26,7 @@ class ProviderServiceAvailabilityController {
             const providerId = req.user.userOrProviderId;
             const availabilities = req.body;
             if(!providerId || !availabilities || availabilities.length  === 0) throw new Error("Invalid request.");
-            const result = await this.providerAddServiceAvailabilitiesUseCase.execute(providerId, availabilities);
+            const result = await this.providerAddServiceAvailabilitiesUseCase.execute({providerId: new Types.ObjectId(providerId), availabilities});
             res.status(200).json(result);
         }catch(error){
             HandleError.handle(error, res);
@@ -34,9 +36,10 @@ class ProviderServiceAvailabilityController {
     async getServiceAvailability(req: Request, res: Response) {
         try{
             const providerId = req.user.userOrProviderId;
-            const date = req.query.date as string;
+            const validateQuery = DateOnlyZodSchema.parse(req.query);
+            const { date } = validateQuery;
             if(!providerId || !date) throw new Error("Invalid request.");
-            const result = await this.providerFetchServiceAvailabilityUseCase.execute(providerId, date);
+            const result = await this.providerFetchServiceAvailabilityUseCase.execute({providerId: new Types.ObjectId(providerId), date: new Date(date)});
             res.status(200).json(result);
         }catch(error){
             HandleError.handle(error,res);

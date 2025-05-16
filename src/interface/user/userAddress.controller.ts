@@ -1,7 +1,7 @@
 import { Types } from "mongoose";
 import { Request, Response } from "express";
 import { HandleError } from "../../infrastructure/error/error";
-import { UserAddAddressZodSchema } from "../../infrastructure/zod/user.zod";
+import { AddAddressZodSchema } from "../../infrastructure/zod/common.zod";
 import { UserRepositoryImpl } from "../../infrastructure/database/user/user.repository.impl";
 import { AddressRepositoryImpl } from "../../infrastructure/database/address/address.repository.impl";
 import { UserAddAddressUseCase, UserFetchAddressUseCase } from "../../application/user-use.case/userAddress.use-case";
@@ -34,7 +34,7 @@ export class UserAddressController {
 
     async addAddress(req: Request, res: Response) {
         try{
-            const validateData = UserAddAddressZodSchema.parse(req.body)
+            const validateData = AddAddressZodSchema.parse(req.body)
             const userId = req.user.userOrProviderId;
             const { addressLine, phone, place, city, district, pincode, state,  country, googleMapLink } = validateData;
             if(!userId || !phone || !place || !city || !district || !pincode || !state || !country || !googleMapLink) throw new Error("Invalid request.");

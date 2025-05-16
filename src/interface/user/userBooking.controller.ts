@@ -1,15 +1,16 @@
 import { Types } from "mongoose";
 import { Request, Response } from "express";
 import { HandleError } from "../../infrastructure/error/error";
+import { SaveStripePaymentZodSchema } from "../../infrastructure/zod/common.zod";
 import { UserRepositoryImpl } from "../../infrastructure/database/user/user.repository.impl";
 import { PaymentRepositoryImpl } from "../../infrastructure/database/payment/payment.repository.impl";
 import { BookingRepositoryImpl } from "../../infrastructure/database/booking/booking.repository.impl";
 import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/provider.repository.impl";
 import { UserCancelBookingUseCase, UserFetchBookingsUseCase } from "../../application/user-use.case/userBooking.use-case";
 import { ProviderServiceRepositoryImpl } from "../../infrastructure/database/providerService/providerService.repository.impl";
+import { UserCancelBookingZodSchema, UserCreateSessionIdForbookingViaStripeZodSchema } from "../../infrastructure/zod/user.zod";
 import { ServiceAvailabilityRepositoryImpl } from "../../infrastructure/database/serviceAvailability/serviceAvailability.repository.impl";
 import { UserAppointmentBookingViaStripeUseCase, UserSaveBookingAfterStripePaymentUseCase } from "../../application/user-use.case/userStripeBooking.use-case";
-import { UserCancelBookingZodSchema, UserCreateSessionIdForbookingViaStripeZodSchema, UserSaveBookingAfterStripePaymentZodSchema } from "../../infrastructure/zod/user.zod";
 
 const userRepositoryImpl = new UserRepositoryImpl();
 const paymentRepositoryImpl = new PaymentRepositoryImpl();
@@ -82,7 +83,7 @@ export class UserBookingController {
     async saveBookingAfterStripePayment(req: Request, res: Response) {
         try {
             const userId = req.user.userOrProviderId;
-            const validateData = UserSaveBookingAfterStripePaymentZodSchema.parse(req.body);
+            const validateData = SaveStripePaymentZodSchema.parse(req.body);
             const { sessionId } = validateData;
             if(!userId || !sessionId) throw new Error("Invalid request");
             const result = await this.userSaveBookingAfterStripePaymentUseCase.execute({userId: new Types.ObjectId(userId), sessionId});

@@ -4,6 +4,7 @@ import { ServiceRepositoryImpl } from "../../infrastructure/database/appservice/
 import { ProviderFetchAllAppServicesUseCase } from "../../application/provider-use.case/providerAppServices.use-case";
 
 const serviceRepositoryImpl = new ServiceRepositoryImpl();
+
 const providerFetchAllServicesUseCase = new ProviderFetchAllAppServicesUseCase(serviceRepositoryImpl);
 
 class ProviderAppServiceController {

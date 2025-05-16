@@ -5,7 +5,6 @@ import { HandleError } from "../../infrastructure/error/error";
 import { UserRepositoryImpl } from "../../infrastructure/database/user/user.repository.impl";
 import { UserFetchProfileDetailsUseCase, UserUpdateProfileImageUseCase } from "../../application/user-use.case/userProfile.use-Case";
 
-
 const userRepositoryImpl = new UserRepositoryImpl();
 
 const userFetchProfileDetailsUseCase = new UserFetchProfileDetailsUseCase(userRepositoryImpl);

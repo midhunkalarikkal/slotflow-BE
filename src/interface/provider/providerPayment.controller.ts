@@ -1,11 +1,13 @@
+import { Types } from "mongoose";
 import { Request, Response } from "express";
 import { HandleError } from "../../infrastructure/error/error";
-import { ProviderFetchAllPaymentsUseCase } from "../../application/provider-use.case/providerPayment.use-case";
-import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/provider.repository.impl";
 import { PaymentRepositoryImpl } from "../../infrastructure/database/payment/payment.repository.impl";
+import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/provider.repository.impl";
+import { ProviderFetchAllPaymentsUseCase } from "../../application/provider-use.case/providerPayment.use-case";
 
-const providerRepositoryImpl = new ProviderRepositoryImpl();
 const paymentRepositoryImpl = new PaymentRepositoryImpl();
+const providerRepositoryImpl = new ProviderRepositoryImpl();
+
 const providerFetchAllPaymentsUseCase = new ProviderFetchAllPaymentsUseCase( providerRepositoryImpl,paymentRepositoryImpl )
 
 export class ProviderPaymentController {
@@ -19,7 +21,7 @@ export class ProviderPaymentController {
         try{
             const providerId = req.user.userOrProviderId;
             if(!providerId) throw new Error("Invalid requeest.");
-            const result = await this.providerFetchAllPaymentsUseCase.execute(providerId);
+            const result = await this.providerFetchAllPaymentsUseCase.execute({providerId: new Types.ObjectId(providerId)});
             res.status(200).json(result);
         }catch(error) {
             HandleError.handle(error,res);

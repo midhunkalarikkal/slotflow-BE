@@ -5,35 +5,39 @@ import { CommonResponse } from "../../infrastructure/dtos/common.dto";
 import { PlanRepositoryImpl } from "../../infrastructure/database/plan/plan.repository.impl";
 import { PaymentRepositoryImpl } from "../../infrastructure/database/payment/payment.repository.impl";
 import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/provider.repository.impl";
-import { ProviderStripeSubscriptionCreateSessionIdResProps } from "../../infrastructure/dtos/provider.dto";
 import { SubscriptionRepositoryImpl } from "../../infrastructure/database/subscription/subscription.repository.impl";
+import { ProviderSaveSubscriptionUseCaseRequestPayload, ProviderStripeSubscriptionCreateSessionIdUseCaseRequestPayload, ProviderStripeSubscriptionCreateSessionIdUseCaseResponse } from "../../infrastructure/dtos/provider.dto";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 export class ProviderStripeSubscriptionCreateSessionIdUseCase {
     constructor(
-            private planRepository: PlanRepositoryImpl,
-            private providerRepository: ProviderRepositoryImpl,
-            private subscriptionRepository: SubscriptionRepositoryImpl,
+            private planRepositoryImpl: PlanRepositoryImpl,
+            private providerRepositoryImpl: ProviderRepositoryImpl,
+            private subscriptionRepositoryImpl: SubscriptionRepositoryImpl,
         ) { }
     
-        async execute(providerId: string, planId: string, duration: string): Promise<ProviderStripeSubscriptionCreateSessionIdResProps> {
+        async execute(data: ProviderStripeSubscriptionCreateSessionIdUseCaseRequestPayload): Promise<ProviderStripeSubscriptionCreateSessionIdUseCaseResponse> {
+            const { providerId, planId, duration } = data;
+
             if (!providerId || !planId || !duration) throw new Error("Invalid request.");
             let planDuration: number = parseInt(duration.trim().split(" ")[0]);
     
-            const provider = await this.providerRepository.findProviderById(new Types.ObjectId(providerId));
+            const provider = await this.providerRepositoryImpl.findProviderById(providerId);
             if (!provider) throw new Error("No user found, please logout and try again.");
     
-            const plan = await this.planRepository.findPlanById(new Types.ObjectId(planId));
+            const plan = await this.planRepositoryImpl.findPlanById(planId);
             if (!plan) throw new Error("Unexpected error, please try again after sometimes.");
     
             const providerLastSubscriptionsId = provider.subscription.pop();
-    
-            const subscription = await this.subscriptionRepository.findSubscriptionById(providerLastSubscriptionsId!);
-            if(subscription){
-                if(subscription.subscriptionStatus === "Active") throw new Error("Your subscription is on live.");
-                const isSubscriptionExpired = dayjs().isAfter(dayjs(subscription.endDate), "day");
-                if(!isSubscriptionExpired) throw new Error("Your subscription is on live.");
+
+            if(providerLastSubscriptionsId) {   
+                const subscription = await this.subscriptionRepositoryImpl.findSubscriptionById(providerLastSubscriptionsId!);
+                if(subscription){
+                    if(subscription.subscriptionStatus === "Active") throw new Error("Your subscription is on live.");
+                    const isSubscriptionExpired = dayjs().isAfter(dayjs(subscription.endDate), "day");
+                    if(!isSubscriptionExpired) throw new Error("Your subscription is on live.");
+                }
             }
     
             const session = await stripe.checkout.sessions.create({
@@ -53,8 +57,8 @@ export class ProviderStripeSubscriptionCreateSessionIdUseCase {
                 success_url: `http://localhost:5173/provider/payment-success/?session_id={CHECKOUT_SESSION_ID}`,
                 cancel_url: `http://localhost:5173/provider/payment-failed/`,
                 metadata: {
-                    providerId: providerId,
-                    planId: planId,
+                    providerId: providerId.toString(),
+                    planId: planId.toString(),
                     planDuration: planDuration,
                     initialAmount: plan.price * planDuration * 100,
                     totalAmount: plan.price * planDuration * 100,
@@ -66,15 +70,17 @@ export class ProviderStripeSubscriptionCreateSessionIdUseCase {
 
 export class ProviderSaveSubscriptionUseCase {
     constructor(
-        private providerRepository: ProviderRepositoryImpl,
-        private paymentRepository: PaymentRepositoryImpl,
-        private subscriptionRepository: SubscriptionRepositoryImpl,
+        private providerRepositoryImpl: ProviderRepositoryImpl,
+        private paymentRepositoryImpl: PaymentRepositoryImpl,
+        private subscriptionRepositoryImpl: SubscriptionRepositoryImpl,
     ) { }
 
-    async execute(providerId: string, sessionId: string): Promise<CommonResponse> {
+    async execute(data: ProviderSaveSubscriptionUseCaseRequestPayload): Promise<CommonResponse> {
+        const { providerId, sessionId } = data;
+
         if (!providerId || !sessionId) throw new Error("Invalid request.");
 
-        const provider = await this.providerRepository.findProviderById(new Types.ObjectId(providerId));
+        const provider = await this.providerRepositoryImpl.findProviderById(providerId);
         if (!provider) throw new Error("User not found.");
 
         const session = await stripe.checkout.sessions.retrieve(sessionId);
@@ -94,7 +100,7 @@ export class ProviderSaveSubscriptionUseCase {
         mongoSession.startTransaction();
 
         try {
-            const payment = await this.paymentRepository.createPaymentForSubscription({
+            const payment = await this.paymentRepositoryImpl.createPaymentForSubscription({
                 transactionId: paymentIntent.toString(),
                 paymentStatus: paymentStatus,
                 paymentMethod: paymentType,
@@ -108,7 +114,7 @@ export class ProviderSaveSubscriptionUseCase {
 
             if (!payment) throw new Error("Unexpected error, payment saving error.");
 
-            const subscription = await this.subscriptionRepository.createSubscription({
+            const subscription = await this.subscriptionRepositoryImpl.createSubscription({
                 providerId: new Types.ObjectId(pId),
                 subscriptionPlanId: new Types.ObjectId(subscriptionPlanId),
                 startDate: new Date(),
@@ -121,7 +127,7 @@ export class ProviderSaveSubscriptionUseCase {
 
             provider.subscription.push(subscription._id);
 
-            const updatedProvider = await this.providerRepository.updateProvider(provider);
+            const updatedProvider = await this.providerRepositoryImpl.updateProvider(provider);
             if (!updatedProvider) throw new Error("Unexpected error, subscription adding error.");
 
             await mongoSession.commitTransaction();

@@ -1,20 +1,20 @@
-import { Types } from "mongoose";
-import { ProviderFetchProviderSubscriptionsResProps } from "../../infrastructure/dtos/provider.dto";
 import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/provider.repository.impl";
 import { SubscriptionRepositoryImpl } from "../../infrastructure/database/subscription/subscription.repository.impl";
+import { ProviderFetchProviderSubscriptionsUseCaseRequestPayload, ProviderFetchProviderSubscriptionsUseCaseResponse } from "../../infrastructure/dtos/provider.dto";
 
 
 export class ProviderFetchAllSubscriptionsUseCase {
     constructor(
-        private providerRepository: ProviderRepositoryImpl,
-        private subscriptionRepository: SubscriptionRepositoryImpl,
+        private providerRepositoryImpl: ProviderRepositoryImpl,
+        private subscriptionRepositoryImpl: SubscriptionRepositoryImpl,
     ) { }
 
-    async execute(providerId: string): Promise<ProviderFetchProviderSubscriptionsResProps> {
-        const provider = await this.providerRepository.findProviderById(new Types.ObjectId(providerId));
+    async execute(data: ProviderFetchProviderSubscriptionsUseCaseRequestPayload): Promise<ProviderFetchProviderSubscriptionsUseCaseResponse> {
+        const { providerId } = data;
+        const provider = await this.providerRepositoryImpl.findProviderById(providerId);
         if(!provider) throw new Error("Invalid request.");
 
-        const providerSubscriptions = await this.subscriptionRepository.findSubscriptionsByProviderId(new Types.ObjectId(providerId));
+        const providerSubscriptions = await this.subscriptionRepositoryImpl.findSubscriptionsByProviderId(providerId);
         if(!providerSubscriptions) throw new Error("Subscriptions fetching error.");
 
         return { success: true, message: "Fetched all subscriptions.", subscriptions: providerSubscriptions};

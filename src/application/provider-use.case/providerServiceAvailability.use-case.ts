@@ -1,22 +1,24 @@
 import { Types } from "mongoose";
 import { Validator } from "../../infrastructure/validator/validator";
 import { CommonResponse } from "../../infrastructure/dtos/common.dto";
-import { ProviderFetchServiceAvailabilityResProps } from "../../infrastructure/dtos/provider.dto";
 import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/provider.repository.impl";
 import { FrontendAvailabilityForRequest, TimeSlot } from "../../domain/entities/serviceAvailability.entity";
 import { ServiceAvailabilityRepositoryImpl } from "../../infrastructure/database/serviceAvailability/serviceAvailability.repository.impl";
+import { ProviderAddServiceAvailabilityUseCaseRewuestPayload, ProviderFetchServiceAvailabilityUseCaseRequestPayload, ProviderFetchServiceAvailabilityUseCaseResponse } from "../../infrastructure/dtos/provider.dto";
 
 export class ProviderAddServiceAvailabilitiesUseCase {
     constructor(
-        private providerRepository: ProviderRepositoryImpl,
-        private serviceAvailabilityRepository: ServiceAvailabilityRepositoryImpl,
+        private providerRepositoryImpl: ProviderRepositoryImpl,
+        private serviceAvailabilityRepositoryImpl: ServiceAvailabilityRepositoryImpl,
     ){}
 
-    async execute(providerId: string, availabilities: FrontendAvailabilityForRequest[]): Promise<CommonResponse> {
+    async execute(data: ProviderAddServiceAvailabilityUseCaseRewuestPayload): Promise<CommonResponse> {
+        const { providerId, availabilities } = data;
+
         if(!providerId || !availabilities || availabilities.length  === 0) throw new Error("Invalid request.");
 
         const convertedProviderId = new Types.ObjectId(providerId);
-        const provider = await this.providerRepository.findProviderById(new Types.ObjectId(providerId));
+        const provider = await this.providerRepositoryImpl.findProviderById(new Types.ObjectId(providerId));
         if(!provider) throw new Error("Please logout and try again.");
 
         availabilities.map((data) => {
@@ -34,12 +36,12 @@ export class ProviderAddServiceAvailabilitiesUseCase {
             }))
         }));
         
-        const serviceAvailability = await this.serviceAvailabilityRepository.createServiceAvailabilities(convertedProviderId, newAvailabilities)
+        const serviceAvailability = await this.serviceAvailabilityRepositoryImpl.createServiceAvailabilities(convertedProviderId, newAvailabilities)
         if(!serviceAvailability) throw new Error("Service availability adding failed.");
         
         if (provider && serviceAvailability && serviceAvailability._id) {
             provider.serviceAvailabilityId = serviceAvailability._id;
-            const updatedProvider = await this.providerRepository.updateProvider(provider);
+            const updatedProvider = await this.providerRepositoryImpl.updateProvider(provider);
             if (!updatedProvider) throw new Error("Failed to update provider with service availability ID.");
         }
 
@@ -49,11 +51,13 @@ export class ProviderAddServiceAvailabilitiesUseCase {
 
 
 export class ProviderFetchServiceAvailabilityUseCase {
-    constructor(private serviceAvailabilityRepository: ServiceAvailabilityRepositoryImpl) { }
+    constructor(private serviceAvailabilityRepositoryImpl: ServiceAvailabilityRepositoryImpl) { }
 
-    async execute(providerId: string, date: string): Promise<ProviderFetchServiceAvailabilityResProps> {
+    async execute(data: ProviderFetchServiceAvailabilityUseCaseRequestPayload): Promise<ProviderFetchServiceAvailabilityUseCaseResponse> {
+        const { providerId, date } = data;
+        
         if (!providerId || !date) throw new Error("Invalid request.");
-        const availability = await this.serviceAvailabilityRepository.findServiceAvailabilityByProviderId(new Types.ObjectId(providerId), new Date(date));
+        const availability = await this.serviceAvailabilityRepositoryImpl.findServiceAvailabilityByProviderId(new Types.ObjectId(providerId), new Date(date));
         if(availability === null) return { success: true, message: "Provider service availability not yet added.", availability: {} };
         if (!availability) throw new Error("Provider service availability fetching error.");
         return { success: true, message: "Provider service availability fetched.", availability };

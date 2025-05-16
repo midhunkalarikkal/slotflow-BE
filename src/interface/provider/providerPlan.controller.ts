@@ -1,9 +1,10 @@
 import { Request, Response } from "express";
 import { HandleError } from "../../infrastructure/error/error";
-import { ProviderFetchAllPlansUseCase } from "../../application/provider-use.case/providerPlan.use-case";
 import { PlanRepositoryImpl } from "../../infrastructure/database/plan/plan.repository.impl";
+import { ProviderFetchAllPlansUseCase } from "../../application/provider-use.case/providerPlan.use-case";
 
 const planRepositoryImpl = new PlanRepositoryImpl();
+
 const providerFetchAllPlansUseCase = new ProviderFetchAllPlansUseCase(planRepositoryImpl);
 
 export class ProviderPlanController {

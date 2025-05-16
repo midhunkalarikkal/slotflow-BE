@@ -6,12 +6,24 @@ import { Service } from "../../domain/entities/service.entity";
 import { Provider } from "../../domain/entities/provider.entity";
 import { Subscription } from "../../domain/entities/subscription.entity";
 import { ProviderService } from "../../domain/entities/providerService.entity";
-import { FontendAvailabilityForResponse } from "../../domain/entities/serviceAvailability.entity";
+import { FontendAvailabilityForResponse, FrontendAvailabilityForRequest } from "../../domain/entities/serviceAvailability.entity";
+import { Booking } from "../../domain/entities/booking.entity";
 
 // **** used in providerAddress.use-case **** \\
 
-// provider fetch address response props
-export interface ProviderFetchAddressResProps extends CommonResponse {
+// provider add address use case request payload type
+type AddAddressUseCaseRequestPayload = Pick<Address, "addressLine" | "place" | "phone" | "city" | "country" | "district" | "pincode" | "state" | "googleMapLink">;
+export interface ProvideAddAddressUseCaseRequestPayload extends AddAddressUseCaseRequestPayload {
+    providerId: Provider["_id"];
+}
+
+
+// provider fetch address use case request payload interface
+export interface ProviderFetchAddressUseCaseRequestPayload {
+    providerId: Provider["_id"];
+}
+// provider fetch address use case response interface
+export interface ProviderFetchAddressUseCaseResponse extends CommonResponse {
     address: Pick<Address, "_id" | "addressLine" | "phone" | "place" | "city" | "district" | "pincode" | "state" | "country" | "googleMapLink"> | {};
 }
 
@@ -32,8 +44,12 @@ export interface ProviderFetchAllAppServicesResProps extends CommonResponse {
 
 // **** used in providerPayment.use-case **** \\
 
-// provider fetch all payments response props 
-export interface ProviderFetchAllPaymentsResProps extends CommonResponse {
+// provider fetch all payments use case request interface
+export interface ProviderFetchAllPaymentUseCaseRequestPayload {
+    providerId: Provider["_id"];
+}
+// provider fetch all payments use case response interface 
+export interface ProviderFetchAllPaymentUseCaseResponse extends CommonResponse {
     payments: Array<Pick<Payment, "paymentStatus" | "paymentMethod" | "paymentGateway" | "paymentFor" | "discountAmount" | "totalAmount" | "createdAt" | "_id">> | [];
 }
 
@@ -43,8 +59,8 @@ export interface ProviderFetchAllPaymentsResProps extends CommonResponse {
 
 // **** used in providerPlan.use-case **** \\
 
-// provider fetch all plans response props
-export interface ProviderFetchAllPlansResProps extends CommonResponse {
+// provider fetch all plans use case response interface 
+export interface ProviderFetchAllPlansUseCaseResponse extends CommonResponse {
     plans: Array<Pick<Plan, "_id" | "planName" | "price" | "features" | "description">> | [];
 }
 
@@ -54,13 +70,23 @@ export interface ProviderFetchAllPlansResProps extends CommonResponse {
 
 // **** used in providerProfile.use-case **** \\
 
-// provider fetch profile detals response props
-export interface ProviderFetchProfileDetailsResProps extends CommonResponse {
+// provider fetch profile detals use case request payload interface
+export interface ProviderFetchProfileDetailsUseCaseRequestPayload {
+    providerId: Provider["_id"];
+}
+// provider fetch profile detals use case response interface
+export interface ProviderFetchProfileDetailsUseCaseResponse extends CommonResponse {
     profileDetails: Pick<Provider, "username" | "email" | "isAdminVerified" | "isBlocked" | "isEmailVerified" | "phone" | "createdAt"> | {};
 }
 
-// provider update profile image response props
-export interface ProviderUpdateprofileImageResProps extends CommonResponse, Pick<Provider, "profileImage"> { }
+
+// provider update profile image use case request payload interface
+export interface ProviderUpdateprofileImageRequestPayload {
+    providerId: Provider["_id"];
+    file: Express.Multer.File;
+}
+// provider update profile image use case response interface 
+export interface ProviderUpdateprofileImageResponse extends CommonResponse, Pick<Provider, "profileImage"> { }
 
 
 
@@ -68,12 +94,23 @@ export interface ProviderUpdateprofileImageResProps extends CommonResponse, Pick
 
 // **** used in providerService.use-case **** \\
 
-// provider
+// provider add service details use case request payload interface
+type AddServiceDetailsUseCaseRequestPayload = Pick<ProviderService, "providerId" | "serviceCategory" | "serviceName" | "serviceDescription" | "servicePrice" | "providerAdhaar" | "providerExperience">;
+export interface ProviderAddServiceDetailsUseCaseRequestPayload extends AddServiceDetailsUseCaseRequestPayload {
+        file: Express.Multer.File
+}
+
+
+// provider fetch service details use case request payload
+export interface ProviderFetchProviderServiceUseCaseRequestPayload {
+    providerId: Provider["_id"];
+}
+// provider fetch service details use case respomse interface
 type FindProviderServiceProps = Pick<ProviderService, "_id" | "serviceName" | "serviceDescription" | "servicePrice" | "providerAdhaar" | "providerExperience" | "providerCertificateUrl" | "updatedAt" | "createdAt">;
 export interface ProviderFindProviderServiceResProps extends FindProviderServiceProps {
     serviceCategory: Pick<Service, "serviceName">;
 }
-export interface ProviderFetchProviderServiceResProps extends CommonResponse {
+export interface ProviderFetchProviderServiceUseCaseResponse extends CommonResponse {
     service: ProviderFindProviderServiceResProps | {};
 }
 
@@ -83,8 +120,20 @@ export interface ProviderFetchProviderServiceResProps extends CommonResponse {
 
 // **** used in providerServiceAvailability **** \\
 
-//  provider fetch service availability response props
-export interface ProviderFetchServiceAvailabilityResProps extends CommonResponse {
+// provider add service availability use case reques tpayload
+export interface ProviderAddServiceAvailabilityUseCaseRewuestPayload {
+    providerId: Provider["_id"];
+    availabilities: FrontendAvailabilityForRequest[]
+}
+
+
+//  provider fetch service availability use case response interface 
+export interface ProviderFetchServiceAvailabilityUseCaseRequestPayload {
+    providerId: Provider["_id"];
+    date: Date
+}
+//  provider fetch service availability use case response interface 
+export interface ProviderFetchServiceAvailabilityUseCaseResponse extends CommonResponse {
     availability : FontendAvailabilityForResponse | {};
 }
 
@@ -94,9 +143,22 @@ export interface ProviderFetchServiceAvailabilityResProps extends CommonResponse
 
 // **** used in providerStripeSubscription.use-case **** \\
 
-// provider stripe subscription create sessionId
-export interface ProviderStripeSubscriptionCreateSessionIdResProps extends CommonResponse {
+// provider stripe subscription create sessionId use case  request payload interface
+export interface ProviderStripeSubscriptionCreateSessionIdUseCaseRequestPayload {
+    providerId: Provider["_id"];
+    planId: Plan["_id"];
+    duration: string;
+}
+// provider stripe subscription create sessionId use case response interface
+export interface ProviderStripeSubscriptionCreateSessionIdUseCaseResponse extends CommonResponse {
     sessionId : string
+}
+
+
+// provider save subscription after stripe payment use case request payload interface
+export interface ProviderSaveSubscriptionUseCaseRequestPayload {
+    providerId: Provider["_id"];
+    sessionId: string
 }
 
 
@@ -105,7 +167,11 @@ export interface ProviderStripeSubscriptionCreateSessionIdResProps extends Commo
 
 // **** used in providerSubscription.use-case **** \\
 
-// provider fetch subscriptions response props
+// provider fetch subscriptions use case request payload interface
+export interface ProviderFetchProviderSubscriptionsUseCaseRequestPayload {
+    providerId: Provider["_id"];
+}
+// provider fetch subscriptions use case response interface
 type SubscripionsResProps = Pick<Subscription, "startDate" | "endDate" | "subscriptionStatus">;
 interface AdminFetchProviderSubscriptions extends SubscripionsResProps {
     subscriptionPlanId?: {
@@ -113,8 +179,27 @@ interface AdminFetchProviderSubscriptions extends SubscripionsResProps {
         planName: string;
     };
 }
-export interface ProviderFetchProviderSubscriptionsResProps extends CommonResponse {
+export interface ProviderFetchProviderSubscriptionsUseCaseResponse extends CommonResponse {
     subscriptions: AdminFetchProviderSubscriptions[] | [];
 }
 
 
+// provider trial subscription use case reuest payload
+export interface ProviderTrialSubscriptionUseCaseRequestPayload {
+    providerId: Provider["_id"];
+}
+
+
+
+
+
+// **** used in providerBooking.use-case **** \\
+
+// provider fetch bookings use case request payload interface
+export interface ProviderFetchBookingAppointmentsUseCaseRequestPayload {
+    providerId: Provider['_id']
+}
+// provider fetch bookings use case response interface
+export interface ProviderFetchBookingAppointmentsUseCaseResponse extends CommonResponse {
+    bookingAppointments : Array<Pick<Booking, "_id" | "appointmentDate" | "appointmentMode" | "appointmentStatus" | "appointmentTime" | "createdAt" >>;
+}
