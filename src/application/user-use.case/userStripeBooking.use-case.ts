@@ -52,7 +52,8 @@ export class UserAppointmentBookingViaStripeUseCase {
         const providerServiceAvailability = await this.serviceAvailabilityRepositoryImpl.findServiceAvailabilityByProviderId(providerId, date);
         if (!providerServiceAvailability) throw new Error("No availability found");
 
-        const selectedSlot = providerServiceAvailability.slots.filter((slot) => slot._id === slotId);
+        const selectedSlot = providerServiceAvailability.slots.filter((slot) => slot._id.toString() === slotId.toString());
+        
         if (!selectedSlot || selectedSlot.length === 0) throw new Error("Not slot found");
 
         if (!selectedSlot[0].available) throw new Error("This slot is not available for today");

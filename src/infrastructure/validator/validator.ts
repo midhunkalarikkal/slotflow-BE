@@ -309,9 +309,8 @@ export class Validator {
         if (typeof value !== "string" || !value.trim()) {
             throw new Error("Payment Intent ID must be a non-empty string.");
         }
-
         // Stripe Payment Intent ID pattern
-        const pattern = /^pi_[a-zA-Z0-9]+$/;
+        const pattern = /^cs_test_[a-zA-Z0-9]+$/;
         if (!pattern.test(value)) {
             throw new Error("Invalid Stripe Payment Intent ID format.");
         }

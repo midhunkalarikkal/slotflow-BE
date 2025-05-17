@@ -19,5 +19,7 @@ export interface IBookingRepository {
 
     updateBooking(booking: Booking) : Promise<Booking | null>;
 
-    findAllBookingAppointmentsUsingProviderId(providerId: Types.ObjectId): Promise<Array<FindAllBookingAppointmentsUsingProviderIdResponseProps> | []>
+    findAllBookingAppointmentsUsingProviderId(providerId: Types.ObjectId): Promise<Array<FindAllBookingAppointmentsUsingProviderIdResponseProps> | []>;
+
+    findTodaysBookingForCronjob() : Promise<boolean> ;
 }

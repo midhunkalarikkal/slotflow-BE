@@ -63,9 +63,11 @@ export class UserBookingController {
     
     async createSessionIdForbookingViaStripe(req: Request, res: Response) {
         try {
+            console.log("create booking");
             const userId = req.user.userOrProviderId;
             const validateData = UserCreateSessionIdForbookingViaStripeZodSchema.parse(req.body);
             const { providerId, slotId, date, selectedServiceMode } = validateData;
+            console.log("validateData : ",validateData);
             if(!userId || !providerId || !slotId || !selectedServiceMode || !date) throw new Error("Invalid request");
             const result = await this.userAppointmentBookingViaStripeUseCase.execute({
                 userId: new Types.ObjectId(userId), 

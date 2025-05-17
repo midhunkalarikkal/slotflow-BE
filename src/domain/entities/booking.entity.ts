@@ -4,7 +4,8 @@ export enum AppointmentStatus {
     Booked = "Booked",
     Completed = "Completed",
     Cancelled = "Cancelled",
-    Rejected = "Rejected",
+    Rejected = "Rejected By Provider",
+    NotAttended = "Not Attended",
 }
 
 export class Booking {
