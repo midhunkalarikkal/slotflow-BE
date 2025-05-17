@@ -9,6 +9,7 @@ import {
     ProviderAddServiceAvailabilityUseCaseRewuestPayload, 
     ProviderFetchServiceAvailabilityUseCaseRequestPayload, 
 } from "../../infrastructure/dtos/provider.dto";
+import dayjs from "dayjs";
 
 export class ProviderAddServiceAvailabilitiesUseCase {
     constructor(
@@ -61,6 +62,8 @@ export class ProviderFetchServiceAvailabilityUseCase {
     async execute(data: ProviderFetchServiceAvailabilityUseCaseRequestPayload): Promise<ProviderFetchServiceAvailabilityUseCaseResponse> {
         const { providerId, date } = data;
         if (!providerId || !date) throw new Error("Invalid request.");
+        const currentDateTime = dayjs();
+        const selectedDate = dayjs(date).format('YYYY-MM-DD');
 
         Validator.validateObjectId(providerId, "providerId");
         Validator.validateDate(date);
@@ -68,6 +71,16 @@ export class ProviderFetchServiceAvailabilityUseCase {
         const availability = await this.serviceAvailabilityRepositoryImpl.findServiceAvailabilityByProviderId(new Types.ObjectId(providerId), new Date(date));
         if(availability === null) return { success: true, message: "Provider service availability not yet added.", availability: {} };
         if (!availability) throw new Error("Provider service availability fetching error.");
-        return { success: true, message: "Provider service availability fetched.", availability };
+
+        const updatedSlots = availability.slots.map((slot) => {
+              const slotDateTime = dayjs(`${selectedDate} ${slot.time}`, 'YYYY-MM-DD hh:mm A');
+              const isWithin2Hours = slotDateTime.diff(currentDateTime, 'minute') < 120;
+              return {
+                ...slot,
+                available: !isWithin2Hours
+              }
+            });
+            
+        return { success: true, message: "Provider service availability fetched.", availability: { ...availability, slots: updatedSlots } };
     }
 }

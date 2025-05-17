@@ -7,20 +7,21 @@ import { AddressRepositoryImpl } from "../../infrastructure/database/address/add
 import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/provider.repository.impl";
 import { ProviderServiceRepositoryImpl } from "../../infrastructure/database/providerService/providerService.repository.impl";
 import { ServiceAvailabilityRepositoryImpl } from "../../infrastructure/database/serviceAvailability/serviceAvailability.repository.impl";
-import { 
-  FindProviderServiceResProps, 
-  UserFetchProviderServiceUseCaseResponse, 
-  UserFetchServiceProvidersUseCaseResponse, 
-  FindProvidersUsingServiceCategoryIdsResProps, 
-  UserFetchServiceProviderAddressUseCaseResponse, 
-  UserFetchServiceProviderDetailsUseCaseResponse, 
-  UserFetchServiceProvidersUseCaseRequestPayload, 
-  UserFetchProviderServiceAvailabilityUseCaseResponse, 
-  UserFetchServiceProviderAddressUseCaseRequestPayload, 
-  UserFetchServiceProviderDetailsUseCaseRequestPayload, 
-  UserFetchServiceproviderServiceUsecaseRequestPayload, 
+import {
+  FindProviderServiceResProps,
+  UserFetchProviderServiceUseCaseResponse,
+  UserFetchServiceProvidersUseCaseResponse,
+  FindProvidersUsingServiceCategoryIdsResProps,
+  UserFetchServiceProviderAddressUseCaseResponse,
+  UserFetchServiceProviderDetailsUseCaseResponse,
+  UserFetchServiceProvidersUseCaseRequestPayload,
+  UserFetchProviderServiceAvailabilityUseCaseResponse,
+  UserFetchServiceProviderAddressUseCaseRequestPayload,
+  UserFetchServiceProviderDetailsUseCaseRequestPayload,
+  UserFetchServiceproviderServiceUsecaseRequestPayload,
   UserFetchProviderServiceAvailabilityUseCaseRequestPayload
 } from "../../infrastructure/dtos/user.dto";
+import dayjs from "dayjs";
 
 export class UserFetchServiceProvidersUseCase {
   constructor(
@@ -98,9 +99,9 @@ export class UserFetchServiceProviderAddressUseCase {
   ) { }
 
   async execute(data: UserFetchServiceProviderAddressUseCaseRequestPayload): Promise<UserFetchServiceProviderAddressUseCaseResponse> {
-    const { userId, providerId} = data;
+    const { userId, providerId } = data;
     if (!userId || !providerId) throw new Error("Invalid request");
-    
+
     Validator.validateObjectId(userId, "userId");
     Validator.validateObjectId(providerId, "providerId");
 
@@ -145,31 +146,42 @@ export class UserFetchServiceProviderServiceDetailsUseCase {
 
     const { serviceName, serviceDescription, servicePrice, providerExperience, serviceCategory } = serviceData;
 
-    return { success: true, message: "Service provider address fetched", service : { serviceName, serviceDescription, servicePrice, providerExperience, serviceCategory } }
+    return { success: true, message: "Service provider address fetched", service: { serviceName, serviceDescription, servicePrice, providerExperience, serviceCategory } }
   }
 }
 
 
 export class UserFetchServiceProviderServiceAvailabilityUseCase {
-    constructor(
-        private userRepositoryImpl: UserRepositoryImpl,
-        private serviceAvailabilityRepositoryImpl: ServiceAvailabilityRepositoryImpl,
-    ) { }
+  constructor(
+    private userRepositoryImpl: UserRepositoryImpl,
+    private serviceAvailabilityRepositoryImpl: ServiceAvailabilityRepositoryImpl,
+  ) { }
 
-    async execute(data: UserFetchProviderServiceAvailabilityUseCaseRequestPayload): Promise<UserFetchProviderServiceAvailabilityUseCaseResponse> {
-      const { userId, providerId, date } = data;
-        if (!userId || !providerId || !date) throw new Error("Invalid request.");
+  async execute(data: UserFetchProviderServiceAvailabilityUseCaseRequestPayload): Promise<UserFetchProviderServiceAvailabilityUseCaseResponse> {
+    const { userId, providerId, date } = data;
+    if (!userId || !providerId || !date) throw new Error("Invalid request.");
+    const currentDateTime = dayjs();
+    const selectedDate = dayjs(date).format('YYYY-MM-DD');
 
-        Validator.validateObjectId(userId, "userId");
-        Validator.validateObjectId(providerId, "providerId");
-        Validator.validateDate(date);
+    Validator.validateObjectId(userId, "userId");
+    Validator.validateObjectId(providerId, "providerId");
+    Validator.validateDate(date);
 
-        const user = await this.userRepositoryImpl.findUserById(new Types.ObjectId(userId));
-        if (!user) throw new Error("No user found");
+    const user = await this.userRepositoryImpl.findUserById(new Types.ObjectId(userId));
+    if (!user) throw new Error("No user found");
 
-        const availability = await this.serviceAvailabilityRepositoryImpl.findServiceAvailabilityByProviderId(new Types.ObjectId(providerId), date);
-        if (availability == null) return { success: true, message: "Service availability fetched successfully.", availability: {} };
+    const availability = await this.serviceAvailabilityRepositoryImpl.findServiceAvailabilityByProviderId(new Types.ObjectId(providerId), date);
+    if (availability == null) return { success: true, message: "Service availability fetched successfully.", availability: {} };
 
-        return { success: true, message: "Service availability fetched successfully.", availability };
-    }
+    const updatedSlots = availability.slots.map((slot) => {
+      const slotDateTime = dayjs(`${selectedDate} ${slot.time}`, 'YYYY-MM-DD hh:mm A');
+      const isWithin2Hours = slotDateTime.diff(currentDateTime, 'minute') < 120;
+      return {
+        ...slot,
+        available: !isWithin2Hours
+      }
+    });
+
+    return { success: true, message: "Service availability fetched successfully.", availability: { ...availability, slots: updatedSlots } };
+  }
 }

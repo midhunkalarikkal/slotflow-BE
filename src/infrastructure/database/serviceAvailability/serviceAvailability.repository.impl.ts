@@ -2,6 +2,7 @@ import { Types } from 'mongoose';
 import { IServiceAvailability, ServiceAvailabilityModel } from './serviceAvailability.model';
 import { FontendAvailabilityForResponse, FrontendAvailabilityForRequest, ServiceAvailability } from '../../../domain/entities/serviceAvailability.entity';
 import { IServiceAvailabilityRepository } from '../../../domain/repositories/IServiceAvailability.repository';
+import dayjs from 'dayjs';
 
 const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
@@ -46,14 +47,14 @@ export class ServiceAvailabilityRepositoryImpl implements IServiceAvailabilityRe
                     }
                 },
                 {
-                    $addFields : {
-                        availabilityForDay : {
-                            $arrayElemAt : [
+                    $addFields: {
+                        availabilityForDay: {
+                            $arrayElemAt: [
                                 {
-                                    $filter : {
+                                    $filter: {
                                         input: "$availabilities",
                                         as: "availability",
-                                        cond: { $eq : [ "$$availability.day", targetDay ]}
+                                        cond: { $eq: ["$$availability.day", targetDay] }
                                     }
                                 },
                                 0
@@ -64,7 +65,7 @@ export class ServiceAvailabilityRepositoryImpl implements IServiceAvailabilityRe
                 {
                     $lookup: {
                         from: "bookings",
-                        let: { providerId: "$providerId", startOfDay: startOfDay, endOfDay: endOfDay }, 
+                        let: { providerId: "$providerId", startOfDay: startOfDay, endOfDay: endOfDay },
                         pipeline: [
                             {
                                 $match: {
@@ -109,9 +110,7 @@ export class ServiceAvailabilityRepositoryImpl implements IServiceAvailabilityRe
                                         "$$slot",
                                         {
                                             available: {
-                                                $not: {
-                                                    $in: ["$$slot._id", "$bookedSlots"]
-                                                }
+                                                $not: { $in: ["$$slot._id", "$bookedSlots"] } ,           
                                             }
                                         }
                                     ]
