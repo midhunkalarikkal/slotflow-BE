@@ -97,6 +97,16 @@ export interface UsrUpdateProfileImageUseCaseRequestPayload {
 // user update profile image use case response interface
 export interface UserUpdateProfileImageResProps extends CommonResponse, Pick<User, "profileImage"> { };
 
+// user update user info request payload interface
+export interface UserUpdateUserInfoUseCaseRequestPayload {
+    userId: User["_id"];
+    username: User["username"];
+    phone: User["phone"];
+}
+// user update user info use case response interface
+export interface UserUpdateUserInfoUseCaseResponse extends CommonResponse {
+    userInfo: Pick<User, "username" | "phone">
+}
 
 
 

@@ -9,7 +9,9 @@ import {
     UserFetchProfileDetails, 
     UserUpdateProfileImageResProps, 
     UserFetchProfileUseCaseRequestPayload, 
-    UsrUpdateProfileImageUseCaseRequestPayload, 
+    UsrUpdateProfileImageUseCaseRequestPayload,
+    UserUpdateUserInfoUseCaseRequestPayload,
+    UserUpdateUserInfoUseCaseResponse, 
 } from "../../infrastructure/dtos/user.dto";
 
 
@@ -71,5 +73,33 @@ export class UserUpdateProfileImageUseCase {
         } catch {
             throw new Error("Unexpected error occured while updating profile image.");
         }
+    }
+}
+
+
+export class UserUpdateProviderInfoUseCase {
+    constructor(
+        private userRepositoryImpl: UserRepositoryImpl 
+    ) { }
+
+    async execute(data: UserUpdateUserInfoUseCaseRequestPayload) : Promise<UserUpdateUserInfoUseCaseResponse> {
+        const { userId, username, phone } = data;
+        if(!userId || !username || !phone) throw new Error("Invalid request");
+
+        const user = await this.userRepositoryImpl.findUserById(userId);
+        if(!user) throw new Error("No user found");
+
+        const userData = {
+            ...user,
+            username: username,
+            phone: phone
+        }
+
+        const updatedUser = await this.userRepositoryImpl.updateUser(userData);
+        if(!updatedUser) throw new Error("Info adding failed, please try again");
+
+        const updatedData = { username: updatedUser.username, phone: updatedUser.phone };
+
+        return { success: true, message: "Info updated successfully", userInfo: updatedData }
     }
 }

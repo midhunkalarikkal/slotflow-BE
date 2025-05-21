@@ -97,7 +97,6 @@ export class ProviderUpdateProviderInfoUseCase {
             phone: phone
         }
 
-
         const updatedProvider = await this.providerRepositoryImpl.updateProvider(providerData);
         if(!updatedProvider) throw new Error("Info adding failed, please try again");
 

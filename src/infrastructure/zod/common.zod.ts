@@ -95,8 +95,23 @@ const SaveStripePaymentZodSchema = z.object({
     }),
 });
 
+// **** user or provider username and phone updation controller **** \\
+const UserOrProviderUpdateProviderInfoZodSchema = z.object({
+  username: z.string({
+    required_error: "Username is required",
+    invalid_type_error: "Username must be a string",
+  }).min(4, "Username must be at least 4 characters")
+    .max(25, "Username must not exceed 25 characters"),
+
+  phone: z.string({
+    required_error: "Phone number is required",
+    invalid_type_error: "Phone number must be a string",
+  }).length(10, "Phone number must be exactly 10 digits"),
+});
+
 export {
     AddAddressZodSchema,
     DateOnlyZodSchema,
     SaveStripePaymentZodSchema,
+    UserOrProviderUpdateProviderInfoZodSchema,
 };

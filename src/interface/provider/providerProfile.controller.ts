@@ -2,7 +2,7 @@ import { Types } from "mongoose";
 import { Request, Response } from "express";
 import { s3Client } from "../../config/aws_s3";
 import { HandleError } from "../../infrastructure/error/error";
-import { ProviderUpdateProviderInfoZodSchema } from "../../infrastructure/zod/provider.zod";
+import { UserOrProviderUpdateProviderInfoZodSchema } from "../../infrastructure/zod/common.zod";
 import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/provider.repository.impl";
 import { ProviderFetchProfileDetailsUseCase, ProviderUpdateProfileImageUseCase, ProviderUpdateProviderInfoUseCase } from "../../application/provider-use.case/providerProfile.use-case";
 
@@ -49,7 +49,7 @@ class ProviderProfileController {
     async updateProviderInfo(req: Request, res: Response) {
         try {
             const providerId = req.user.userOrProviderId;
-            const validateData = ProviderUpdateProviderInfoZodSchema.parse(req.body);
+            const validateData = UserOrProviderUpdateProviderInfoZodSchema.parse(req.body);
             const { username, phone } = validateData;
             if(!providerId || !username || !phone) throw new Error("Invalid request");
             const result = await this.providerUpdateProviderInfoUseCase.execute({
