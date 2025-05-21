@@ -1,6 +1,20 @@
 import { z } from "zod";
 import { Types } from "mongoose";
 
+// **** Provider Profile Controller **** \\
+const ProviderUpdateProviderInfoZodSchema = z.object({
+  username: z.string({
+    required_error: "Username is required",
+    invalid_type_error: "Username must be a string",
+  }).min(4, "Username must be at least 4 characters")
+    .max(25, "Username must not exceed 25 characters"),
+
+  phone: z.string({
+    required_error: "Phone number is required",
+    invalid_type_error: "Phone number must be a string",
+  }).length(10, "Phone number must be exactly 10 digits"),
+});
+
 // **** Provider Service Controller **** \\
 const ProviderAddServiceDetailsZodSchema = z.object({
     serviceName: z.string({
@@ -72,4 +86,5 @@ const ProviderPlanSubscribeZodSchema = z.object({
 export {
     ProviderAddServiceDetailsZodSchema,
     ProviderPlanSubscribeZodSchema,
+    ProviderUpdateProviderInfoZodSchema,
 };

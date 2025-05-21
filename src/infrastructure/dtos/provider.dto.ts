@@ -89,6 +89,17 @@ export interface ProviderUpdateprofileImageRequestPayload {
 export interface ProviderUpdateprofileImageResponse extends CommonResponse, Pick<Provider, "profileImage"> { }
 
 
+// provider update providerInfo request payload interface
+export interface ProviderUpdateProviderInfoUseCaseRequestPayload {
+    providerId: Provider["_id"];
+    username: Provider["username"];
+    phone: Provider["phone"];
+}
+// provider update provider info use case response interface
+export interface ProviderUpdateProviderInfoUseCaseResponse extends CommonResponse {
+    providerInfo: Pick<Provider, "username" | "phone">
+}
+
 
 
 

@@ -1,8 +1,7 @@
 import { Types } from 'mongoose';
 import { IServiceAvailability, ServiceAvailabilityModel } from './serviceAvailability.model';
-import { FontendAvailabilityForResponse, FrontendAvailabilityForRequest, ServiceAvailability } from '../../../domain/entities/serviceAvailability.entity';
 import { IServiceAvailabilityRepository } from '../../../domain/repositories/IServiceAvailability.repository';
-import dayjs from 'dayjs';
+import { FontendAvailabilityForResponse, FrontendAvailabilityForRequest, ServiceAvailability } from '../../../domain/entities/serviceAvailability.entity';
 
 const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 

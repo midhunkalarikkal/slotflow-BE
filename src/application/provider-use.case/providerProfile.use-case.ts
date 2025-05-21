@@ -9,7 +9,9 @@ import {
     ProviderUpdateprofileImageResponse, 
     ProviderUpdateprofileImageRequestPayload, 
     ProviderFetchProfileDetailsUseCaseResponse, 
-    ProviderFetchProfileDetailsUseCaseRequestPayload, 
+    ProviderFetchProfileDetailsUseCaseRequestPayload,
+    ProviderUpdateProviderInfoUseCaseRequestPayload,
+    ProviderUpdateProviderInfoUseCaseResponse, 
 } from "../../infrastructure/dtos/provider.dto";
 
 
@@ -74,5 +76,33 @@ export class ProviderUpdateProfileImageUseCase {
         } catch {
             throw new Error("Unexpected error occured while updating profile image.");
         }
+    }
+}
+
+export class ProviderUpdateProviderInfoUseCase {
+    constructor(
+        private providerRepositoryImpl: ProviderRepositoryImpl
+    ) { }
+
+    async execute(data: ProviderUpdateProviderInfoUseCaseRequestPayload) : Promise<ProviderUpdateProviderInfoUseCaseResponse> {
+        const { providerId, username, phone } = data;
+        if(!providerId || !username || !phone) throw new Error("Invalid request");
+
+        const provider = await this.providerRepositoryImpl.findProviderById(providerId);
+        if(!provider) throw new Error("No user found");
+
+        const providerData = {
+            ...provider,
+            username: username,
+            phone: phone
+        }
+
+
+        const updatedProvider = await this.providerRepositoryImpl.updateProvider(providerData);
+        if(!updatedProvider) throw new Error("Info adding failed, please try again");
+
+        const updatedData = { username: updatedProvider.username, phone: updatedProvider.phone };
+
+        return { success: true, message: "Info updated successfully", providerInfo: updatedData }
     }
 }

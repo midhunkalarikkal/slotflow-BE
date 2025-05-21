@@ -41,4 +41,6 @@ router.get('/getPayments', authMiddleware, providerPaymentController.getPayments
 
 router.get('/getBookingAppointments', authMiddleware, providerBookingController.fetchBookingAppointments);
 
+router.put('/updaterUserInfo', authMiddleware, providerProfileController.updateProviderInfo);
+
 export default router;  

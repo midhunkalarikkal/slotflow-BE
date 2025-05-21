@@ -27,7 +27,7 @@ const ProviderSchema = new Schema<IProvider>({
   isBlocked: { type: Boolean, default: false },
   isEmailVerified: { type: Boolean, default: false },
   isAdminVerified: { type: Boolean, default: false },
-  phone: { type: String, default: null, minlength: 13, maxlength: 13 },
+  phone: { type: String, default: null, minlength: 10, maxlength: 10 },
   profileImage: { type: String, default: null },
   addressId: { type: Schema.Types.ObjectId, ref: "Address", default: null },
   serviceId: { type: Schema.Types.ObjectId, ref: "Service", default: null},
