@@ -14,6 +14,7 @@
     "@aws-sdk/client-s3": "^3.758.0",
     "@aws-sdk/lib-storage": "^3.758.0",
     "@aws-sdk/s3-request-presigner": "^3.772.0",
+    "@upstash/redis": "^1.35.0",
     "bcryptjs": "^3.0.1",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
@@ -45,6 +46,7 @@
     "@types/node": "^22.13.4",
     "@types/nodemailer": "^6.4.17",
     "@types/validator": "^13.12.2",
+    "otp-generator-module": "^1.0.1",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.7.3"

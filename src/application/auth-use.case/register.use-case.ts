@@ -40,7 +40,7 @@ export class RegisterUseCase {
     const verificationToken = uuidv4();
     if (!verificationToken) throw new Error("Unexpected error, please try again.");
 
-    const otp = OTPService.generateOTP(verificationToken!);
+    const otp = await OTPService.setOtp(verificationToken);
     if (!otp) throw new Error("Unexpected error, please try again.");
 
     await OTPService.sendOTP(email, otp);

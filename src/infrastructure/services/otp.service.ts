@@ -1,6 +1,8 @@
 import crypto from 'crypto';
 import nodemailer from 'nodemailer';
+import { Redis } from '@upstash/redis';
 import { mailConfig } from '../../config/env';
+import { generateOTP } from 'otp-generator-module';
 
 interface EmailOptions {
   subject: string;
@@ -8,24 +10,24 @@ interface EmailOptions {
   html: string;
 }
 
-export class OTPService {
-  private static otpStore: Map<string, string> = new Map();
 
-  static generateOTP(verificationToken: string): string {
+export class OTPService {
+  static redis = Redis.fromEnv();
+  
+  static async setOtp(verificationToken: string): Promise<string> {
     try {
-      const otp = crypto.randomInt(100000, 999999).toString();
-      this.otpStore.set(verificationToken, otp);
-      setTimeout(() => this.otpStore.delete(verificationToken), 300000);
+      const otp = generateOTP({ length: 6, upperCase: true});
+      await this.redis.expire(verificationToken,300000);
       return otp;
     } catch (error) {
       throw new Error("Failed to generate OTP.");
     }
   }
 
-  static verifyOTP(verificationToken: string, otp: string): boolean {
+  static async verifyOTP(verificationToken: string, otp: string): Promise<boolean> {
     try {
-      const result = this.otpStore.get(verificationToken) === otp;
-      return result;
+      const storedOtp = await this.redis.get(verificationToken);
+      return storedOtp === otp;
     } catch (error) {
       throw new Error("Failed to verify OTP.")
     }
