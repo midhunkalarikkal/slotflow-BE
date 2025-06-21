@@ -28,6 +28,7 @@ export class LoginUseCase {
         } else if (role === "PROVIDER") {
             userOrProvider = await this.providerRepositoryImpl.findProviderByEmail(email);
         } else if (role === "ADMIN") {
+            console.log("role : ",role);
             if (email !== adminConfig.adminEmail || password !== adminConfig.adminPassword) {
                 throw new Error("Invalid credentials.");
             }

@@ -15,5 +15,8 @@ export class User {
         public verificationToken: string,
         public createdAt: Date,
         public updatedAt: Date,
-    ) {}
+    ) {
+
+    }
+    
 }

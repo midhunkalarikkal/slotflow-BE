@@ -67,7 +67,7 @@ const LoginZodSchema = z.object({
         invalid_type_error: "Password must be a string"
     }).min(8, "Password must be at least 8 characters"),
 
-    role: z.enum(["USER", "PROVIDER"], {
+    role: z.enum(["USER", "PROVIDER", "ADMIN"], {
         required_error: "Role is required",
         invalid_type_error: "Invalid role"
     })

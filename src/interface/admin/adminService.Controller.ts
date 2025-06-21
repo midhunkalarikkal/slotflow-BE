@@ -34,9 +34,9 @@ class AdminServiceController {
     async addService(req: Request, res: Response) {
         try{
             const validateData = AdminAddServiceXZodSchema.parse(req.body);
-            const { serviceName } = validateData;
-            if(!serviceName) throw new Error("Invalid request.");
-            const result = await this.adminAddServiceUseCase.execute({serviceName});
+            const { appServiceName } = validateData;
+            if(!appServiceName) throw new Error("Invalid request.");
+            const result = await this.adminAddServiceUseCase.execute({serviceName : appServiceName});
             res.status(200).json(result);
         }catch(error){
             HandleError.handle(error,res);

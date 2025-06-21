@@ -256,7 +256,7 @@ export class Validator {
     // **** admin app service
     static validateAppServiceName(serviceName: string): void {
         if (!serviceName || serviceName.trim().length === 0) throw new Error("Service name is required.");
-        if (!/^[A-Za-z ]{4,25}$/.test(serviceName.trim())) throw new Error("Invalid service name. Service name should contain only alphabets and spaces and be between 4 and 25 characters.");
+        if (!/^[A-Za-z ]{4,40}$/.test(serviceName.trim())) throw new Error("Invalid service name. Service name should contain only alphabets and spaces and be between 4 and 40 characters.");
     }
 
 

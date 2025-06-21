@@ -9,7 +9,7 @@ export interface IService extends Document {
 }
 
 const serviceSchema = new Schema<IService>({
-    serviceName: { type: String, required: true, minlength: 4, maxlength: 25, trim: true},
+    serviceName: { type: String, required: true, minlength: 4, maxlength: 40, trim: true},
     isBlocked: { type: Boolean, default: false }
 },{
     timestamps: true

@@ -17,6 +17,7 @@ export class VerifyOTPUseCase {
     Validator.validateRole(role);
 
     const isValidOTP = await OTPService.verifyOTP(verificationToken, otp);
+    console.log("isValidOTP : ",isValidOTP);
     if (!isValidOTP) throw new Error("Invalid or expired OTP.");  
       
     if (role === "USER") {

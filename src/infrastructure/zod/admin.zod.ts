@@ -47,10 +47,10 @@ const AdminAddNewPlanZodSchema = z.object({
         .min(0, "Min value is 0")
         .max(10000, "Max value is 10000"),
 
-    adVisibility: z.enum(["true", "false"], {
+    adVisibility: z.boolean({
         required_error: "Ad visibility is required",
-        invalid_type_error: "Ad visibility must be 'true' or 'false'"
-    }),
+        invalid_type_error: "Ad visibility must be true or false"
+    })
 });
 
 const AdminChangePlanIsBlockedStatusReqParamsZodSchema = z.object({
@@ -123,11 +123,11 @@ const AdminDateZodSchema = z.object({
 
 // **** admin service controller **** \\
 const AdminAddServiceXZodSchema = z.object({
-    serviceName: z.string({
+    appServiceName: z.string({
         required_error: "Service name is required",
         invalid_type_error: "Service name must be a string"
     }).min(4, "Minimun length is 4 characters")
-      .max(25, "Maximum length is 25"),
+        .max(40, "Maximum length is 40"),
 });
 
 const AdminChangeServiceStatusParamsZodSchema = z.object({

@@ -1,8 +1,7 @@
 import nodemailer from 'nodemailer';
-import { Redis } from '@upstash/redis';
+import { redis } from '../lib/redis';
 import { mailConfig } from '../../config/env';
 import { generateOTP } from 'otp-generator-module';
-import { redis } from '../lib/redis';
 
 interface EmailOptions {
   subject: string;
@@ -16,7 +15,7 @@ export class OTPService {
   static async setOtp(verificationToken: string): Promise<string> {
     try {
       const otp = generateOTP({ length: 6 });
-      await redis.expire(verificationToken,300000);
+      const storingOtp = await redis.set(verificationToken,otp, { px : 300000 });
       return otp;
     } catch (error) {
       console.error("error : ", error);
@@ -27,7 +26,7 @@ export class OTPService {
   static async verifyOTP(verificationToken: string, otp: string): Promise<boolean> {
     try {
       const storedOtp = await redis.get(verificationToken);
-      return storedOtp === otp;
+      return storedOtp == otp;
     } catch (error) {
       throw new Error("Failed to verify OTP.")
     }
