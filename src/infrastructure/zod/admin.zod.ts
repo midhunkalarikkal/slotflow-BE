@@ -115,10 +115,16 @@ const AdminProviderIdZodSchema = z.object({
 });
 
 const AdminDateZodSchema = z.object({
-    date: z.date({
-        required_error: "Date is required",
-        invalid_type_error: "Date must be a valid Date object",
-    }),
+    date: z.preprocess((val) => {
+    if (typeof val === "string" || val instanceof String) {
+      const parsed = new Date(val as string);
+      if (!isNaN(parsed.getTime())) return parsed;
+    }
+    return val;
+  }, z.date({
+    required_error: "Date is required",
+    invalid_type_error: "Date must be a valid Date object",
+  })),
 });
 
 // **** admin service controller **** \\

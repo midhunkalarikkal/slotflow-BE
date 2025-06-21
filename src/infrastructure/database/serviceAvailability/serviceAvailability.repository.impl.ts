@@ -37,7 +37,7 @@ export class ServiceAvailabilityRepositoryImpl implements IServiceAvailabilityRe
         endOfDay.setHours(23, 59, 59, 999);
 
         const targetDay = daysOfWeek[date.getDay()];
-
+        console.log("fetching service availabilty")
         try {
             const availability = await ServiceAvailabilityModel.aggregate([
                 {

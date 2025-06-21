@@ -11,7 +11,6 @@ export class HandleError {
         }
 
         if (error instanceof Error) {
-            console.log("instance error calling", error);
             res.status(400).json({ success: false, message: error.message });
             return;
         }
