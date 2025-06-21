@@ -1,7 +1,7 @@
 import { Types } from 'mongoose';
 import { IServiceAvailability, ServiceAvailabilityModel } from './serviceAvailability.model';
 import { IServiceAvailabilityRepository } from '../../../domain/repositories/IServiceAvailability.repository';
-import { FontendAvailabilityForResponse, FrontendAvailabilityForRequest, ServiceAvailability } from '../../../domain/entities/serviceAvailability.entity';
+import { FontendAvailabilityForResponse, FrontendAvailabilityUpdatedSlots, ServiceAvailability } from '../../../domain/entities/serviceAvailability.entity';
 
 const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
@@ -16,7 +16,7 @@ export class ServiceAvailabilityRepositoryImpl implements IServiceAvailabilityRe
         )
     }
 
-    async createServiceAvailabilities(providerId: Types.ObjectId, availabilities: Array<FrontendAvailabilityForRequest>): Promise<ServiceAvailability> {
+    async createServiceAvailabilities(providerId: Types.ObjectId, availabilities: Array<FrontendAvailabilityUpdatedSlots>): Promise<ServiceAvailability> {
         try {
             const serviceAvailability = {
                 providerId, availabilities
@@ -24,6 +24,7 @@ export class ServiceAvailabilityRepositoryImpl implements IServiceAvailabilityRe
             const newServiceAvailability = await ServiceAvailabilityModel.create(serviceAvailability);
             return this.mapToEntity(newServiceAvailability);
         } catch (error) {
+            console.log("error : ",error);
             throw new Error("Service Availability adding failed.");
         }
     }

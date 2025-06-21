@@ -2,7 +2,7 @@ import { Types } from "mongoose";
 import { Validator } from "../../infrastructure/validator/validator";
 import { CommonResponse } from "../../infrastructure/dtos/common.dto";
 import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/provider.repository.impl";
-import { FrontendAvailabilityForRequest, TimeSlot } from "../../domain/entities/serviceAvailability.entity";
+import { FrontendAvailabilityForRequest, FrontendAvailabilityUpdatedSlots, TimeSlot } from "../../domain/entities/serviceAvailability.entity";
 import { ServiceAvailabilityRepositoryImpl } from "../../infrastructure/database/serviceAvailability/serviceAvailability.repository.impl";
 import { 
     ProviderFetchServiceAvailabilityUseCaseResponse, 
@@ -30,20 +30,19 @@ export class ProviderAddServiceAvailabilitiesUseCase {
         availabilities.map((data) => {
             Validator.validateDay(data.day);
             Validator.validateDuration(data.duration);
-            Validator.validateStartTime(data.startTime);
-            Validator.validateEndTime(data.endTime, data.startTime);
+            Validator.validateTiming(data.endTime, data.startTime);
             Validator.validateModes(data.modes);
         })
 
-        const newAvailabilities: FrontendAvailabilityForRequest[] = availabilities.map((availability: FrontendAvailabilityForRequest) => ({
+        const newAvailabilities: FrontendAvailabilityUpdatedSlots[] = availabilities.map((availability: FrontendAvailabilityForRequest) => ({
             ...availability,
-            slots: availability.slots.map((slot: TimeSlot) => ({
-                time: slot.time, 
+            slots: availability.slots.map((slot: string) => ({
+                time: slot
             }))
         }));
         
         const serviceAvailability = await this.serviceAvailabilityRepositoryImpl.createServiceAvailabilities(convertedProviderId, newAvailabilities)
-        if(!serviceAvailability) throw new Error("Service availability adding failed.");
+        if(!serviceAvailability) throw new Error("Service availability adding .");
         
         if (provider && serviceAvailability && serviceAvailability._id) {
             provider.serviceAvailabilityId = serviceAvailability._id;

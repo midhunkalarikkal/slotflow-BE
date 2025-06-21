@@ -8,7 +8,7 @@ export class ProviderService {
         public serviceName: string,
         public serviceDescription: string,
         public servicePrice: number,
-        public providerAdhaar: string,
+        public providerAdhaar: number,
         public providerExperience: string,
         public providerCertificateUrl: string,
         public createdAt: Date,

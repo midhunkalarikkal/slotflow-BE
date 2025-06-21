@@ -29,7 +29,7 @@ class ProviderServiceController {
             const { serviceCategory, serviceName, serviceDescription, servicePrice, providerAdhaar, providerExperience } = validateData;
             const file = req.file;
             if (!providerId || !serviceCategory || !serviceName || !serviceDescription || !servicePrice || !providerAdhaar || !providerExperience || !file) throw new Error("Invalid Request.");
-            const result = await this.providerAddServiceDetailsUseCase.execute({providerId: new Types.ObjectId(providerId), serviceCategory: new Types.ObjectId(serviceCategory), serviceName, serviceDescription, servicePrice, providerAdhaar, providerExperience, file});
+            const result = await this.providerAddServiceDetailsUseCase.execute({providerId: new Types.ObjectId(providerId), serviceCategory: new Types.ObjectId(serviceCategory), serviceName, serviceDescription, servicePrice: Number(servicePrice), providerAdhaar: Number(providerAdhaar), providerExperience, file});
             res.status(200).json(result);
         } catch (error) {
             HandleError.handle(error, res);

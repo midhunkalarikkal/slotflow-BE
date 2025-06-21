@@ -1,5 +1,9 @@
 import { Types } from 'mongoose';
 import validator from 'validator';
+import dayjs from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat";
+
+dayjs.extend(customParseFormat);
 
 export class Validator {
 
@@ -114,15 +118,15 @@ export class Validator {
     }
 
     // Provider adhaar number
-    static validateProviderAdhaar(providerAdhaar: string): void {
-        if (!providerAdhaar || providerAdhaar.trim().length === 0) throw new Error("Adhaar number is required.");
-        if (!validator.isNumeric(providerAdhaar.trim())) throw new Error("Invalid adhaar number. Adhaar number should contain only numbers.");
-        if (providerAdhaar.trim().length !== 6) throw new Error("Invalid adhaar number. Please enter the last 6 digits.");
+    static validateProviderAdhaar(providerAdhaar: number): void {
+        if (!providerAdhaar) throw new Error("Adhaar number is required.");
+        if (typeof providerAdhaar !== "number") throw new Error("Invalid adhaar number. Adhaar number should contain only numbers.");
+        if (providerAdhaar < 100000 || providerAdhaar > 999999) throw new Error("Invalid adhaar number. Please enter the last 6 digits.");
     }
 
     // Provider experience
     static validateProviderExperience(providerExperience: string): void {
-        if (!providerExperience || providerExperience.trim().length === 0) throw new Error("Provider experience is required.");
+        if (!providerExperience) throw new Error("Provider experience is required.");
         if (!/^[\w\d !"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~]{1,100}$/.test(providerExperience.trim())) throw new Error("Invalid experience. Provider experience should contain alphanumeric characters, spaces, and special characters, and be between 1 and 100 characters.");
     }
 
@@ -150,32 +154,20 @@ export class Validator {
         if (!validDurations.includes(duration.trim().toLowerCase())) throw new Error("Invalid duration. Duration must be one of: 15 minutes, 30 minutes, 1 hour.");
     }
 
-    static validateTime(time: string, fieldName: string): void {
-        if (!time || time.trim().length === 0) {
-            throw new Error(`${fieldName} is required.`);
+    static validateTiming(endTime: string, startTime: string): void {
+        const format = "hh:mm A";
+
+        const start = dayjs(startTime, format);
+        const end = dayjs(endTime, format);
+
+        if (!start.isValid() || !end.isValid()) {
+            throw new Error("Invalid time format.");
         }
 
-        const timePattern = /^(0?[1-9]|1[0-2]):[0-5][0-9]\s?(AM|PM)$/i;
-
-        if (!timePattern.test(time.trim())) {
-            throw new Error(
-                `Invalid ${fieldName}. ${fieldName} must be in HH:MM AM/PM format (12-hour).`
-            );
+        if (!start.isBefore(end)) {
+            throw new Error("Start time is greater than endTime.")
         }
-    }
 
-    static validateStartTime(startTime: string): void {
-        this.validateTime(startTime, "Start time");
-    }
-
-    static validateEndTime(endTime: string, startTime: string): void {
-        this.validateTime(endTime, "End time");
-
-        if (startTime && endTime) {
-            if (endTime <= startTime) {
-                throw new Error("End time must be after start time.");
-            }
-        }
     }
 
     static validateModes(modes: string[]): void {

@@ -26,6 +26,10 @@ export interface FontendAvailabilityForResponse extends Omit<Availability, "slot
 
 // Frontend availability interface for adding to db
 export interface FrontendAvailabilityForRequest extends Omit<Availability, "slots"> {
+    slots : string[]
+}
+
+export interface FrontendAvailabilityUpdatedSlots extends Omit<Availability, "slots"> {
     slots : TimeSlot[]
 }
 

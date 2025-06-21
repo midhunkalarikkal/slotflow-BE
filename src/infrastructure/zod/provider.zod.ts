@@ -20,12 +20,15 @@ const ProviderAddServiceDetailsZodSchema = z.object({
         .max(250, "Service description must be at most 250 characters")
         .regex(/^[\w\d !"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~]+$/, "Invalid service description"),
 
-    servicePrice: z.number({
-        required_error: "Service price is required",
-        invalid_type_error: "Service price must be a number"
-    })
-        .min(1, "Service price must be at least 1")
-        .max(10000000, "Service price must be less than 1 crore"),
+    servicePrice: z.preprocess(
+        (val) => Number(val),
+        z.number({
+            required_error: "Service price is required",
+            invalid_type_error: "Service price must be a number"
+        })
+            .min(1, "Service price must be at least 1")
+            .max(10000000, "Service price must be less than or equal to 1 crore")
+    ),
 
     providerAdhaar: z.string({
         required_error: "Adhaar number is required",
@@ -41,12 +44,6 @@ const ProviderAddServiceDetailsZodSchema = z.object({
         .min(1, "Experience must be at least 1 character")
         .max(100, "Experience must be at most 100 characters")
         .regex(/^[\w\d !"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~]+$/, "Invalid experience"),
-
-    providerCertificateUrl: z.string({
-        required_error: "Certificate URL is required",
-        invalid_type_error: "Certificate URL must be a string"
-    })
-        .url("Invalid certificate URL"),
 
     serviceCategory: z.string({
         required_error: "Service category is required",

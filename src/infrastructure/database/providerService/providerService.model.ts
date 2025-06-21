@@ -7,7 +7,7 @@ export interface IProviderService extends Document {
     serviceName: string;
     serviceDescription: string;
     servicePrice: number;
-    providerAdhaar: string;
+    providerAdhaar: number;
     providerExperience: string;
     providerCertificateUrl: string;
     createdAt: Date;
@@ -42,12 +42,10 @@ const ProviderServiceSchema = new Schema<IProviderService>({
         max: [10000000, "Price must be at most 1 crore"]
     },
     providerAdhaar: {
-        type: String,
+        type: Number,
         required: true,
-        validate: {
-            validator: (v: string) => /^\d{6}$/.test(v),
-            message: "Adhaar number must be exactly 6 digits"
-        }
+        min: [111111, "Invalid adhaar number."],
+        max: [999999, "Invalid adhaar number."],
     },
     providerExperience: {
         type: String,
