@@ -48,53 +48,65 @@ export class ProviderServiceRepositoryImpl implements IProviderServiceRepository
         try {
             const pipeline: any[] = [];
 
-        if (serviceCategoryIds.length > 0) {
-            pipeline.push({
-                $match: {
-                    serviceCategory: { $in: serviceCategoryIds }
-                }
-            });
-        }
+            if (serviceCategoryIds.length > 0) {
+                pipeline.push({
+                    $match: {
+                        serviceCategory: { $in: serviceCategoryIds }
+                    }
+                });
+            }
 
-        pipeline.push(
-            {
-                $lookup: {
-                    from: "providers",
-                    localField: "providerId",
-                    foreignField: "_id",
-                    as: "provider"
-                }
-            },
-            { $unwind: "$provider" },
-            {
-                $lookup: {
-                    from: "services",
-                    localField: "serviceCategory",
-                    foreignField: "_id",
-                    as: "category"
-                }
-            },
-            { $unwind: "$category" },
-            {
-                $project: {
-                    service: {
-                        serviceCategory: "$serviceCategory",
-                        serviceName: "$serviceName",
-                        servicePrice: "$servicePrice",
-                        categoryName: "$category.serviceName"
-                    },
-                    provider: {
-                        _id: '$provider._id',
-                        username: '$provider.username',
-                        profileImage: '$provider.profileImage',
-                        trustedBySlotflow: '$provider.trustedBySlotflow'
+            pipeline.push(
+                {
+                    $lookup: {
+                        from: "providers",
+
+                        let: { providerId: "$providerId" },
+                        pipeline: [
+                            {
+                                $match: {
+                                    $expr: {
+                                        $and: [
+                                            { $eq: ["$_id", "$$providerId"] },
+                                            { $eq: ["$adminVerified", true] }
+                                        ]
+                                    }
+                                }
+                            }
+                        ],
+                        as: "provider"
+                    }
+                },
+                { $unwind: "$provider" },
+                {
+                    $lookup: {
+                        from: "services",
+                        localField: "serviceCategory",
+                        foreignField: "_id",
+                        as: "category"
+                    }
+                },
+                { $unwind: "$category" },
+                {
+                    $project: {
+                        service: {
+                            serviceCategory: "$serviceCategory",
+                            serviceName: "$serviceName",
+                            servicePrice: "$servicePrice",
+                            categoryName: "$category.serviceName"
+                        },
+                        provider: {
+                            _id: '$provider._id',
+                            username: '$provider.username',
+                            profileImage: '$provider.profileImage',
+                            trustedBySlotflow: '$provider.trustedBySlotflow'
+                        }
                     }
                 }
-            }
-        );
+            );
 
-        const providers = await ProviderServiceModel.aggregate(pipeline);
-        return providers;
+            const providers = await ProviderServiceModel.aggregate(pipeline);
+            return providers;
         } catch (error) {
             throw new Error("Provider Ids fetching error");
         }

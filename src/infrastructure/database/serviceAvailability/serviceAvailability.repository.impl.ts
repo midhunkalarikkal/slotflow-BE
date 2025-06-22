@@ -24,7 +24,7 @@ export class ServiceAvailabilityRepositoryImpl implements IServiceAvailabilityRe
             const newServiceAvailability = await ServiceAvailabilityModel.create(serviceAvailability);
             return this.mapToEntity(newServiceAvailability);
         } catch (error) {
-            console.log("error : ",error);
+            console.log("error : ", error);
             throw new Error("Service Availability adding failed.");
         }
     }
@@ -38,8 +38,12 @@ export class ServiceAvailabilityRepositoryImpl implements IServiceAvailabilityRe
         endOfDay.setHours(23, 59, 59, 999);
 
         const targetDay = daysOfWeek[date.getDay()];
-        console.log("fetching service availabilty")
-        try {
+        console.log("fetching service availabilty of ", targetDay, " on ", date.toDateString());
+
+        console.log("Provider ID:", providerId.toString()); // Log the actual providerId
+        console.log("Target Date:", date.toISOString()); // Log the date in ISO format for precision
+
+ try {
             const availability = await ServiceAvailabilityModel.aggregate([
                 {
                     $match: {
@@ -124,6 +128,7 @@ export class ServiceAvailabilityRepositoryImpl implements IServiceAvailabilityRe
                 },
             ]);
             return availability[0] || null;
+
         } catch (error) {
             throw new Error("Service availability fetching error.");
         }
