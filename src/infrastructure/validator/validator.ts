@@ -2,38 +2,11 @@ import { Types } from 'mongoose';
 import validator from 'validator';
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
+import { validateEmail, validateOtp, validatePassword, validateUsername } from '@codebymk/validator';
 
 dayjs.extend(customParseFormat);
 
 export class Validator {
-
-    // Sign in Sign up
-    // Username
-    static validateUsername(username: string): void {
-        if (!username || username.trim().length === 0) throw new Error("Username is required.");
-        if (!/^[A-Za-z ]{4,25}$/.test(username)) throw new Error("Invalid username. Username should contain only alphabets and spaces and be between 4 and 25 characters.");
-    }
-
-    // email
-    static validateEmail(email: string): void {
-        if (!email || email.trim().length === 0) throw new Error("Email is required.");
-        if (!validator.isEmail(email)) throw new Error("Invalid email format.");
-    }
-
-    // password
-    static validatePassword(password: string): void {
-        if (!password || password.trim().length === 0) throw new Error("Password is required.");
-        if (!validator.isStrongPassword(password, { minLength: 8, minLowercase: 1, minUppercase: 1, minNumbers: 1, minSymbols: 1 })) throw new Error("Password must be at least 8 characters long and include uppercase, lowercase, numbers, and symbols.");
-    }
-
-    // otp
-    static validateOtp(otp: string): void {
-        if (!otp || otp.trim().length === 0) throw new Error("OTP is required.");
-        if (!validator.isNumeric(otp, { no_symbols: true }) || otp.length !== 6) throw new Error("Invalid OTP. OTP must be a 6-digit number.");
-    }
-
-
-
 
 
     // Address Validation
@@ -309,3 +282,79 @@ export class Validator {
     }
 
 }
+
+
+
+
+type ValidationResult =
+    | null
+    | { status: boolean, message?: string, point?: number };
+
+export class CustomValidator {
+    static validator(id: string, value: string | number): ValidationResult {
+        switch (id) {
+            case "username": {
+                const { status, message } = validateUsername(
+                    value as string,
+                    {
+                        minLength: 4,
+                        maxLength: 30,
+                        uppercase: true,
+                        digits: false,
+                        specialCharacters: false,
+                        allowSpace: true,
+                    }
+                );
+                return status ? null : { status, message };
+            }
+
+            case "email": {
+                const { status, message } = validateEmail(value as string);
+                return status ? null : { status, message };
+            }
+
+            case "password":
+            case "confirmPassword": {
+                const { status, message, point } = validatePassword(value as string, {
+                    returnPoint: true,
+                    minLength: 8,
+                    maxLength: 50,
+                    minDigits: 1,
+                    minLowercase: 1,
+                    minSpecialCharacter: 1,
+                    minUppercase: 1,
+                    pointsForLowercase: 25,
+                    pointsForUppercase: 25,
+                    pointsForDigits: 25,
+                    pointsForSpecialCharacter: 25,
+                });
+                return status ? { status, point } : { status, message, point };
+            }
+
+            case "otp": {
+                const { status, message } = validateOtp(value as string, {
+                    length: 6
+                });
+                return status ? null : { status, message };
+            }
+
+            case "role": {
+                const roles = ["ADMIN", "USER", "PROVIDER"];
+                if (!roles.includes(value as string)) {
+                    return { status: false, message: "Invalid role." };
+                }
+                return null;
+            }
+
+            default:
+                return { status: false, message: "No validation found" };
+        }
+    }
+}
+
+export const validateOrThrow = (id: string, value: string | number) => {
+  const result = CustomValidator.validator(id, value);
+  if (result && result.status === false) {
+    throw new Error(result.message);
+  }
+};

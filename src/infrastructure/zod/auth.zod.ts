@@ -6,7 +6,8 @@ const RegisterZodSchema = z.object({
         invalid_type_error: "Username must be a string"
     })
     .min(4, "Username must be at least 4 characters")
-    .max(25, "Username must be at most 25 characters"),
+    .max(30, "Username must be at most 30 characters")
+    .regex(/^[a-zA-Z\s]{4,30}$/, "Invalid username"),
     
     email: z.string({
         required_error: "Email is required",
@@ -16,7 +17,10 @@ const RegisterZodSchema = z.object({
     password: z.string({
         required_error: "Password is required",
         invalid_type_error: "Password must be a string"
-    }).min(8, "Password must be at least 8 characters"),
+    })
+    .min(8, "Password must be at least 8 characters")
+    .max(50,"Password must be at most 50 characters")
+    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z0-9]).{8,50}$/,"Invalid password"),
 
     role: z.enum(["USER", "PROVIDER"], {
         required_error: "Role is required",

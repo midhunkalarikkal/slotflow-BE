@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { User } from '../../domain/entities/user.entity';
 import { JWTService } from '../../infrastructure/security/jwt';
 import { Provider } from '../../domain/entities/provider.entity';
-import { Validator } from '../../infrastructure/validator/validator';
+import { CustomValidator, validateOrThrow, Validator } from '../../infrastructure/validator/validator';
 import { OTPService } from '../../infrastructure/services/otp.service';
 import { PasswordHasher } from '../../infrastructure/security/password-hashing';
 import { UserRepositoryImpl } from '../../infrastructure/database/user/user.repository.impl';
@@ -15,13 +15,13 @@ export class RegisterUseCase {
   constructor(private userRepositoryImpl: UserRepositoryImpl, private providerRepositoryImpl: ProviderRepositoryImpl) { }
 
   async execute(data: RegisterUseCaseRequestPayload): Promise<RegisterUseCaseResponse> {
-    const { username, email, password, role} = data;
-    if(!username || !email || !password || !role) throw new Error("Invalid request");
-    
-    Validator.validateUsername(username);
-    Validator.validateEmail(email);
-    Validator.validatePassword(password);
-    Validator.validateRole(role);
+    const { username, email, password, role } = data;
+    if (!username || !email || !password || !role) throw new Error("Invalid request");
+
+    validateOrThrow("username", username);
+    validateOrThrow("email", email);
+    validateOrThrow("password", password);
+    validateOrThrow("role", role);
 
     let userOrProvider: Partial<Provider> | Partial<User> | null;
 
@@ -55,7 +55,7 @@ export class RegisterUseCase {
       }
     } else {
       if (role === "USER") {
-       await this.userRepositoryImpl.createUser({
+        await this.userRepositoryImpl.createUser({
           username: username,
           email: email,
           password: hashedPassword,
@@ -70,9 +70,9 @@ export class RegisterUseCase {
         });
       }
     }
-    
-    const token = JWTService.generateToken({email, role});
 
-    return { success: true, message: `OTP sent to email`, authUser: {verificationToken, role, token} };
+    const token = JWTService.generateToken({ email, role });
+
+    return { success: true, message: `OTP sent to email`, authUser: { verificationToken, role, token } };
   }
 }

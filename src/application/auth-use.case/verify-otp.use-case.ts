@@ -1,4 +1,4 @@
-import { Validator } from '../../infrastructure/validator/validator';
+import { validateOrThrow, Validator } from '../../infrastructure/validator/validator';
 import { CommonResponse } from '../../infrastructure/dtos/common.dto';
 import { OTPService } from '../../infrastructure/services/otp.service';
 import { OTPVerificationUseCaseRequestPayload } from '../../infrastructure/dtos/auth.dto';
@@ -13,11 +13,10 @@ export class VerifyOTPUseCase {
     const { otp, verificationToken, role } = data;
     if(!otp || !verificationToken || !role) throw new Error("Invalid request.");
     
-    Validator.validateOtp(otp);
-    Validator.validateRole(role);
+    validateOrThrow("otp", otp);
+    validateOrThrow("role", role);
 
     const isValidOTP = await OTPService.verifyOTP(verificationToken, otp);
-    console.log("isValidOTP : ",isValidOTP);
     if (!isValidOTP) throw new Error("Invalid or expired OTP.");  
       
     if (role === "USER") {
