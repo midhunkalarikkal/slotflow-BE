@@ -3,7 +3,7 @@ import { generateSignedUrl } from "../../config/aws_s3";
 import { User } from "../../domain/entities/user.entity";
 import { JWTService } from "../../infrastructure/security/jwt";
 import { Provider } from "../../domain/entities/provider.entity";
-import { Validator } from "../../infrastructure/validator/validator";
+import { validateOrThrow } from "../../infrastructure/validator/validator";
 import { PasswordHasher } from "../../infrastructure/security/password-hashing";
 import { UserRepositoryImpl } from "../../infrastructure/database/user/user.repository.impl";
 import { LoginUseCaseRequestPayload, LoginUseCaseResponse } from "../../infrastructure/dtos/auth.dto";
@@ -17,9 +17,9 @@ export class LoginUseCase {
         const { email, password, role } = data;
         if (!email || !password || !role) throw new Error("Invalid request.");
 
-        Validator.validateEmail(email);
-        Validator.validatePassword(password);
-        Validator.validateRole(role);
+        validateOrThrow("email", email);
+        validateOrThrow("password", password);
+        validateOrThrow("role", role);
 
         let userOrProvider: User | Provider | null = null;
 
@@ -28,7 +28,6 @@ export class LoginUseCase {
         } else if (role === "PROVIDER") {
             userOrProvider = await this.providerRepositoryImpl.findProviderByEmail(email);
         } else if (role === "ADMIN") {
-            console.log("role : ",role);
             if (email !== adminConfig.adminEmail || password !== adminConfig.adminPassword) {
                 throw new Error("Invalid credentials.");
             }

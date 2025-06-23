@@ -41,8 +41,8 @@ const ProviderSchema = new Schema<IProvider>({
     type: String,
     required: [true, "Password is required"],
     minlength: [8, "Password must be at least 8 characters"],
-    maxlength: [50, "Password must be at most 50 characters"],
-    match: [/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z0-9]).{8,50}$/, "Invalid password"]
+    maxlength: [100, "Password must be at most 100 characters"],
+    match: [/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z0-9]).{8,100}$/, "Invalid password"]
   },
   isBlocked: {
     type: Boolean,

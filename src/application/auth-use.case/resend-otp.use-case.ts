@@ -1,11 +1,11 @@
 import { User } from '../../domain/entities/user.entity';
 import { Provider } from '../../domain/entities/provider.entity';
-import { Validator } from '../../infrastructure/validator/validator';
 import { CommonResponse } from '../../infrastructure/dtos/common.dto';
 import { OTPService } from '../../infrastructure/services/otp.service';
+import { validateOrThrow } from '../../infrastructure/validator/validator';
+import { ResendOtpUseCaseRequestPayload } from '../../infrastructure/dtos/auth.dto';
 import { UserRepositoryImpl } from '../../infrastructure/database/user/user.repository.impl';
 import { ProviderRepositoryImpl } from '../../infrastructure/database/provider/provider.repository.impl';
-import { ResendOtpUseCaseRequestPayload } from '../../infrastructure/dtos/auth.dto';
 
 
 interface ResendOtpResProps extends CommonResponse {
@@ -24,8 +24,8 @@ export class ResendOtpUseCase {
     const { role, verificationToken, email } = data;
     if(!role || (!verificationToken && !email)) throw new Error("Invalid request.");
 
-    if(email) Validator.validateEmail(email);
-    Validator.validateRole(role);
+    if(email) validateOrThrow("email", email);
+    validateOrThrow("role", role);
 
     let userOrProvider: Provider | User | null = null;
 
@@ -50,7 +50,7 @@ export class ResendOtpUseCase {
 
     if (!userOrProvider || !userOrProvider?.email || !userOrProvider?.verificationToken) throw new Error("Please register.")
 
-    const otp = OTPService.generateOTP(userOrProvider?.verificationToken);
+    const otp = await OTPService.setOtp(userOrProvider?.verificationToken);
     if (!otp) throw new Error("Unexpected error, please try again.");
   
     await OTPService.sendOTP(userOrProvider?.email, otp);

@@ -27,6 +27,7 @@ export class UserRepositoryImpl implements IUserRepository {
             const createdUser = await UserModel.create(user);
             return this.mapToEntity(createdUser);
         } catch (error) {
+            console.log("error : ",error);
             throw new Error("Unable to register, please try again after a few minutes.");
         }
     }
