@@ -1,12 +1,33 @@
+import dayjs from "dayjs";
 import { Types } from 'mongoose';
 import validator from 'validator';
-import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import { validateEmail, validateOtp, validatePassword, validateUsername } from '@codebymk/validator';
 
 dayjs.extend(customParseFormat);
 
 export class Validator {
+
+    // phone
+    static validatePhone(phone: string): void {
+        if (!validator.isMobilePhone(phone, ["en-IN"])) {
+            throw new Error("Invalid mobile number");
+        }
+    }
+
+
+    // app service name
+    static validateAppServiceName(serviceName: string): void {
+        if (!serviceName || serviceName.trim().length === 0) throw new Error("Service name is required.");
+        if (!/^[A-Za-z0-9 ]{4,50}$/.test(serviceName)) {
+            throw new Error("Invalid service Name, only letters allowed.");
+        }
+
+        if (serviceName.length > 50 || serviceName.length < 4) {
+            throw new Error("Allowed length is 4 to 40 characters.")
+        }
+    }
+    
 
 
     // Address Validation
@@ -15,11 +36,6 @@ export class Validator {
         if (!/^[a-zA-Z0-9\s.,#-]+$/.test(addressLine)) throw new Error("Invalid address line, should only contain alphabets, numbers, spaces, and common address characters.");
         if (addressLine.length < 6) throw new Error("Address line length should be more than 6.");
         if (addressLine.length > 150) throw new Error("Address line length should be less than 150");
-    }
-
-    // Phone
-    static validatePhone(phone: string): void {
-        if (!validator.isMobilePhone(phone, ["en-IN"])) throw new Error("Invalid mobile number.");
     }
 
     // Place
@@ -168,8 +184,8 @@ export class Validator {
     static validatePlanName(planName: string): void {
         if (!planName || planName.trim().length === 0)
             throw new Error("Plan name is required.");
-        if (!/^[a-zA-Z]{4,20}$/.test(planName.trim()))
-            throw new Error("Invalid plan name. Only alphabets are allowed, length between 4 and 20.");
+        if (!/^[a-zA-Z ]{4,20}$/.test(planName.trim()))
+            throw new Error("Invalid plan name. Only alphabets and spaces are allowed, length between 4 and 20.");
     }
 
     // Description – allow alphabets, numbers, spaces, punctuation; 10 to 200 chars
@@ -197,6 +213,8 @@ export class Validator {
         for (const feature of features) {
             if (typeof feature !== "string" || feature.trim().length === 0)
                 throw new Error("Each feature must be a non-empty string.");
+            if(!/^[\w\d\s!"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~]{5,100}$/.test(feature.trim()))
+                throw new Error("Invalid feature.");
         }
     }
 
@@ -218,11 +236,7 @@ export class Validator {
 
 
 
-    // **** admin app service
-    static validateAppServiceName(serviceName: string): void {
-        if (!serviceName || serviceName.trim().length === 0) throw new Error("Service name is required.");
-        if (!/^[A-Za-z ]{4,40}$/.test(serviceName.trim())) throw new Error("Invalid service name. Service name should contain only alphabets and spaces and be between 4 and 40 characters.");
-    }
+
 
 
     // **** Common validations

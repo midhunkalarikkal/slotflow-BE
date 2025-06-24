@@ -34,7 +34,6 @@ export class AdminSubscriptionController {
             const { subscriptionId } = validateParams;
             if(!subscriptionId) throw new Error("Invalid request.");
             const result = await this.adminFetchSubscriptionDetailsUseCase.execute({subscriptionId: new Types.ObjectId(subscriptionId)});
-            console.log("Result : ",result);
             res.status(200).json(result);
         }catch (error) {
             HandleError.handle(error, res);

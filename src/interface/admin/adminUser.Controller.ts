@@ -1,21 +1,21 @@
 import { Types } from "mongoose";
 import { Request, Response } from "express";
 import { HandleError } from "../../infrastructure/error/error";
-import { AdminChangeUserStatusZOdSchema } from "../../infrastructure/zod/admin.zod";
+import { AdminChangeUserBlockStatusZOdSchema } from "../../infrastructure/zod/admin.zod";
 import { UserRepositoryImpl } from "../../infrastructure/database/user/user.repository.impl";
-import { AdminChangeUserStatusUseCase, AdminUserListUseCase } from "../../application/admin-use.case/adminUser.use-case";
+import { AdminChangeUserBlockStatusUseCase, AdminUserListUseCase } from "../../application/admin-use.case/adminUser.use-case";
 
 const userRepositoryImpl = new UserRepositoryImpl();
 const adminUserListUseCase = new AdminUserListUseCase(userRepositoryImpl);
-const adminChangeUserStatusUseCase = new AdminChangeUserStatusUseCase(userRepositoryImpl);
+const adminChangeUserBlockStatusUseCase = new AdminChangeUserBlockStatusUseCase(userRepositoryImpl);
 
 class AdminUserController {
     constructor(
         private adminUserListUseCase : AdminUserListUseCase,
-        private adminChangeUserStatusUseCase : AdminChangeUserStatusUseCase,
+        private adminChangeUserBlockStatusUseCase : AdminChangeUserBlockStatusUseCase,
     ){
         this.getAllUsers = this.getAllUsers.bind(this);
-        this.changeUserStatus = this.changeUserStatus.bind(this);
+        this.changeUserBlockStatus = this.changeUserBlockStatus.bind(this);
     }
 
     async getAllUsers(req: Request, res: Response) {
@@ -27,13 +27,12 @@ class AdminUserController {
         }
     }
 
-    async changeUserStatus(req: Request, res: Response) {
+    async changeUserBlockStatus(req: Request, res: Response) {
         try{
-            const validateData = AdminChangeUserStatusZOdSchema.parse(req.body);
+            const validateData = AdminChangeUserBlockStatusZOdSchema.parse(req.body);
             const { userId, isBlocked } = validateData;
             if(!userId || isBlocked === null) throw new Error("Invalid request");
-            const blockedStatus = isBlocked === "true";
-            const result = await this.adminChangeUserStatusUseCase.execute({userId : new Types.ObjectId(userId), isBlocked : blockedStatus});
+            const result = await this.adminChangeUserBlockStatusUseCase.execute({userId : new Types.ObjectId(userId), isBlocked });
             res.status(200).json(result);
         }catch(error){
             HandleError.handle(error, res);
@@ -41,6 +40,6 @@ class AdminUserController {
     }
 }
 
-const adminUserController = new AdminUserController(adminUserListUseCase, adminChangeUserStatusUseCase);
+const adminUserController = new AdminUserController(adminUserListUseCase, adminChangeUserBlockStatusUseCase);
 export { adminUserController };
 

@@ -1,7 +1,7 @@
 import { Types } from "mongoose";
 import { Request, Response } from "express";
 import { HandleError } from "../../infrastructure/error/error";
-import { DateOnlyZodSchema } from "../../infrastructure/zod/common.zod";
+import { DateZodSchema } from "../../infrastructure/zod/common.zod";
 import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/provider.repository.impl";
 import { ServiceAvailabilityRepositoryImpl } from "../../infrastructure/database/serviceAvailability/serviceAvailability.repository.impl";
 import { ProviderAddServiceAvailabilitiesUseCase, ProviderFetchServiceAvailabilityUseCase } from "../../application/provider-use.case/providerServiceAvailability.use-case";
@@ -36,7 +36,7 @@ class ProviderServiceAvailabilityController {
     async getServiceAvailability(req: Request, res: Response) {
         try{
             const providerId = req.user.userOrProviderId;
-            const validateQuery = DateOnlyZodSchema.parse(req.query);
+            const validateQuery = DateZodSchema.parse(req.query);
             const { date } = validateQuery;
             if(!providerId || !date) throw new Error("Invalid request.");
             const result = await this.providerFetchServiceAvailabilityUseCase.execute({providerId: new Types.ObjectId(providerId), date: new Date(date)});

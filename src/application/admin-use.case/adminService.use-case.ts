@@ -42,7 +42,7 @@ export class AdminAddServiceUseCase {
 }
 
 
-export class AdminChnageServiceStatusUseCase {
+export class AdminChnageServiceBlockStatusUseCase {
     constructor(
         private seriveRepositoryImpl: ServiceRepositoryImpl
     ) { }

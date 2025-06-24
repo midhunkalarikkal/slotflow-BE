@@ -50,7 +50,7 @@ export class AdminCreatePlanUseCase {
 }
 
 
-export class AdminChangePlanStatusUseCase {
+export class AdminChangePlanBlockStatusUseCase {
     constructor(private planRepositoryImpl: PlanRepositoryImpl) { }
 
     async execute(data: AdminChangePlanIsBlockedStatusUseCaseRequestPayload): Promise<AdminChangePlanStatusUseCaseResponse> {

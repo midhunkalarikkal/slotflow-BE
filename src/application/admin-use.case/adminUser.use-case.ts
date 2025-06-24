@@ -16,12 +16,14 @@ export class AdminUserListUseCase {
 }
 
 
-export class AdminChangeUserStatusUseCase {
+export class AdminChangeUserBlockStatusUseCase {
     constructor(private userRepositoryImpl: UserRepositoryImpl) { }
 
     async execute(data: AdminChangeUserIsBlockedStatusUseCaseRequestPayload): Promise<AdminChangeUserStatusUseCaseResponse> {
         const {userId, isBlocked} = data;
         if (!userId || isBlocked === null) throw new Error("Invalid request");
+
+        console.log("changing user block status");
 
         Validator.validateObjectId(userId, "userId");
         Validator.validateBooleanValue(isBlocked, "isBlocked");
@@ -38,6 +40,6 @@ export class AdminChangeUserStatusUseCase {
             isBlocked: updatedUser.isBlocked,
             isEmailVerified: updatedUser.isEmailVerified
         }
-        return { success: true, message: `User ${status ? "blocked" : "Unblocked"} successfully.`, updatedUser: updatedUserData };
+        return { success: true, message: `User ${isBlocked ? "blocked" : "Unblocked"} successfully.`, updatedUser: updatedUserData };
     }
 }

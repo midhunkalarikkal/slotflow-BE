@@ -2,24 +2,24 @@ import { Types } from "mongoose";
 import { Request, Response } from "express";
 import { HandleError } from "../../infrastructure/error/error";
 import { PlanRepositoryImpl } from "../../infrastructure/database/plan/plan.repository.impl";
-import { AdminChangePlanStatusUseCase, AdminCreatePlanUseCase, AdminPlanListUseCase } from "../../application/admin-use.case/adminPlan.use-case";
-import { AdminAddNewPlanZodSchema, AdminChangePlanIsBlockedStatusReqParamsZodSchema, AdminChangePlanIsBlockedStatusReqQueryZodSchema } from "../../infrastructure/zod/admin.zod";
+import { AdminChangePlanBlockStatusUseCase, AdminCreatePlanUseCase, AdminPlanListUseCase } from "../../application/admin-use.case/adminPlan.use-case";
+import { AdminAddNewPlanZodSchema, AdminChangePlanIsBlockStatusZodSchema } from "../../infrastructure/zod/admin.zod";
 
 const planRepositoryImpl = new PlanRepositoryImpl();
 
 const adminPlanListUseCase = new AdminPlanListUseCase(planRepositoryImpl);
 const adminCreatePlanUseCase = new AdminCreatePlanUseCase(planRepositoryImpl);
-const adminChangePlanStatusUseCase = new AdminChangePlanStatusUseCase(planRepositoryImpl);
+const adminChangePlanBlockStatusUseCase = new AdminChangePlanBlockStatusUseCase(planRepositoryImpl);
 
 class AdminPlanController {
     constructor(
         private adminPlanListUseCase : AdminPlanListUseCase,
         private adminCreatePlanUseCase : AdminCreatePlanUseCase,
-        private adminChangePlanStatusUseCase : AdminChangePlanStatusUseCase,
+        private adminChangePlanBlockStatusUseCase : AdminChangePlanBlockStatusUseCase,
     ){
         this.getAllPLans = this.getAllPLans.bind(this);
         this.addNewPlan = this.addNewPlan.bind(this);
-        this.changePlanStatus = this.changePlanStatus.bind(this);
+        this.changePlanBlockStatus = this.changePlanBlockStatus.bind(this);
     }
 
     async getAllPLans(req: Request, res: Response) {
@@ -43,15 +43,12 @@ class AdminPlanController {
         }
     }
 
-    async changePlanStatus(req: Request, res: Response) {
+    async changePlanBlockStatus(req: Request, res: Response) {
         try{
-            const validateParams = AdminChangePlanIsBlockedStatusReqParamsZodSchema.parse(req.params);
-            const validateQuery = AdminChangePlanIsBlockedStatusReqQueryZodSchema.parse(req.query);
-            const { planId } = validateParams;
-            const { isBlocked } = validateQuery;
+            const validateData = AdminChangePlanIsBlockStatusZodSchema.parse(req.body);
+            const { planId, isBlocked } = validateData;
             if(!planId || !isBlocked) throw new Error("Invalid request.");
-            const status = isBlocked === "true";
-            const result = await this.adminChangePlanStatusUseCase.execute({planId : new Types.ObjectId(planId as string), isBlocked: status});
+            const result = await this.adminChangePlanBlockStatusUseCase.execute({planId : new Types.ObjectId(planId as string), isBlocked });
             res.status(200).json(result);
         }catch(error){
             HandleError.handle(error, res);
@@ -59,5 +56,5 @@ class AdminPlanController {
     }
 }
 
-const adminPlanController = new AdminPlanController(adminPlanListUseCase,adminCreatePlanUseCase, adminChangePlanStatusUseCase);
+const adminPlanController = new AdminPlanController(adminPlanListUseCase,adminCreatePlanUseCase, adminChangePlanBlockStatusUseCase);
 export { adminPlanController };

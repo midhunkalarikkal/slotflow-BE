@@ -53,7 +53,7 @@ export class AdminApproveProviderUseCase {
 }
 
 
-export class AdminChangeProviderStatusUseCase {
+export class AdminChangeProviderBlockStatusUseCase {
     constructor(private providerRepositoryImpl: ProviderRepositoryImpl) { }
 
     async execute(data: AdminChangeProviderStatusUseCaseRequestPaylod): Promise<AdminChangeProviderStatusUseCaseResponse> {

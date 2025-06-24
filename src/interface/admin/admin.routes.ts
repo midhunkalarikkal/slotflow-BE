@@ -10,9 +10,10 @@ import { adminSubscriptionController } from "./adminSubscription.Controller";
 const router = Router();
 
 router.get('/providers',authMiddleware, adminProviderController.getAllProviders);
-router.put('/approveProvider',authMiddleware,adminProviderController.approveProvider);
-router.put('/changeProviderStatus',authMiddleware,adminProviderController.changeProviderStatus);
-router.post('/changeProvidertrustedTag', authMiddleware, adminProviderController.changeProviderTrustedTag);
+router.patch('/approveProvider',authMiddleware,adminProviderController.approveProvider);
+router.patch('/changeProviderBlockStatus',authMiddleware,adminProviderController.changeProviderBlockStatus);
+router.patch('/changeProvidertrustedTag', authMiddleware, adminProviderController.changeProviderTrustedTag);
+// TODO Trust tag removing rout
 router.get('/fetchProviderDetails/:providerId', authMiddleware, adminProviderController.fetchProviderDetails);
 router.get('/fetchProviderAddress/:providerId', authMiddleware, adminProviderController.fetchProviderAddress);
 router.get('/fetchProviderService/:providerId', authMiddleware, adminProviderController.fetchProviderService);
@@ -21,15 +22,15 @@ router.get('/fetchProviderSubscriptions/:providerId', authMiddleware, adminProvi
 router.get('/fetchProviderPayments/:providerId', authMiddleware,adminProviderController.fetchProviderPayments);
 
 router.get('/users',authMiddleware, adminUserController.getAllUsers);
-router.put('/changeUserStatus',authMiddleware,adminUserController.changeUserStatus);
+router.patch('/changeUserBlockStatus',authMiddleware,adminUserController.changeUserBlockStatus);
 
 router.get('/services',authMiddleware, adminServiceController.getAllServices);
 router.post('/addNewService',authMiddleware,adminServiceController.addService);
-router.put('/changeServiceStatus/:serviceId',authMiddleware, adminServiceController.changeServiceStatus);
+router.patch('/changeServiceBlockStatus',authMiddleware, adminServiceController.changeServiceBlockStatus);
 
 router.get('/plans', authMiddleware,adminPlanController.getAllPLans);
 router.post('/addNewPlan', authMiddleware, adminPlanController.addNewPlan);
-router.put('/changePlanStatus/:planId', authMiddleware, adminPlanController.changePlanStatus);
+router.patch('/changePlanBlockStatus/', authMiddleware, adminPlanController.changePlanBlockStatus);
 
 router.get('/getSubscriptions', authMiddleware, adminSubscriptionController.getAllSubscriptions);
 router.get('/getSubscription/:subscriptionId', authMiddleware, adminSubscriptionController.getSubscriptionDetails);

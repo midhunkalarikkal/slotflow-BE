@@ -1,12 +1,13 @@
 import { Types } from "mongoose";
 import { Request, Response } from "express";
 import { HandleError } from "../../infrastructure/error/error";
+import { DateZodSchema } from "../../infrastructure/zod/common.zod";
 import { UserRepositoryImpl } from "../../infrastructure/database/user/user.repository.impl";
 import { AddressRepositoryImpl } from "../../infrastructure/database/address/address.repository.impl";
 import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/provider.repository.impl";
+import { UserProviderControllerCommonZodSchema, UserFetchAllProvidersZodSchema } from "../../infrastructure/zod/user.zod";
 import { ProviderServiceRepositoryImpl } from "../../infrastructure/database/providerService/providerService.repository.impl";
 import { ServiceAvailabilityRepositoryImpl } from "../../infrastructure/database/serviceAvailability/serviceAvailability.repository.impl";
-import { UserProviderControllerCommonZodSchema, UserFetchAllProvidersZodSchema } from "../../infrastructure/zod/user.zod";
 import { 
     UserFetchServiceProvidersUseCase, 
     UserFetchServiceProviderAddressUseCase, 
@@ -14,7 +15,6 @@ import {
     UserFetchServiceProviderProfileDetailsUseCase, 
     UserFetchServiceProviderServiceAvailabilityUseCase, 
 } from "../../application/user-use.case/userProvider.use-case";
-import { DateOnlyZodSchema } from "../../infrastructure/zod/common.zod";
 
 const userRepositoryImpl = new UserRepositoryImpl();
 const addressRepositoryImpl = new AddressRepositoryImpl();
@@ -104,7 +104,7 @@ export class UserProviderController {
         try {
             const userId = req.user.userOrProviderId;
             const validateParams = UserProviderControllerCommonZodSchema.parse(req.params);
-            const validateQuery = DateOnlyZodSchema.parse(req.query);
+            const validateQuery = DateZodSchema.parse(req.query);
             const { providerId } = validateParams;
             const { date } = validateQuery;
             if (!userId || !providerId || !date) throw new Error("Invalid request");
