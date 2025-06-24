@@ -1,6 +1,6 @@
 import { Types } from "mongoose";
-import { Validator } from "../../infrastructure/validator/validator";
 import { CommonResponse } from "../../infrastructure/dtos/common.dto";
+import { validateOrThrow, Validator } from "../../infrastructure/validator/validator";
 import { UserRepositoryImpl } from "../../infrastructure/database/user/user.repository.impl";
 import { AddressRepositoryImpl } from "../../infrastructure/database/address/address.repository.impl";
 import { 
@@ -45,7 +45,7 @@ export class UserAddAddressUseCase {
         
         Validator.validateObjectId(userId, "userId");
         Validator.validateAddressLine(addressLine);
-        Validator.validatePhone(phone);
+        validateOrThrow("phone",phone);
         Validator.validatePlace(place);
         Validator.validateCity(city);
         Validator.validateDistrict(district);

@@ -14,6 +14,7 @@ const router = Router();
 
 router.get('/getProfileDetails', authMiddleware, userProfileController.getProfileDetails);
 router.post('/updateProfileImage', authMiddleware, upload.single("profileImage"), userProfileController.updateProfileImage);
+router.put('/updateUserInfo', authMiddleware, userProfileController.updateUserInfo);
 
 router.get('/getAddress', authMiddleware, userAddressController.getAddress);
 router.post('/addAddress', authMiddleware, userAddressController.addAddress);
@@ -32,6 +33,5 @@ router.get('/getPayments', authMiddleware, userPaymentController.fetchPayments);
 
 router.put('/cancelBooking/:bookingId', authMiddleware, userBookingController.cancelBooking);
 
-router.put('/updateUserInfo', authMiddleware, userProfileController.updateUserInfo);
 
 export default router;

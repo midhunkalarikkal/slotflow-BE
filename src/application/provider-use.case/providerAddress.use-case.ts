@@ -1,5 +1,5 @@
-import { Validator } from "../../infrastructure/validator/validator";
 import { CommonResponse } from "../../infrastructure/dtos/common.dto";
+import { validateOrThrow, Validator } from "../../infrastructure/validator/validator";
 import { AddressRepositoryImpl } from "../../infrastructure/database/address/address.repository.impl";
 import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/provider.repository.impl";
 import { 
@@ -19,8 +19,9 @@ export class ProviderAddAddressUseCase {
         const { providerId, addressLine, phone, place, city, district, pincode, state, country, googleMapLink } = data;
         if(!providerId || !addressLine || !phone || !place || !city || !district || !pincode || !state || !country || !googleMapLink) throw new Error("Invalid request.");
 
+        Validator.validateObjectId(providerId,"providerId");
         Validator.validateAddressLine(addressLine);
-        Validator.validatePhone(phone);
+        validateOrThrow("phone",phone);
         Validator.validatePlace(place);
         Validator.validateCity(city);
         Validator.validateDistrict(district);

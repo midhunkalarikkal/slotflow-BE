@@ -1,4 +1,3 @@
-import validator from 'validator';
 import mongoose, { Document, Schema, Types } from "mongoose";
 
 export interface IAddress extends Document {
@@ -18,81 +17,77 @@ export interface IAddress extends Document {
 }
 
 const addressSchema = new Schema<IAddress>({
-    userId: { type: Schema.Types.ObjectId, required: true, unique: true },
+    userId: {
+        type: Schema.Types.ObjectId,
+        required: [true,"UserId is required"],
+        unique: true,
+    },
     addressLine: {
         type: String,
-        required: true,
-        minlength: 10,
-        maxlength: 150,
-        match: [/^[a-zA-Z0-9\s.,#-]+$/, "Address line should only contain valid characters"],
+        required: [true, "Address line is required"],
+        minlength: [10, "Address line must be at least 10 characters"],
+        maxlength: [150, "Address line must be at most 150 characters"],
+        match: [/^[a-zA-Z0-9 .,#-]{10,150}$/,"Address line can only include letters, numbers, spaces, and the symbols . , # -",],
     },
     phone: {
         type: String,
-        required: true,
-        validate: {
-            validator: function (val: string) {
-                return validator.isMobilePhone(val, ["en-IN"]);
-            },
-            message: "Invalid mobile number",
-        },
+        required: [true, "Phone number is required"],
+        minlength: [10, "Phone number must be at least 10 characters"],
+        maxlength: [15, "Phone number must be at most 15 characters"],
+        match: [/^\+\d{10,15}$/, "Invalid phone number. It should start with '+' followed by 10 to 15 digits"],
     },
     place: {
         type: String,
-        required: true,
-        minlength: 2,
-        maxlength: 50,
-        match: [/^[a-zA-Z\s]+$/, "Place should only contain alphabets and spaces"],
+        required: [true, "Place is required"],
+        minlength: [3, "Place must be at least 3 characters"],
+        maxlength: [50, "Place must be at most 50 characters"],
+        match: [/^[a-zA-Z .-]{3,50}$/,"Place must only contain letters, spaces, dots, and hyphens"],
     },
     city: {
         type: String,
-        required: true,
-        minlength: 2,
-        maxlength: 50,
-        match: [/^[a-zA-Z\s]+$/, "City should only contain alphabets and spaces"],
+        required: [true, "City is required"],
+        minlength: [3, "City must be at least 3 characters"],
+        maxlength: [50, "City must be at most 50 characters"],
+        match: [/^[a-zA-Z ]{3,50}$/,"City must only contain letters and spaces"],
     },
     district: {
         type: String,
-        required: true,
-        minlength: 2,
-        maxlength: 50,
-        match: [/^[a-zA-Z\s]+$/, "District should only contain alphabets and spaces"],
+        required: [true, "District is required"],
+        minlength: [3, "District must be at least 3 characters"],
+        maxlength: [50, "District must be at most 50 characters"],
+        match: [/^[a-zA-Z ]{3,50}$/,"District must only contain letters and spaces"],
     },
     pincode: {
         type: String,
-        required: true,
-        minlength: 6,
-        maxlength: 6,
-        validate: {
-            validator: function (val: string) {
-                return validator.isPostalCode(val, "IN");
-            },
-            message: "Invalid pincode",
-        },
+        required: [true, "Postal code is required"],
+        minlength: [3, "Postal code must be at least 3 characters"],
+        maxlength: [12, "Postal code must be at most 12 characters"],
+        match: [/^[A-Za-z0-9\s-]{3,12}$/,"Postal code can only include letters, numbers, spaces, and hyphens"],
     },
     state: {
         type: String,
-        required: true,
-        minlength: 2,
-        maxlength: 50,
-        match: [/^[a-zA-Z\s]+$/, "State should only contain alphabets and spaces"],
+        required: [true, "State is required"],
+        minlength: [2, "State must be at least 2 characters"],
+        maxlength: [50, "State must be at most 50 characters"],
+        match: [/^[a-zA-Z ]{2,50}$/,"State must only contain letters and spaces"],
     },
     country: {
         type: String,
-        required: true,
-        minlength: 2,
-        maxlength: 50,
-        match: [/^[a-zA-Z\s]+$/, "Country should only contain alphabets and spaces"],
+        required: [true, "Country is required"],
+        minlength: [2, "Country must be at least 2 characters"],
+        maxlength: [50, "Country must be at most 50 characters"],
+        match: [/^[a-zA-Z ]{2,50}$/,"Country must only contain letters and spaces"],
     },
     googleMapLink: {
         type: String,
-        required: true,
+        required: [true, "Google Map link is required"],
         validate: {
-            validator: function (val: string) {
-                return validator.isURL(val) && val.startsWith("https://maps.app.goo.gl/");
+            validator: function (value) {
+                return value.startsWith("https://maps.app.goo.gl/");
             },
-            message: "Invalid Google Map URL",
+            message: "Google Map link must start with https://maps.app.goo.gl/",
         },
-    }
+    },
 }, {
     timestamps: true
 });

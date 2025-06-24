@@ -6,7 +6,7 @@ export const usernameField = z.string({
 })
   .min(4, "Username must be at least 4 characters")
   .max(30, "Username must be at most 30 characters")
-  .regex(/^[a-zA-Z\s]{4,30}$/, "Invalid username");
+  .regex(/^[a-zA-Z ]{4,30}$/, "Invalid username");
 
 export const emailField = z.string({
   required_error: "Email is required",

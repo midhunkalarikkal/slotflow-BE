@@ -1,5 +1,22 @@
 import { z } from "zod";
 import { Types } from "mongoose";
+import { stringField } from "./common.zod";
+
+// **** user profile controller **** \\
+// User update user info controller zod validation
+export const UserUpdateInfoZOdSchema = z.object({
+    username: stringField("Username",4,30,/^[a-zA-Z ]{4,30}$/,"Invalid username"),
+    phone: stringField("Phone",10,15,/^\+\d{10,15}$/, "Invalid phone number")
+})
+
+
+
+
+
+
+
+
+
 
 // **** user provider controller **** \\
 const UserProviderControllerCommonZodSchema = z.object({

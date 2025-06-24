@@ -13,7 +13,6 @@ router.get('/providers',authMiddleware, adminProviderController.getAllProviders)
 router.patch('/approveProvider',authMiddleware,adminProviderController.approveProvider);
 router.patch('/changeProviderBlockStatus',authMiddleware,adminProviderController.changeProviderBlockStatus);
 router.patch('/changeProvidertrustedTag', authMiddleware, adminProviderController.changeProviderTrustedTag);
-// TODO Trust tag removing rout
 router.get('/fetchProviderDetails/:providerId', authMiddleware, adminProviderController.fetchProviderDetails);
 router.get('/fetchProviderAddress/:providerId', authMiddleware, adminProviderController.fetchProviderAddress);
 router.get('/fetchProviderService/:providerId', authMiddleware, adminProviderController.fetchProviderService);

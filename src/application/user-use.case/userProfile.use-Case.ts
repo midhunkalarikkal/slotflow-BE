@@ -3,7 +3,7 @@ import { Upload } from "@aws-sdk/lib-storage";
 import { aws_s3Config } from "../../config/env";
 import { generateSignedUrl } from "../../config/aws_s3";
 import { extractS3Key } from "../../infrastructure/helpers/helper";
-import { Validator } from "../../infrastructure/validator/validator";
+import { validateOrThrow, Validator } from "../../infrastructure/validator/validator";
 import { UserRepositoryImpl } from "../../infrastructure/database/user/user.repository.impl";
 import { 
     UserFetchProfileDetails, 
@@ -85,6 +85,10 @@ export class UserUpdateProviderInfoUseCase {
     async execute(data: UserUpdateUserInfoUseCaseRequestPayload) : Promise<UserUpdateUserInfoUseCaseResponse> {
         const { userId, username, phone } = data;
         if(!userId || !username || !phone) throw new Error("Invalid request");
+
+        Validator.validateObjectId(userId,"userId");
+        validateOrThrow("username",username);
+        validateOrThrow("phone",phone);
 
         const user = await this.userRepositoryImpl.findUserById(userId);
         if(!user) throw new Error("No user found");

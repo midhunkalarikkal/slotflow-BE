@@ -83,117 +83,34 @@ export const DateZodSchema = z.object({
     })),
 });
 
-
-
-
-
-
-
-
-
-
-// **** Address Schema **** \\
-const AddAddressZodSchema = z.object({
-    addressLine: z.string({
-        required_error: "Address line is required",
-        invalid_type_error: "Address line must be a string"
-    })
-        .min(10, "Address line should be at least 10 characters")
-        .max(150, "Address line should be at most 150 characters")
-        .regex(/^[a-zA-Z0-9\s.,#-]+$/, "Address line should only contain letters, numbers, spaces, and ,.#-"),
-
-    phone: z.string({
-        required_error: "Phone number is required",
-        invalid_type_error: "Phone number must be a string"
-    }).refine((val) => validator.isMobilePhone(val, ["en-IN"]), {
-        message: "Invalid mobile number",
-    }),
-
-    place: z.string({
-        required_error: "Place is required",
-        invalid_type_error: "Place must be a string"
-    })
-        .min(2, "Place must be at least 2 characters")
-        .max(50, "Place must be at most 50 characters")
-        .regex(/^[a-zA-Z\s]+$/, "Place should only contain alphabets and spaces"),
-
-    city: z.string({
-        required_error: "City is required",
-        invalid_type_error: "City must be a string"
-    })
-        .min(2, "City must be at least 2 characters")
-        .max(50, "City must be at most 50 characters")
-        .regex(/^[a-zA-Z\s]+$/, "City should only contain alphabets and spaces"),
-
-    district: z.string({
-        required_error: "District is required",
-        invalid_type_error: "District must be a string"
-    })
-        .min(2, "District must be at least 2 characters")
-        .max(50, "District must be at most 50 characters")
-        .regex(/^[a-zA-Z\s]+$/, "District should only contain alphabets and spaces"),
-
-    pincode: z.string({
-        required_error: "Pincode is required",
-        invalid_type_error: "Pincode must be a string"
-    })
-        .length(6, "Pincode must be exactly 6 digits")
-        .refine((val) => validator.isPostalCode(val, "IN"), {
-            message: "Invalid pincode",
-        }),
-
-    state: z.string({
-        required_error: "State is required",
-        invalid_type_error: "State must be a string"
-    })
-        .min(2, "State must be at least 2 characters")
-        .max(50, "State must be at most 50 characters")
-        .regex(/^[a-zA-Z\s]+$/, "State should only contain alphabets and spaces"),
-
-    country: z.string({
-        required_error: "Country is required",
-        invalid_type_error: "Country must be a string"
-    })
-        .min(2, "Country must be at least 2 characters")
-        .max(50, "Country must be at most 50 characters")
-        .regex(/^[a-zA-Z\s]+$/, "Country should only contain alphabets and spaces"),
-
+// User and Provider addess adding controllerz zod validation
+export const AddAddressZodSchema = z.object({
+    addressLine: stringField("AddressLine",10,150,/^[a-zA-Z0-9 .,#-]{10,150}$/,"Address line must be 10–150 characters long and can only include letters, numbers, spaces, and the symbols . , # -") ,
+    phone: stringField("Phone",10,15,/^\+\d{10,15}$/, "Invalid phone number"),
+    place: stringField("Place",3,50,/^[a-zA-Z .-]{3,50}$/, "Place name must be 3–50 characters long and can only include letters, spaces, dots, and hyphens"),
+    city: stringField("City",3,50,/^[a-zA-Z ]{3,50}$/,"City must only contain letters and spaces"),
+    district: stringField("District",2,50,/^[a-zA-Z ]{3,50}$/,"District must only contain letters and spaces"),
+    pincode: stringField("pincode",3,12,/^[A-Za-z0-9\s-]{3,12}$/,"Invalid postal code"),
+    state: stringField("State",2,50,/^[a-zA-Z ]{2,50}$/,"State must only contain letters and spaces"),
+    country: stringField("Country",2,50,/^[a-zA-Z ]{2,50}$/,"Country must only contain letters and spaces"),
     googleMapLink: z.string({
-        required_error: "Google Map link is required",
-        invalid_type_error: "Google Map link must be a string"
+      required_error: "Google Map link is required",
+      invalid_type_error: "Google Map link must be a string",
     })
-        .url("Invalid Google Map link")
-        .refine((val) => val.startsWith("https://maps.app.goo.gl/"), {
-            message: "Link must be from Google Maps (maps.app.goo.gl)",
-        }),
-});
-
-
-
-// **** Stripe Payment Schema **** \\
-const SaveStripePaymentZodSchema = z.object({
-    sessionId: z.string({
-        required_error: "Session ID is required",
-        invalid_type_error: "Session ID must be a string"
+    .url("Invalid Google Map link")
+    .refine((val) => val.startsWith("https://maps.app.goo.gl/"), {
+      message: "Link must be from Google Maps (maps.app.goo.gl)",
     }),
 });
 
-// **** user or provider username and phone updation controller **** \\
-const UserOrProviderUpdateProviderInfoZodSchema = z.object({
-    username: z.string({
-        required_error: "Username is required",
-        invalid_type_error: "Username must be a string",
-    }).min(4, "Username must be at least 4 characters")
-        .max(25, "Username must not exceed 25 characters"),
-
-    phone: z.string({
-        required_error: "Phone number is required",
-        invalid_type_error: "Phone number must be a string",
-    }).length(10, "Phone number must be exactly 10 digits"),
+// user or provider username and phone updation controller
+export const UserOrProviderUpdateInfoZodSchema = z.object({
+    username: stringField("Username",4,30,/^[a-zA-Z ]{4,30}$/,"Invalid username"),
+    phone: stringField("Phone",10,15,/^\+\d{10,15}$/, "Invalid phone number")
 });
 
-export {
-    AddAddressZodSchema,
-    SaveStripePaymentZodSchema,
-    UserOrProviderUpdateProviderInfoZodSchema,
-};
+// Stripe Payment Schema
+export const SaveStripePaymentZodSchema = z.object({
+    sessionId: stringField("Stripe session Id"),
+});
+

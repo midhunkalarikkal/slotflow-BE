@@ -2,19 +2,11 @@ import dayjs from "dayjs";
 import { Types } from 'mongoose';
 import validator from 'validator';
 import customParseFormat from "dayjs/plugin/customParseFormat";
-import { validateEmail, validateOtp, validatePassword, validateUsername } from '@codebymk/validator';
+import { validateEmail, validateOtp, validatePassword, validatePhone, validateUsername } from '@codebymk/validator';
 
 dayjs.extend(customParseFormat);
 
 export class Validator {
-
-    // phone
-    static validatePhone(phone: string): void {
-        if (!validator.isMobilePhone(phone, ["en-IN"])) {
-            throw new Error("Invalid mobile number");
-        }
-    }
-
 
     // app service name
     static validateAppServiceName(serviceName: string): void {
@@ -33,49 +25,51 @@ export class Validator {
     // Address Validation
     // Address Line
     static validateAddressLine(addressLine: string): void {
-        if (!/^[a-zA-Z0-9\s.,#-]+$/.test(addressLine)) throw new Error("Invalid address line, should only contain alphabets, numbers, spaces, and common address characters.");
-        if (addressLine.length < 6) throw new Error("Address line length should be more than 6.");
+        if (!/^[a-zA-Z0-9 .,#-]{10,150}$/.test(addressLine)) throw new Error("Address line must be 10–150 characters long and can only include letters, numbers, spaces, and the symbols . , # -");
+        if (addressLine.length < 10) throw new Error("Address line length should be more than 10.");
         if (addressLine.length > 150) throw new Error("Address line length should be less than 150");
     }
 
     // Place
     static validatePlace(place: string): void {
-        if (!place || place.trim().length < 2) throw new Error("Place is required and should have at least 2 characters.");
+        if (!place || place.trim().length < 3) throw new Error("Place is required and should have at least 3 characters.");
         if (place.trim().length > 50) throw new Error("Place should have less than 50 characters.");
-        if (!/^[a-zA-Z\s]+$/.test(place)) throw new Error("Place should only contain alphabets and spaces");
+        if (!/^[a-zA-Z .-]{3,50}$/.test(place)) throw new Error("Place name must be 3–50 characters long and can only include letters, spaces, dots, and hyphens");
     }
 
     // City
     static validateCity(city: string): void {
-        if (!city || city.trim().length < 2) throw new Error("City is required and should have at least 2 characters.");
+        if (!city || city.trim().length < 3) throw new Error("City is required and should have at least 3 characters.");
         if (city.trim().length > 50) throw new Error("City should have less than 50 characters.");
-        if (!/^[a-zA-Z\s]+$/.test(city)) throw new Error("City should only contain alphabets and spaces");
+        if (!/^[a-zA-Z ]{3,50}$/.test(city)) throw new Error("City must only contain letters and spaces");
     }
 
     // District
     static validateDistrict(district: string): void {
-        if (!district || district.trim().length < 2) throw new Error("District is required and should have at least 2 characters.");
+        if (!district || district.trim().length < 3) throw new Error("District is required and should have at least 3 characters.");
         if (district.trim().length > 50) throw new Error("District should have less than 50 characters.");
-        if (!/^[a-zA-Z\s]+$/.test(district)) throw new Error("District should only contain alphabets and spaces");
+        if (!/^[a-zA-Z ]{3,50}$/.test(district)) throw new Error("District must only contain letters and spaces");
     }
 
     // Pincode
-    static validatePincode(pincode: string): void {
-        if (!validator.isPostalCode(pincode, "IN")) throw new Error("Invalid pincode.");
+    static validatePincode(pincode: string): void { 
+        if (!pincode || pincode.trim().length < 3) throw new Error("Pincode is required and should have at least 3 characters.");
+        if (pincode.trim().length > 12) throw new Error("Pincode should have less than 12 characters.");
+        if (!/^[A-Za-z0-9\s-]{3,12}$/.test(pincode)) throw new Error("Invalid postal code");
     }
 
     // State
     static validateState(state: string): void {
         if (!state || state.trim().length < 2) throw new Error("State is required and should have at least 2 characters.");
         if (state.trim().length > 50) throw new Error("State should have less than 50 characters.");
-        if (!/^[a-zA-Z\s]+$/.test(state)) throw new Error("State should only contain alphabets and spaces");
+        if (!/^[a-zA-Z ]{2,50}$/.test(state)) throw new Error("State must only contain letters and spaces");
     }
 
     // Country
     static validateCountry(country: string): void {
         if (!country || country.trim().length < 2) throw new Error("Country is required and should have at least 2 characters.");
         if (country.trim().length > 50) throw new Error("Country should have less than 50 characters.");
-        if (!/^[a-zA-Z\s]+$/.test(country)) throw new Error("Country should only contain alphabets and spaces");
+        if (!/^[a-zA-Z ]{2,50}$/.test(country)) throw new Error("Country should only contain alphabets and spaces");
     }
 
     // Google Map Link
@@ -358,6 +352,13 @@ export class CustomValidator {
                     return { status: false, message: "Invalid role." };
                 }
                 return null;
+            }
+
+            case "phone": {
+                const { status, message } = validatePhone(value as string,{
+                    length: 13,
+                });
+                return status ? null : { status, message };
             }
 
             default:
