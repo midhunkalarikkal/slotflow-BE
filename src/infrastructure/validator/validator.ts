@@ -8,7 +8,9 @@ dayjs.extend(customParseFormat);
 
 export class Validator {
 
-    // app service name
+    // app service name, that is the admin is adding different categories to the system for the providers can choose
+    // service category, that is providers choose these app service names as their service categories
+    // this can be used for validating both app service name and service category
     static validateAppServiceName(serviceName: string): void {
         if (!serviceName || serviceName.trim().length === 0) throw new Error("Service name is required.");
         if (!/^[A-Za-z0-9 ]{4,50}$/.test(serviceName)) {
@@ -82,37 +84,53 @@ export class Validator {
 
 
 
-    // Provider service 
+    // **** Provider service 
     // Service name
     static validateServiceName(serviceName: string): void {
         if (!serviceName || serviceName.trim().length === 0) throw new Error("Service name is required.");
-        if (!/^[A-Za-z ]{4,25}$/.test(serviceName.trim())) throw new Error("Invalid service name. Service name should contain only alphabets and spaces and be between 4 and 25 characters.");
+        if (!/^[A-Za-z ]{4,50}$/.test(serviceName.trim())) throw new Error("Invalid service name. Service name should contain only alphabets and spaces and be between 4 and 50 characters.");
     }
 
     // Service description
     static validateServiceDescription(serviceDescription: string): void {
         if (!serviceDescription || serviceDescription.trim().length === 0) throw new Error("Service description is required.");
-        if (!/^[\w\d !"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~]{4,250}$/.test(serviceDescription.trim())) throw new Error("Invalid service description. Service description should contain alphanumeric characters, spaces, and special characters, and be between 4 and 250 characters.");
+        if (!/^[\w\d !"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~]{10,500}$/.test(serviceDescription.trim())) throw new Error("Invalid service description. Service description should contain alphanumeric characters, spaces, and special characters, and be between 10 and 500 characters.");
     }
 
     // Service price
     static validateServicePrice(servicePrice: number): void {
-        if (servicePrice < 1 || servicePrice > 10000000) throw new Error("Invalid service price. Service price must be between 1 and 10000000.");
+        if (!servicePrice) {
+            throw new Error("Service price is required.");
+        }
+
+        if (typeof servicePrice !== "number") {
+            throw new Error("Invalid service price Must be a number.");
+        }
+        if (servicePrice < 1 || servicePrice > 1000000) throw new Error("Invalid service price. Service price must be between 1 and 1000000.");
     }
 
     // Provider adhaar number
-    static validateProviderAdhaar(providerAdhaar: number): void {
-        if (!providerAdhaar) throw new Error("Adhaar number is required.");
-        if (typeof providerAdhaar !== "number") throw new Error("Invalid adhaar number. Adhaar number should contain only numbers.");
-        if (providerAdhaar < 100000 || providerAdhaar > 999999) throw new Error("Invalid adhaar number. Please enter the last 6 digits.");
+    static validateProviderAdhaar(providerAdhaar: string): void {
+        if (!providerAdhaar) {
+            throw new Error("Adhaar number is required.");
+        }
+
+        if (typeof providerAdhaar !== "string") {
+            throw new Error("Invalid adhaar number. Must be a string.");
+        }
+
+        if (!/^\d{6}$/.test(providerAdhaar)) {
+            throw new Error("Invalid adhaar number. Please enter exactly 6 digits.");
+        }
     }
 
     // Provider experience
     static validateProviderExperience(providerExperience: string): void {
-        if (!providerExperience) throw new Error("Provider experience is required.");
-        if (!/^[\w\d !"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~]{1,100}$/.test(providerExperience.trim())) throw new Error("Invalid experience. Provider experience should contain alphanumeric characters, spaces, and special characters, and be between 1 and 100 characters.");
+        if (!providerExperience || providerExperience.trim().length === 0) throw new Error("Provider experience is required.");
+        if (!/^[\w\d !"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~]{1,500}$/.test(providerExperience.trim())) throw new Error("Invalid experience. Provider experience should contain alphanumeric characters, spaces, and special characters, and be between 1 and 500 characters.");
     }
 
+    // provider service mode, that is the user can pick a service mode while booking an appointment
     static validateServiceMode(value: string): void {
         const serviceModes = ["online", "offline"];
         if (!serviceModes.includes(value)) {

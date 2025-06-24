@@ -27,8 +27,8 @@ export class ProviderAddServiceDetailsUseCase {
         Validator.validateObjectId(serviceCategory, "serviceCategoryId");
         Validator.validateServiceName(serviceName);
         Validator.validateServiceDescription(serviceDescription);
-        Validator.validateServicePrice(Number(servicePrice));   
-        Validator.validateProviderAdhaar(providerAdhaar);
+        Validator.validateServicePrice(servicePrice);   
+        Validator.validateProviderAdhaar(String(providerAdhaar));
         Validator.validateProviderExperience(providerExperience);
         Validator.validateFile(file);
         

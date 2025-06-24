@@ -1,56 +1,33 @@
 import { z } from "zod";
 import { Types } from "mongoose";
+import { numberField, objectIdField, stringField } from "./common.zod";
 
 
 // **** Provider Service Controller **** \\
+// Provider add service details controller zod schema
 const ProviderAddServiceDetailsZodSchema = z.object({
-    serviceName: z.string({
-        required_error: "Service name is required",
-        invalid_type_error: "Service name must be a string"
-    })
-        .min(4, "Service name must be at least 4 characters long")
-        .max(25, "Service name must be at most 25 characters long")
-        .regex(/^[A-Za-z ]+$/, "Service name should only contain alphabets and spaces"),
-
-    serviceDescription: z.string({
-        required_error: "Service description is required",
-        invalid_type_error: "Service description must be a string"
-    })
-        .min(4, "Service description must be at least 4 characters")
-        .max(250, "Service description must be at most 250 characters")
-        .regex(/^[\w\d !"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~]+$/, "Invalid service description"),
-
+    serviceName: stringField("Service name", 4, 50, /^[A-Za-z ]{4,50}$/, "Invalid service name. Service name should contain only alphabets and spaces and be between 4 and 50 characters."),
+    serviceDescription: stringField("Service description", 10, 500, /^[\w\d !"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~]{10,500}$/, "Invalid service description. Service description should contain alphanumeric characters, spaces, and special characters, and be between 10 and 500 characters."),
     servicePrice: z.preprocess(
-        (val) => Number(val),
+        (val) => {
+            if (typeof val === "string" && val.trim() !== "") return Number(val);
+            return val;
+        },
         z.number({
             required_error: "Service price is required",
-            invalid_type_error: "Service price must be a number"
+            invalid_type_error: "Service price must be a number",
         })
-            .min(1, "Service price must be at least 1")
-            .max(10000000, "Service price must be less than or equal to 1 crore")
+        .min(1, "Service price must be at least 1")
+        .max(1000000, "Service price must be at most 1000000")
     ),
-
-    providerAdhaar: z.string({
-        required_error: "Adhaar number is required",
-        invalid_type_error: "Adhaar number must be a string"
-    })
-        .length(6, "Adhaar number must be exactly 6 digits")
-        .regex(/^\d{6}$/, "Adhaar number must contain only digits"),
-
-    providerExperience: z.string({
-        required_error: "Experience is required",
-        invalid_type_error: "Experience must be a string"
-    })
-        .min(1, "Experience must be at least 1 character")
-        .max(100, "Experience must be at most 100 characters")
-        .regex(/^[\w\d !"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~]+$/, "Invalid experience"),
-
-    serviceCategory: z.string({
-        required_error: "Service category is required",
-        invalid_type_error: "Service category must be a string"
-    })
-        .min(1, "Service category is required"),
+    providerAdhaar: stringField("Service provider adhaar number", 6, 6, /^\d{6}$/, "Invalid adhaar number. Please enter exactly 6 digits."),
+    providerExperience: stringField("Service provider experience", 1, 500, /^[\w\d !"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~]{1,500}$/, "Invalid experience. Provider experience should contain alphanumeric characters, spaces, and special characters, and be between 1 and 500 characters."),
+    serviceCategory: objectIdField("Service Category ID"),
 });
+
+
+
+
 
 // **** Provider Subscription Controller **** \\
 const ProviderPlanSubscribeZodSchema = z.object({
