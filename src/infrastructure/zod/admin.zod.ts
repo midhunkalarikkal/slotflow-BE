@@ -63,7 +63,7 @@ const AdminChangeServiceBlockStatusZodSchema = z.object({
 // **** admin plan controller **** \\
 //Admin add new plan controller zod validation
 const AdminAddNewPlanZodSchema = z.object({
-    planName: stringField("PlanName",4,20,/^[a-zA-Z]{4,20}$/,"Invalid plan name. Only alphabets and spaces are allowed, length between 4 and 20."),
+    planName: stringField("PlanName",4,20,/^[a-zA-Z ]{4,20}$/,"Invalid plan name. Only alphabets and spaces are allowed, length between 4 and 20."),
     description: stringField("Plan description",10,200,/^[\w\d\s!"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~]{10,200}$/,"Invalid description. Contains unsupported characters."),
     price: numberField("Plan price",0,100000),
     features: z.array(

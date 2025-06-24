@@ -20,7 +20,7 @@ const PlanSchema = new Schema<IPlan>({
         minlength: [4, "Plan name must be at least 4 characters"],
         maxlength: [20, "Plan name must be at most 20 characters"],
         unique: true,
-        match: [/^[a-zA-Z]+$/, "Plan name can only contain alphabets (A-Z, a-z)"]
+        match: [/^[a-zA-Z ]+$/, "Plan name can only contain alphabets (A-Z, a-z)"]
     },
     description: {
         type: String,
@@ -51,8 +51,14 @@ const PlanSchema = new Schema<IPlan>({
         min: [0, "Min value is 0"],
         max: [10000, "Max value is 10000"]
     },
-    adVisibility: { type: Boolean, default: false },
-    isBlocked: { type: Boolean, default: false },      
+    adVisibility: { 
+        type: Boolean, 
+        default: false 
+    },
+    isBlocked: { 
+        type: Boolean, 
+        default: false 
+    },      
 },{
     timestamps: true
 });
