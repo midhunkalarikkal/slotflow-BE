@@ -58,7 +58,7 @@ export class UserCancelBookingUseCase {
             throw new Error("Already cancelled");
         } else if(booking.appointmentStatus === "Completed") {
             throw new Error("Appointment completed")
-        } else if(booking.appointmentStatus === "Rejected") {
+        } else if(booking.appointmentStatus === "Rejected By Provider") {
             throw new Error("Appointment rejected by the Service provider")
         }
 

@@ -111,6 +111,6 @@ export const UserOrProviderUpdateInfoZodSchema = z.object({
 
 // Stripe Payment Schema
 export const SaveStripePaymentZodSchema = z.object({
-    sessionId: stringField("Stripe session Id"),
+    sessionId: stringField("Stripe session Id",5,200,/^cs_test_[a-zA-Z0-9]{5,200}$/,"Invalid session ID")
 });
 

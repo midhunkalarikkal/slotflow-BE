@@ -16,14 +16,42 @@ export interface IBooking extends Document {
 }
 
 const BookingSchema = new Schema<IBooking>({
-    serviceProviderId: { type: mongoose.Schema.Types.ObjectId, ref: "Provider", required: true },
-    userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-    appointmentDate: { type: Date, required: true },
-    appointmentTime: { type: String, required: true },
-    appointmentMode: { type: String, required: true },
-    appointmentStatus: { type: String, enum: Object.values(AppointmentStatus), required: true },
-    slotId: { type: mongoose.Schema.Types.ObjectId, ref: "ServiceAvailability.slots", required: true },
-    paymentId: { type: mongoose.Schema.Types.ObjectId, ref: "Payment" },
+    serviceProviderId: { 
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: "Provider", 
+        required: true 
+    },
+    userId: { 
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: "User", 
+        required: true 
+    },
+    appointmentDate: { 
+        type: Date, 
+        required: true 
+    },
+    appointmentTime: { 
+        type: String, 
+        required: true 
+    },
+    appointmentMode: { 
+        type: String, 
+        required: true 
+    },
+    appointmentStatus: { 
+        type: String, 
+        enum: Object.values(AppointmentStatus), 
+        required: true 
+    },
+    slotId: { 
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: "ServiceAvailability.slots", 
+        required: true 
+    },
+    paymentId: { 
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: "Payment" 
+    },
 }, {
     timestamps: true
 });

@@ -27,11 +27,11 @@ router.get('/getServiceProviderServiceAvailability/:providerId', authMiddleware,
 
 router.post('/createBookingCheckoutSession', authMiddleware, userBookingController.createSessionIdForbookingViaStripe);
 router.post('/saveAppointmentBooking', authMiddleware, userBookingController.saveBookingAfterStripePayment);
-
 router.get('/getBookings', authMiddleware, userBookingController.fetchBookings);
+router.put('/cancelBooking/:bookingId', authMiddleware, userBookingController.cancelBooking);
+
 router.get('/getPayments', authMiddleware, userPaymentController.fetchPayments);
 
-router.put('/cancelBooking/:bookingId', authMiddleware, userBookingController.cancelBooking);
 
 
 export default router;
