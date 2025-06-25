@@ -70,6 +70,6 @@ export class AdminChangePlanBlockStatusUseCase {
             planName: updatedPlan.planName,
             isBlocked: updatedPlan.isBlocked,
         }
-        return { success: true, message: `Plan ${status ? "Blocked" : "Unblocked"} successfully.`, updatedPlan: updatedPlanDatadata }
+        return { success: true, message: `Plan ${isBlocked ? "Blocked" : "Unblocked"} successfully.`, updatedPlan: updatedPlanDatadata }
     }
 }

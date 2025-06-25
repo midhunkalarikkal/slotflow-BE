@@ -35,7 +35,6 @@ class AdminPlanController {
         try{
             const validateData = AdminAddNewPlanZodSchema.parse(req.body);
             const { planName, description, price, features, maxBookingPerMonth, adVisibility } = validateData;
-            if(!planName || !description || price === undefined || features.length === 0 || !maxBookingPerMonth || typeof adVisibility !== "boolean") throw new Error("Invalid request.");
             const result = await this.adminCreatePlanUseCase.execute({planName, description, price, features, maxBookingPerMonth, adVisibility });
             res.status(200).json(result);
         }catch(error){
@@ -47,7 +46,6 @@ class AdminPlanController {
         try{
             const validateData = AdminChangePlanIsBlockStatusZodSchema.parse(req.body);
             const { planId, isBlocked } = validateData;
-            if(!planId || !isBlocked) throw new Error("Invalid request.");
             const result = await this.adminChangePlanBlockStatusUseCase.execute({planId : new Types.ObjectId(planId as string), isBlocked });
             res.status(200).json(result);
         }catch(error){
