@@ -24,11 +24,12 @@ router.get('/fetchAllAppServices', authMiddleware, providerAppServiceController.
 router.post('/addServiceDetails', authMiddleware,upload.single('certificate'), providerServiceController.addServiceDetails);
 router.get('/getServiceDetails', authMiddleware, providerServiceController.getServiceDetails);
 
-router.get('/getProfileDetails', authMiddleware, providerProfileController.getProfileDetails);
-router.post('/updateProfileImage', authMiddleware,upload.single('profileImage'), providerProfileController.updateProfileImage);
-
 router.post('/addProviderServiceAvailability', authMiddleware, providerServiceAvailabilityController.addServiceAvailability);
 router.get('/getServiceAvailability', authMiddleware, providerServiceAvailabilityController.getServiceAvailability);
+
+router.get('/getProfileDetails', authMiddleware, providerProfileController.getProfileDetails);
+router.post('/updateProfileImage', authMiddleware,upload.single('profileImage'), providerProfileController.updateProfileImage);
+router.put('/updaterUserInfo', authMiddleware, providerProfileController.updateProviderInfo);
 
 router.get('/getPlans', authMiddleware, providerPlanController.fetchAllPlans);
 
@@ -41,6 +42,5 @@ router.get('/getPayments', authMiddleware, providerPaymentController.getPayments
 
 router.get('/getBookingAppointments', authMiddleware, providerBookingController.fetchBookingAppointments);
 
-router.put('/updaterUserInfo', authMiddleware, providerProfileController.updateProviderInfo);
 
 export default router;  

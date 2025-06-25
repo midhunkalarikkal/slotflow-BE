@@ -3,6 +3,7 @@ import { Types } from 'mongoose';
 import validator from 'validator';
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import { validateEmail, validateOtp, validatePassword, validatePhone, validateUsername } from '@codebymk/validator';
+import { daysArray, subscriptionMonthArray, validSlotDuration } from "../helpers/constants";
 
 dayjs.extend(customParseFormat);
 
@@ -37,6 +38,13 @@ export class Validator {
         if (!place || place.trim().length < 3) throw new Error("Place is required and should have at least 3 characters.");
         if (place.trim().length > 50) throw new Error("Place should have less than 50 characters.");
         if (!/^[a-zA-Z .-]{3,50}$/.test(place)) throw new Error("Place name must be 3–50 characters long and can only include letters, spaces, dots, and hyphens");
+    }
+
+    // Phone
+    static validatePhone(phone: string): void {
+        if (!phone || phone.trim().length < 7) throw new Error("Phone is required and should have at least 7 characters.");
+        if (phone.trim().length > 20) throw new Error("Phone should have less than 20 characters.");
+        if (!/^\+?[0-9\s\-().]{7,20}$/.test(phone)) throw new Error("Invalid phone number. Only digits, spaces, dashes (-), dots (.), parentheses (), and an optional + at the beginning are allowed. Length must be between 7 to 20 characters.");
     }
 
     // City
@@ -144,15 +152,13 @@ export class Validator {
 
     // Service availability
     static validateDay(day: string): void {
-        const validDays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
         if (!day || day.trim().length === 0) throw new Error("Day is required.");
-        if (!validDays.includes(day)) throw new Error("Invalid day. Day must be one of: Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday.");
+        if (!daysArray.includes(day)) throw new Error("Invalid day. Day must be one of: Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday.");
     }
 
     static validateDuration(duration: string): void {
-        const validDurations = ["15 minutes", "30 minutes", "1 hour"];
         if (!duration || duration.trim().length === 0) throw new Error("Duration is required.");
-        if (!validDurations.includes(duration.trim().toLowerCase())) throw new Error("Invalid duration. Duration must be one of: 15 minutes, 30 minutes, 1 hour.");
+        if (!validSlotDuration.includes(duration.trim().toLowerCase())) throw new Error("Invalid duration. Duration must be one of: 15 minutes, 30 minutes, 1 hour.");
     }
 
     static validateTiming(endTime: string, startTime: string): void {
@@ -240,8 +246,7 @@ export class Validator {
 
     // Plan duration
     static validatePlanDuration(value: string): void {
-        const durations = ["1 Month", "2 Month", "3 Month", "6 Month", "12 Months"];
-        if (!durations.includes(value)) {
+        if (!subscriptionMonthArray.includes(value)) {
             throw new Error("Invalid duration.");
         }
     }
@@ -370,13 +375,6 @@ export class CustomValidator {
                     return { status: false, message: "Invalid role." };
                 }
                 return null;
-            }
-
-            case "phone": {
-                const { status, message } = validatePhone(value as string,{
-                    length: 13,
-                });
-                return status ? null : { status, message };
             }
 
             default:

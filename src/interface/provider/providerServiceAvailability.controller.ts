@@ -2,6 +2,7 @@ import { Types } from "mongoose";
 import { Request, Response } from "express";
 import { HandleError } from "../../infrastructure/error/error";
 import { DateZodSchema } from "../../infrastructure/zod/common.zod";
+import { ProviderAddServiceAvailabilityZodSchema } from "../../infrastructure/zod/provider.zod";
 import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/provider.repository.impl";
 import { ServiceAvailabilityRepositoryImpl } from "../../infrastructure/database/serviceAvailability/serviceAvailability.repository.impl";
 import { ProviderAddServiceAvailabilitiesUseCase, ProviderFetchServiceAvailabilityUseCase } from "../../application/provider-use.case/providerServiceAvailability.use-case";
@@ -24,7 +25,8 @@ class ProviderServiceAvailabilityController {
     async addServiceAvailability(req: Request, res: Response) {
         try{
             const providerId = req.user.userOrProviderId;
-            const availabilities = req.body;
+            const validateData = ProviderAddServiceAvailabilityZodSchema.parse(req.body);
+            const { availabilities } = validateData;
             if(!providerId || !availabilities || availabilities.length  === 0) throw new Error("Invalid request.");
             const result = await this.providerAddServiceAvailabilitiesUseCase.execute({providerId: new Types.ObjectId(providerId), availabilities});
             res.status(200).json(result);

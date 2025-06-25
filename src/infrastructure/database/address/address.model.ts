@@ -32,9 +32,9 @@ const addressSchema = new Schema<IAddress>({
     phone: {
         type: String,
         required: [true, "Phone number is required"],
-        minlength: [10, "Phone number must be at least 10 characters"],
-        maxlength: [15, "Phone number must be at most 15 characters"],
-        match: [/^\+\d{10,15}$/, "Invalid phone number. It should start with '+' followed by 10 to 15 digits"],
+        minlength: [7, "Phone number must be at least 7 characters"],
+        maxlength: [20, "Phone number must be at most 20 characters"],
+        match: [/^\+?[0-9\s\-().]{7,20}$/, "Invalid phone number. Only digits, spaces, dashes (-), dots (.), parentheses (), and an optional + at the beginning are allowed. Length must be between 7 to 20 characters."],
     },
     place: {
         type: String,

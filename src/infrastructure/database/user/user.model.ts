@@ -51,9 +51,9 @@ const UserSchema = new Schema<IUser>({
   phone: {
     type: String,
     default: null,
-    minlength: [10, "Phone must be exactly 10 characters"],
-    maxlength: [15, "Phone must be exactly 15 characters"],
-    match: [/^\+\d{10,15}$/, "Invalid phone number"],
+    minlength: [7, "Phone number must be at least 7 characters"],
+    maxlength: [20, "Phone number must be at most 20 characters"],
+    match: [/^\+?[0-9\s\-().]{7,20}$/, "Invalid phone number. Only digits, spaces, dashes (-), dots (.), parentheses (), and an optional + at the beginning are allowed. Length must be between 7 to 20 characters."],
   },
   profileImage: {
     type: String,

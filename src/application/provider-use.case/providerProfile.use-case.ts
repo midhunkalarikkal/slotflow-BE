@@ -3,7 +3,7 @@ import { Upload } from "@aws-sdk/lib-storage";
 import { aws_s3Config } from "../../config/env";
 import { generateSignedUrl } from "../../config/aws_s3";
 import { extractS3Key } from "../../infrastructure/helpers/helper";
-import { Validator } from "../../infrastructure/validator/validator";
+import { validateOrThrow, Validator } from "../../infrastructure/validator/validator";
 import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/provider.repository.impl";
 import { 
     ProviderUpdateprofileImageResponse, 
@@ -87,6 +87,10 @@ export class ProviderUpdateProviderInfoUseCase {
     async execute(data: ProviderUpdateProviderInfoUseCaseRequestPayload) : Promise<ProviderUpdateProviderInfoUseCaseResponse> {
         const { providerId, username, phone } = data;
         if(!providerId || !username || !phone) throw new Error("Invalid request");
+
+        Validator.validateObjectId(providerId,"providerId");
+        validateOrThrow("username",username);
+        Validator.validatePhone(phone);
 
         const provider = await this.providerRepositoryImpl.findProviderById(providerId);
         if(!provider) throw new Error("No user found");
