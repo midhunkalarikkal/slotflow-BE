@@ -1,7 +1,9 @@
 import { Types } from "mongoose";
 import { IProvider, ProviderModel } from "./provider.model";
+import { AdiminFindAllProviders } from "../../dtos/admin.dto";
+import { ApiRequest, ApiResponse } from "../../dtos/common.dto";
 import { Provider } from "../../../domain/entities/provider.entity";
-import {  CreateProviderReqProps, FindAllProvidersResProps, IProviderRepository } from '../../../domain/repositories/IProvider.repository';
+import {  CreateProviderReqProps, IProviderRepository } from '../../../domain/repositories/IProvider.repository';
 
 
 export class ProviderRepositoryImpl implements IProviderRepository {
@@ -67,10 +69,27 @@ export class ProviderRepositoryImpl implements IProviderRepository {
         }
     }
 
-    async findAllProviders(): Promise<Array<FindAllProvidersResProps> | null> {
+    async findAllProviders({page,limit}: ApiRequest): Promise<ApiResponse<AdiminFindAllProviders>> {
         try {
-            const providers = await ProviderModel.find({}, { _id: 1, username: 1, email: 1, isBlocked: 1, isAdminVerified: 1, trustedBySlotflow: 1 });
-            return providers ? providers.map((provider) => this.mapToEntity(provider)) : null;
+            const skip = (page - 1) * limit;
+            const [providers, totalCount] = await Promise.all([
+                ProviderModel.find({}, { 
+                    _id: 1, 
+                    username: 1, 
+                    email: 1, 
+                    isBlocked: 1, 
+                    isAdminVerified: 1, 
+                    trustedBySlotflow: 1
+                }).skip(skip).limit(limit).lean(),
+                ProviderModel.countDocuments(),
+            ]);
+            const totalPages = Math.ceil(totalCount / limit);
+            return { 
+                data: providers.map(this.mapToEntity),
+                totalPages,
+                currentPage: page,
+                totalCount
+            }
         } catch (error) {
             throw new Error("Failed to fetch providers from database.");
         }

@@ -1,24 +1,25 @@
 import { Validator } from "../../../infrastructure/validator/validator";
 import { OTPService } from "../../../infrastructure/services/otp.service";
+import { ApiRequest, ApiResponse } from "../../../infrastructure/dtos/common.dto";
 import { ProviderRepositoryImpl } from "../../../infrastructure/database/provider/provider.repository.impl";
 import { 
-    AdminProviderListUseCaseResponse, 
     AdminApproveProviderUseCaseResponse, 
     AdminChangeProviderStatusUseCaseResponse, 
     AdminApproveProviderUseCaseRequestPayload, 
     AdminChangeProviderTrustTagUseCaseResponse, 
     AdminChangeProviderStatusUseCaseRequestPaylod, 
-    AdminChangeProviderTrustTagUseCaseRequestPayload, 
+    AdminChangeProviderTrustTagUseCaseRequestPayload,
+    AdiminFindAllProviders, 
 } from "../../../infrastructure/dtos/admin.dto";
 
 
 export class AdminProviderListUseCase {
     constructor(private providerRepositoryImpl: ProviderRepositoryImpl) { }
 
-    async execute(): Promise<AdminProviderListUseCaseResponse> {
-        const providers = await this.providerRepositoryImpl.findAllProviders();
-        if (!providers) throw new Error("Fetching error, please try again.");
-        return { success: true, message: "Fetched providers.", providers };
+    async execute({page, limit}: ApiRequest): Promise<ApiResponse<AdiminFindAllProviders>> {
+        const result = await this.providerRepositoryImpl.findAllProviders({page, limit});
+        if (!result) throw new Error("Fetching error, please try again.");
+        return { data: result.data, totalPages: result.totalPages, currentPage: result.currentPage, totalCount: result.totalCount };
     }
 
 }

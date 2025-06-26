@@ -130,6 +130,16 @@ export const stringArrayField = (
   return arraySchema;
 };
 
+
+
+
+
+
+
+
+
+
+// **** Zod schema that is common for multiple controllers **** \\
 // Date zod validation alone for the date coming in req.query
 export const DateZodSchema = z.object({
     date: dateField,
@@ -164,5 +174,20 @@ export const AddAddressZodSchema = z.object({
 // Stripe Payment Schema
 export const SaveStripePaymentZodSchema = z.object({
     sessionId: stringField("Stripe session Id",5,200,/^cs_test_[a-zA-Z0-9]{5,200}$/,"Invalid session ID")
+});
+
+// Validating the page and limit in the request query zod schema
+export const RequestQueryCommonZodSchema = z.object({
+  page: stringField("Request query parameter page")
+    .transform(Number)
+    .refine((val) => !isNaN(val) && val > 0, {
+      message: "Page must be a valid positive number",
+    }),
+    
+  limit: stringField("Request query parameter limit")
+    .transform(Number)
+    .refine((val) => !isNaN(val) && val > 0, {
+      message: "Limit must be a valid positive number",
+    }),
 });
 

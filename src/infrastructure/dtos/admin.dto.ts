@@ -130,6 +130,7 @@ export interface AdminFetchAllPaymentsUseCaseResponse extends CommonResponse {
 // **** used in adminProvider.use-case **** \\
 
 // admin list all providers use case response interface 
+export type AdiminFindAllProviders = Array<Pick<Provider, "_id" | "username" | "email" | "isBlocked" | "isAdminVerified" | "trustedBySlotflow">>;
 export interface AdminProviderListUseCaseResponse extends CommonResponse {
     providers: Array<Pick<Provider, "_id" | "username" | "email" | "isBlocked" | "isAdminVerified" | "trustedBySlotflow">>;
 }

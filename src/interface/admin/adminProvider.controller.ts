@@ -10,7 +10,7 @@ import { ServiceAvailabilityRepositoryImpl } from "../../infrastructure/database
 import { AdminApproveProviderUseCase, AdminChangeProviderBlockStatusUseCase, AdminChangeProviderTrustTagUseCase, AdminProviderListUseCase } from "../../application/admin-use.case/adminProvider/adminProvider.use-case";
 import { AdminFetchProviderAddressUseCase, AdminFetchProviderDetailsUseCase, AdminFetchProviderPaymentsUseCase, AdminfetchProviderServiceAvailabilityUseCase, AdminFetchProviderServiceUseCase, AdminFetchProviderSubscriptionsUseCase } from "../../application/admin-use.case/adminProvider/adminProviderProfile.use-case";
 import { AdminApproveProviderZodSchema, AdminChangeProviderStatusZodSchema, AdminChangeProviderTrustedTagZodSchema, AdminProviderIdZodSchema } from "../../infrastructure/zod/admin.zod";
-import { DateZodSchema } from "../../infrastructure/zod/common.zod";
+import { DateZodSchema, RequestQueryCommonZodSchema } from "../../infrastructure/zod/common.zod";
 
 const addressRepositoryImpl = new AddressRepositoryImpl();
 const paymentRepositoryImpl = new PaymentRepositoryImpl();
@@ -57,7 +57,11 @@ class AdminProviderController {
 
     async getAllProviders(req: Request, res: Response) {
         try{
-            const result = await this.adminProviderListUseCase.execute();
+            console.log("requesting providers list");
+            const validateQueryData = RequestQueryCommonZodSchema.parse(req.query);
+            const { page, limit } = validateQueryData;
+            const result = await this.adminProviderListUseCase.execute({ page, limit });
+            console.log("result : ",result);
             res.status(200).json(result);
         }catch(error){
             HandleError.handle(error, res);

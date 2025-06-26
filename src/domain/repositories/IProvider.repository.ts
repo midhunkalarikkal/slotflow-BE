@@ -1,8 +1,9 @@
 import { Types } from "mongoose";
 import { Provider } from "../entities/provider.entity";
+import { AdiminFindAllProviders } from "../../infrastructure/dtos/admin.dto";
+import { ApiRequest, ApiResponse } from "../../infrastructure/dtos/common.dto";
 
 export type CreateProviderReqProps = Pick<Provider, "username" | "email" | "password" | "verificationToken">;
-export type FindAllProvidersResProps = Pick<Provider, "_id" | "username" | "email" | "isBlocked" | "isAdminVerified" | "trustedBySlotflow">;
 
 export interface IProviderRepository {
     createProvider(provider : CreateProviderReqProps) : Promise<Provider | null>;
@@ -13,7 +14,7 @@ export interface IProviderRepository {
     
     findProviderByEmail(email : string) : Promise<Provider | null>;
     
-    findAllProviders(): Promise<Array<FindAllProvidersResProps> | null>;
+    findAllProviders({page,limit}: ApiRequest): Promise<ApiResponse<AdiminFindAllProviders>>;
     
     findProviderById(providerId: Types.ObjectId): Promise<Provider | null>;
 }
