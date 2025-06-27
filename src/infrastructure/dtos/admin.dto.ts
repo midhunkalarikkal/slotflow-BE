@@ -87,10 +87,10 @@ export interface AdminChangeServiceStatusUseCaseResponse extends CommonResponse 
 
 // **** used in adminPlan.use-case **** \\
 
-// admin list all plans use case response interface 
-export interface AdminPlanListUseCaseResponse extends CommonResponse {
-    plans: Array<Pick<Plan, "_id" | "planName" | "isBlocked">>;
-}
+// Data type returned for the Admin Plans table
+// Used in AdminPlanListUseCase, the findAllPlans method in PlanRepositoryImpl, 
+// and the findAllPlans method in IPlanRepository as the response type with the ApiResponse interface
+export type AdminPlanListResponse = Array<Pick<Plan, "_id" | "planName" | "isBlocked" | "price" | "maxBookingPerMonth" | "adVisibility">>;
 
 
 // admin create new plan request payload type 

@@ -1,21 +1,22 @@
-import { Validator } from "../../infrastructure/validator/validator";
-import { PlanRepositoryImpl } from "../../infrastructure/database/plan/plan.repository.impl";
 import { 
-    AdminPlanListUseCaseResponse, 
     AdminCreatePlanUseCaseResponse, 
     AdminAddNewPlanUseCaseRequestPayload, 
     AdminChangePlanStatusUseCaseResponse, 
-    AdminChangePlanIsBlockedStatusUseCaseRequestPayload, 
+    AdminChangePlanIsBlockedStatusUseCaseRequestPayload,
+    AdminPlanListResponse, 
 } from "../../infrastructure/dtos/admin.dto";
+import { Validator } from "../../infrastructure/validator/validator";
+import { ApiPaginationRequest, ApiResponse } from "../../infrastructure/dtos/common.dto";
+import { PlanRepositoryImpl } from "../../infrastructure/database/plan/plan.repository.impl";
 
 
 export class AdminPlanListUseCase {
     constructor(private planRepositoryImpl: PlanRepositoryImpl) { }
 
-    async execute(): Promise<AdminPlanListUseCaseResponse> {
-        const plans = await this.planRepositoryImpl.findAllPlans();
-        if (!plans) throw new Error("Plans fetching error");
-        return { success: true, message: "Plans fetched", plans };
+    async execute({ page, limit }: ApiPaginationRequest): Promise<ApiResponse<AdminPlanListResponse>> {
+        const result = await this.planRepositoryImpl.findAllPlans({ page, limit });
+        if (!result) throw new Error("Plans fetching failed");
+        return { data: result.data, totalPages: result.totalPages, currentPage: result.currentPage, totalCount: result.totalCount };
     }
 }
 

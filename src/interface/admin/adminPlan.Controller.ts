@@ -4,6 +4,7 @@ import { HandleError } from "../../infrastructure/error/error";
 import { PlanRepositoryImpl } from "../../infrastructure/database/plan/plan.repository.impl";
 import { AdminAddNewPlanZodSchema, AdminChangePlanIsBlockStatusZodSchema } from "../../infrastructure/zod/admin.zod";
 import { AdminChangePlanBlockStatusUseCase, AdminCreatePlanUseCase, AdminPlanListUseCase } from "../../application/admin-use.case/adminPlan.use-case";
+import { RequestQueryCommonZodSchema } from "../../infrastructure/zod/common.zod";
 
 const planRepositoryImpl = new PlanRepositoryImpl();
 
@@ -24,7 +25,9 @@ class AdminPlanController {
 
     async getAllPLans(req: Request, res: Response) {
         try{
-            const result = await this.adminPlanListUseCase.execute();
+            const validateQueryData = RequestQueryCommonZodSchema.parse(req.query);
+            const { page, limit } = validateQueryData;
+            const result = await this.adminPlanListUseCase.execute({ page, limit });
             res.status(200).json(result);
         }catch(error){
             HandleError.handle(error, res);
