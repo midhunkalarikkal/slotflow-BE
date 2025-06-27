@@ -13,7 +13,9 @@ import { FindAllSubscriptionsResProps, findSubscriptionFullDetailsResProps } fro
 
 // **** used in adminUser.use-case **** \\
 
-// admin fetch all users for listing use case response interface 
+// Data type returned for the Admin Users table
+// Used in AdminUserListUseCase, the findAllUsers method in UserRepositoryImpl, 
+// and the findAllUsers method in IUserRepository as the response type with the ApiResponse interface
 export type AdminFetchAllUsers = Array<Pick<User, "_id" | "username" | "email" | "isBlocked" | "isEmailVerified">>;
 
 
@@ -116,9 +118,9 @@ export interface AdminChangePlanStatusUseCaseResponse extends CommonResponse {
 // **** used in adminPayment.use-case **** \\
 
 // admin fetch all payments use case response interface 
-type FetchAllPayments = Pick<Payment, "createdAt" | "totalAmount" | "paymentFor" | "paymentGateway" | "paymentStatus" | "paymentMethod">;
+export type AdminFetchAllPayments = Array<Pick<Payment, "createdAt" | "totalAmount" | "paymentFor" | "paymentGateway" | "paymentStatus" | "paymentMethod">>;
 export interface AdminFetchAllPaymentsUseCaseResponse extends CommonResponse {
-    payments: Array<FetchAllPayments>
+    payments: Array<AdminFetchAllPayments>
 }
 
 
@@ -127,7 +129,9 @@ export interface AdminFetchAllPaymentsUseCaseResponse extends CommonResponse {
 
 // **** used in adminProvider.use-case **** \\
 
-// admin list all providers use case response interface 
+// Data type returned for the Admin Providers table
+// Used in AdminProviderListUseCase, the findAllProviders method in ProviderRepositoryImpl, 
+// and the findAllProviders method in IProviderRepository as the response type with ApiResponse
 export type AdiminFetchAllProviders = Array<Pick<Provider, "_id" | "username" | "email" | "isBlocked" | "isAdminVerified" | "trustedBySlotflow">>;
 
 

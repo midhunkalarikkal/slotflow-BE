@@ -1,11 +1,11 @@
-import { Validator } from "../../infrastructure/validator/validator";
-import { UserRepositoryImpl } from "../../infrastructure/database/user/user.repository.impl";
 import { 
+    AdminFetchAllUsers, 
     AdminChangeUserStatusUseCaseResponse, 
     AdminChangeUserIsBlockedStatusUseCaseRequestPayload,
-    AdminFetchAllUsers, 
 } from "../../infrastructure/dtos/admin.dto";
+import { Validator } from "../../infrastructure/validator/validator";
 import { ApiPaginationRequest, ApiResponse } from "../../infrastructure/dtos/common.dto";
+import { UserRepositoryImpl } from "../../infrastructure/database/user/user.repository.impl";
 
 export class AdminUserListUseCase {
     constructor(private userRepositoryImpl: UserRepositoryImpl) { }

@@ -1,6 +1,7 @@
 import { Types } from "mongoose";
 import { Request, Response } from "express";
 import { HandleError } from "../../infrastructure/error/error";
+import { DateZodSchema, RequestQueryCommonZodSchema } from "../../infrastructure/zod/common.zod";
 import { AddressRepositoryImpl } from "../../infrastructure/database/address/address.repository.impl";
 import { PaymentRepositoryImpl } from "../../infrastructure/database/payment/payment.repository.impl";
 import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/provider.repository.impl";
@@ -10,7 +11,6 @@ import { ServiceAvailabilityRepositoryImpl } from "../../infrastructure/database
 import { AdminApproveProviderUseCase, AdminChangeProviderBlockStatusUseCase, AdminChangeProviderTrustTagUseCase, AdminProviderListUseCase } from "../../application/admin-use.case/adminProvider/adminProvider.use-case";
 import { AdminFetchProviderAddressUseCase, AdminFetchProviderDetailsUseCase, AdminFetchProviderPaymentsUseCase, AdminfetchProviderServiceAvailabilityUseCase, AdminFetchProviderServiceUseCase, AdminFetchProviderSubscriptionsUseCase } from "../../application/admin-use.case/adminProvider/adminProviderProfile.use-case";
 import { AdminApproveProviderZodSchema, AdminChangeProviderStatusZodSchema, AdminChangeProviderTrustedTagZodSchema, AdminProviderIdZodSchema } from "../../infrastructure/zod/admin.zod";
-import { DateZodSchema, RequestQueryCommonZodSchema } from "../../infrastructure/zod/common.zod";
 
 const addressRepositoryImpl = new AddressRepositoryImpl();
 const paymentRepositoryImpl = new PaymentRepositoryImpl();
@@ -57,11 +57,9 @@ class AdminProviderController {
 
     async getAllProviders(req: Request, res: Response) {
         try{
-            console.log("requesting providers list");
             const validateQueryData = RequestQueryCommonZodSchema.parse(req.query);
             const { page, limit } = validateQueryData;
             const result = await this.adminProviderListUseCase.execute({ page, limit });
-            console.log("result : ",result);
             res.status(200).json(result);
         }catch(error){
             HandleError.handle(error, res);

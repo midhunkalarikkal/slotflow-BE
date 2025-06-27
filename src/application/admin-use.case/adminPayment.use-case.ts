@@ -1,4 +1,5 @@
-import { AdminFetchAllPaymentsUseCaseResponse } from "../../infrastructure/dtos/admin.dto";
+import { AdminFetchAllPayments } from "../../infrastructure/dtos/admin.dto";
+import { ApiPaginationRequest, ApiResponse } from "../../infrastructure/dtos/common.dto";
 import { PaymentRepositoryImpl } from "../../infrastructure/database/payment/payment.repository.impl";
 
 export class AdminFetchAllPaymentsUseCase {
@@ -6,9 +7,9 @@ export class AdminFetchAllPaymentsUseCase {
         private paymentRepositoryImpl: PaymentRepositoryImpl,
     ) {}
 
-    async execute(): Promise<AdminFetchAllPaymentsUseCaseResponse> {
-        const payments = await this.paymentRepositoryImpl.findAllPayments();
-        if(!payments) throw new Error("Payments fetching error");
-        return { success: true, message: "Payments fetched successfully.", payments}
+    async execute({ page, limit }: ApiPaginationRequest): Promise<ApiResponse<AdminFetchAllPayments>> {
+        const result = await this.paymentRepositoryImpl.findAllPayments({ page, limit });
+        if (!result) throw new Error("Payments fetching failed");
+        return { data: result.data, totalPages: result.totalPages, currentPage: result.currentPage, totalCount: result.totalCount };
     }
 }
