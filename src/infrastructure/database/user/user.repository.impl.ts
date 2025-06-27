@@ -1,7 +1,9 @@
 import { Types } from "mongoose";
 import { IUser, UserModel } from "./user.model";
 import { User } from "../../../domain/entities/user.entity";
-import { CreateUserProps, FindAllUsersProps, IUserRepository } from "../../../domain/repositories/IUser.repository";
+import { CreateUserProps, IUserRepository } from "../../../domain/repositories/IUser.repository";
+import { AdminFetchAllUsers } from "../../dtos/admin.dto";
+import { ApiPaginationRequest, ApiResponse } from "../../dtos/common.dto";
 
 export class UserRepositoryImpl implements IUserRepository {
     private mapToEntity(user: IUser): User {
@@ -27,7 +29,7 @@ export class UserRepositoryImpl implements IUserRepository {
             const createdUser = await UserModel.create(user);
             return this.mapToEntity(createdUser);
         } catch (error) {
-            console.log("error : ",error);
+            console.log("error : ", error);
             throw new Error("Unable to register, please try again after a few minutes.");
         }
     }
@@ -59,20 +61,37 @@ export class UserRepositoryImpl implements IUserRepository {
         }
     }
 
-    async findAllUsers(): Promise<Array<FindAllUsersProps>> {
+    async findAllUsers({ page, limit }: ApiPaginationRequest): Promise<ApiResponse<AdminFetchAllUsers>> {
         try {
-            const users =  await UserModel.find({}, { _id: 1, username: 1, email: 1, isBlocked: 1, isEmailVerified: 1 });
-            return users.map((user) => this.mapToEntity(user));
+            const skip = (page - 1) * limit;
+            const [users, totalCount] = await Promise.all([
+                UserModel.find({}, {
+                    _id: 1,
+                    username: 1,
+                    email: 1,
+                    isBlocked: 1,
+                    isEmailVerified: 1
+                }).skip(skip).limit(limit).lean(),
+                UserModel.countDocuments(),
+
+            ])
+            const totalPages = Math.ceil(totalCount / limit);
+            return {
+                data: users.map(this.mapToEntity),
+                totalPages,
+                currentPage: page,
+                totalCount
+            }
         } catch (error) {
             throw new Error("Failed to fetch users from database.")
         }
-    }    
+    }
 
     async findUserById(userId: Types.ObjectId): Promise<User | null> {
-        try{
+        try {
             const user = await UserModel.findById(userId);
             return user ? this.mapToEntity(user) : null;
-        }catch(error){
+        } catch (error) {
             throw new Error("User not found.");
         }
     }

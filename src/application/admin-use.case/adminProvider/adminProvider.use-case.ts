@@ -1,6 +1,6 @@
 import { Validator } from "../../../infrastructure/validator/validator";
 import { OTPService } from "../../../infrastructure/services/otp.service";
-import { ApiRequest, ApiResponse } from "../../../infrastructure/dtos/common.dto";
+import { ApiPaginationRequest, ApiResponse } from "../../../infrastructure/dtos/common.dto";
 import { ProviderRepositoryImpl } from "../../../infrastructure/database/provider/provider.repository.impl";
 import { 
     AdminApproveProviderUseCaseResponse, 
@@ -9,16 +9,16 @@ import {
     AdminChangeProviderTrustTagUseCaseResponse, 
     AdminChangeProviderStatusUseCaseRequestPaylod, 
     AdminChangeProviderTrustTagUseCaseRequestPayload,
-    AdiminFindAllProviders, 
+    AdiminFetchAllProviders, 
 } from "../../../infrastructure/dtos/admin.dto";
 
 
 export class AdminProviderListUseCase {
     constructor(private providerRepositoryImpl: ProviderRepositoryImpl) { }
 
-    async execute({page, limit}: ApiRequest): Promise<ApiResponse<AdiminFindAllProviders>> {
+    async execute({page, limit}: ApiPaginationRequest): Promise<ApiResponse<AdiminFetchAllProviders>> {
         const result = await this.providerRepositoryImpl.findAllProviders({page, limit});
-        if (!result) throw new Error("Fetching error, please try again.");
+        if (!result) throw new Error("Providers fetching failed");
         return { data: result.data, totalPages: result.totalPages, currentPage: result.currentPage, totalCount: result.totalCount };
     }
 

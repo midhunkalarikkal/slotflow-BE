@@ -14,9 +14,7 @@ import { FindAllSubscriptionsResProps, findSubscriptionFullDetailsResProps } fro
 // **** used in adminUser.use-case **** \\
 
 // admin fetch all users for listing use case response interface 
-export interface AdminUsersListUseCaseResponse extends CommonResponse {
-    users: Array<Pick<User, "_id" | "username" | "email" | "isBlocked" | "isEmailVerified">>
-}
+export type AdminFetchAllUsers = Array<Pick<User, "_id" | "username" | "email" | "isBlocked" | "isEmailVerified">>;
 
 
 // admin chage user isBlocked status use case request payload interface  
@@ -130,10 +128,7 @@ export interface AdminFetchAllPaymentsUseCaseResponse extends CommonResponse {
 // **** used in adminProvider.use-case **** \\
 
 // admin list all providers use case response interface 
-export type AdiminFindAllProviders = Array<Pick<Provider, "_id" | "username" | "email" | "isBlocked" | "isAdminVerified" | "trustedBySlotflow">>;
-export interface AdminProviderListUseCaseResponse extends CommonResponse {
-    providers: Array<Pick<Provider, "_id" | "username" | "email" | "isBlocked" | "isAdminVerified" | "trustedBySlotflow">>;
-}
+export type AdiminFetchAllProviders = Array<Pick<Provider, "_id" | "username" | "email" | "isBlocked" | "isAdminVerified" | "trustedBySlotflow">>;
 
 
 // admin approve provider isAdminVerified use case request payload interface

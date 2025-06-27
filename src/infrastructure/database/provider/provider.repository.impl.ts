@@ -1,7 +1,7 @@
 import { Types } from "mongoose";
 import { IProvider, ProviderModel } from "./provider.model";
-import { AdiminFindAllProviders } from "../../dtos/admin.dto";
-import { ApiRequest, ApiResponse } from "../../dtos/common.dto";
+import { AdiminFetchAllProviders } from "../../dtos/admin.dto";
+import { ApiPaginationRequest, ApiResponse } from "../../dtos/common.dto";
 import { Provider } from "../../../domain/entities/provider.entity";
 import {  CreateProviderReqProps, IProviderRepository } from '../../../domain/repositories/IProvider.repository';
 
@@ -69,7 +69,7 @@ export class ProviderRepositoryImpl implements IProviderRepository {
         }
     }
 
-    async findAllProviders({page,limit}: ApiRequest): Promise<ApiResponse<AdiminFindAllProviders>> {
+    async findAllProviders({page,limit}: ApiPaginationRequest): Promise<ApiResponse<AdiminFetchAllProviders>> {
         try {
             const skip = (page - 1) * limit;
             const [providers, totalCount] = await Promise.all([

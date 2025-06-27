@@ -1,17 +1,19 @@
 import { Validator } from "../../infrastructure/validator/validator";
 import { UserRepositoryImpl } from "../../infrastructure/database/user/user.repository.impl";
 import { 
-    AdminUsersListUseCaseResponse, 
     AdminChangeUserStatusUseCaseResponse, 
-    AdminChangeUserIsBlockedStatusUseCaseRequestPayload, 
+    AdminChangeUserIsBlockedStatusUseCaseRequestPayload,
+    AdminFetchAllUsers, 
 } from "../../infrastructure/dtos/admin.dto";
+import { ApiPaginationRequest, ApiResponse } from "../../infrastructure/dtos/common.dto";
 
 export class AdminUserListUseCase {
     constructor(private userRepositoryImpl: UserRepositoryImpl) { }
 
-    async execute(): Promise<AdminUsersListUseCaseResponse> {
-        const users = await this.userRepositoryImpl.findAllUsers();
-        return { success: true, message: "Fetched users.", users };
+    async execute({ page, limit }: ApiPaginationRequest): Promise<ApiResponse<AdminFetchAllUsers>> {
+        const result = await this.userRepositoryImpl.findAllUsers({ page, limit });
+        if (!result) throw new Error("Users fetching failed, ");
+        return { data: result.data, totalPages: result.totalPages, currentPage: result.currentPage, totalCount: result.totalCount };
     }
 }
 

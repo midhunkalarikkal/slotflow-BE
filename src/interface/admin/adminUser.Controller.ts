@@ -4,6 +4,7 @@ import { HandleError } from "../../infrastructure/error/error";
 import { AdminChangeUserBlockStatusZOdSchema } from "../../infrastructure/zod/admin.zod";
 import { UserRepositoryImpl } from "../../infrastructure/database/user/user.repository.impl";
 import { AdminChangeUserBlockStatusUseCase, AdminUserListUseCase } from "../../application/admin-use.case/adminUser.use-case";
+import { RequestQueryCommonZodSchema } from "../../infrastructure/zod/common.zod";
 
 const userRepositoryImpl = new UserRepositoryImpl();
 const adminUserListUseCase = new AdminUserListUseCase(userRepositoryImpl);
@@ -20,7 +21,9 @@ class AdminUserController {
 
     async getAllUsers(req: Request, res: Response) {
         try{
-            const result = await this.adminUserListUseCase.execute();
+            const validateQueryData = RequestQueryCommonZodSchema.parse(req.query);
+            const { page, limit } = validateQueryData;
+            const result = await this.adminUserListUseCase.execute({ page, limit });
             res.status(200).json(result);
         }catch(error){
             HandleError.handle(error, res);

@@ -14,7 +14,7 @@ export interface ApiResponse<T = unknown> {
 }
 
 // Common request interface for the usecases
-export interface ApiRequest {
+export interface ApiPaginationRequest {
     page: number;
     limit: number;
 }
