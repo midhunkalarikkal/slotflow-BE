@@ -1,4 +1,17 @@
 import dayjs from "dayjs";
+import {
+    FindProviderServiceResProps,
+    AdminFetchProviderServiceRequest,
+    AdminFetchProviderDetailsRequest,
+    AdminFetchProviderAddressRequest,
+    AdminFetchProviderServiceResponse,
+    AdminFetchProviderDetailsResponse,
+    AdminFetchProviderPaymentsRequest,
+    AdminFetchProviderAddressResponse,
+    AdminFetchProviderPaymentsResponse,
+    AdminFetchProviderServiceAvailabilityRequest,
+    AdminFetchProviderServiceAvailabilityResponse,
+} from "../../../infrastructure/dtos/admin.dto";
 import { generateSignedUrl } from "../../../config/aws_s3";
 import { Validator } from "../../../infrastructure/validator/validator";
 import { AddressRepositoryImpl } from "../../../infrastructure/database/address/address.repository.impl";
@@ -7,35 +20,22 @@ import { ProviderRepositoryImpl } from "../../../infrastructure/database/provide
 import { SubscriptionRepositoryImpl } from "../../../infrastructure/database/subscription/subscription.repository.impl";
 import { ProviderServiceRepositoryImpl } from "../../../infrastructure/database/providerService/providerService.repository.impl";
 import { ServiceAvailabilityRepositoryImpl } from "../../../infrastructure/database/serviceAvailability/serviceAvailability.repository.impl";
-import {
-    FindProviderServiceResProps,
-    AdminFetchProviderServiceUseCaseResponse,
-    AdminFetchProviderAddressUseCaseResponse,
-    AdminFetchProviderDetailsUseCaseResponse,
-    AdminFetchProviderPaymentsResponse,
-    AdminFetchProviderDetailsUseCaseRequestPayload,
-    AdminFetchProviderAddressUseCaseRequestPayload,
-    AdminFetchProviderServiceUseCaseRequestPayload,
-    AdminFetchProviderPaymentsRequest,
-    AdminFetchProviderServiceAvailabilityUseCaseResponse,
-    AdminFetchProviderServiceAvailabilityUseCaseRequestPayload,
-} from "../../../infrastructure/dtos/admin.dto";
-import { ApiResponse, FetchProviderSubscriptionsRequestPayload, FindSubscriptionsByProviderIdResProps } from "../../../infrastructure/dtos/common.dto";
+import { ApiResponse, FetchProviderSubscriptionsRequest, FindSubscriptionsByProviderIdResponse } from "../../../infrastructure/dtos/common.dto";
 
 
 export class AdminFetchProviderDetailsUseCase {
     constructor(private providerRepository: ProviderRepositoryImpl) { }
 
-    async execute(data: AdminFetchProviderDetailsUseCaseRequestPayload): Promise<AdminFetchProviderDetailsUseCaseResponse> {
+    async execute(data: AdminFetchProviderDetailsRequest): Promise<ApiResponse<AdminFetchProviderDetailsResponse>> {
         const { providerId } = data;
         if (!providerId) throw new Error("Invalid request.");
 
         Validator.validateObjectId(providerId, "providerId");
 
         const providerData = await this.providerRepository.findProviderById(providerId);
-        if (providerData == null) return { success: true, message: "Provider details fetched", provider: {} };
+        if (providerData == null) return { success: true, message: "Provider details fetched", data: {} };
         const { addressId, subscription, serviceId, serviceAvailabilityId, verificationToken, password, updatedAt, ...provider } = providerData;
-        return { success: true, message: "Provider details fetched", provider };
+        return { success: true, message: "Provider details fetched", data: provider };
     }
 }
 
@@ -45,7 +45,7 @@ export class AdminFetchProviderAddressUseCase {
         private providerRepository: ProviderRepositoryImpl,
         private addressRepository: AddressRepositoryImpl,) { }
 
-    async execute(data: AdminFetchProviderAddressUseCaseRequestPayload): Promise<AdminFetchProviderAddressUseCaseResponse> {
+    async execute(data: AdminFetchProviderAddressRequest): Promise<ApiResponse<AdminFetchProviderAddressResponse>> {
         const { providerId } = data;
         if (!providerId) throw new Error("Invalid request.");
 
@@ -55,10 +55,10 @@ export class AdminFetchProviderAddressUseCase {
         if (!provider) throw new Error("No user found.");
 
         const addressData = await this.addressRepository.findAddressByUserId(providerId);
-        if (addressData == null) return { success: true, message: "Address not yet added.", address: {} };
+        if (addressData == null) return { success: true, message: "Address not yet added.", data: {} };
 
         const { _id, ...address } = addressData;
-        return { success: true, message: "Address fetched successfully.", address };
+        return { success: true, message: "Address fetched successfully.", data: address };
     }
 }
 
@@ -69,7 +69,7 @@ export class AdminFetchProviderServiceUseCase {
         private providerServiceRepository: ProviderServiceRepositoryImpl,
     ) { }
 
-    async execute(data: AdminFetchProviderServiceUseCaseRequestPayload): Promise<AdminFetchProviderServiceUseCaseResponse> {
+    async execute(data: AdminFetchProviderServiceRequest): Promise<ApiResponse<AdminFetchProviderServiceResponse>> {
         const { providerId } = data;
         if (!providerId) throw new Error("Invalid request.");
 
@@ -84,7 +84,7 @@ export class AdminFetchProviderServiceUseCase {
         }
 
         if (!isServiceData(serviceData)) {
-            return { success: true, message: "Service fetched successfully.", service: {} };
+            return { success: true, message: "Service fetched successfully.", data: {} };
         }
 
         const { _id, createdAt, updatedAt, ...service } = serviceData;
@@ -102,7 +102,7 @@ export class AdminFetchProviderServiceUseCase {
         if (!signedUrl) throw new Error("Image fetching error.");
 
         service.providerCertificateUrl = signedUrl;
-        return { success: true, message: "Service fetched successfully.", service };
+        return { success: true, message: "Service fetched successfully.", data: service };
     }
 }
 
@@ -113,7 +113,7 @@ export class AdminfetchProviderServiceAvailabilityUseCase {
         private serviceAvailabilityRepositoryImpl: ServiceAvailabilityRepositoryImpl,
     ) { }
 
-    async execute(data: AdminFetchProviderServiceAvailabilityUseCaseRequestPayload): Promise<AdminFetchProviderServiceAvailabilityUseCaseResponse> {
+    async execute(data: AdminFetchProviderServiceAvailabilityRequest): Promise<ApiResponse<AdminFetchProviderServiceAvailabilityResponse>> {
         const { providerId, date } = data;
         if (!providerId || !date) throw new Error("Invalid request.");
         const currentDateTime = dayjs();
@@ -126,7 +126,7 @@ export class AdminfetchProviderServiceAvailabilityUseCase {
         if (!provider) throw new Error("No user found.");
 
         const availability = await this.serviceAvailabilityRepositoryImpl.findServiceAvailabilityByProviderId(providerId, date);
-        if (availability == null) return { success: true, message: "Service availability fetched successfully.", availability: {} };
+        if (availability == null) return { success: true, message: "Service availability fetched successfully.", data: {} };
         const updatedSlots = availability.slots.map((slot) => {
             const slotDateTime = dayjs(`${selectedDate} ${slot.time}`, 'YYYY-MM-DD hh:mm A');
             const isWithin2Hours = slotDateTime.diff(currentDateTime, 'minute') < 120;
@@ -136,7 +136,7 @@ export class AdminfetchProviderServiceAvailabilityUseCase {
             }
         });
 
-        return { success: true, message: "Service availability fetched successfully.", availability: { ...availability, slots: updatedSlots } };
+        return { success: true, message: "Service availability fetched successfully.", data: { ...availability, slots: updatedSlots } };
     }
 }
 
@@ -147,7 +147,7 @@ export class AdminFetchProviderSubscriptionsUseCase {
         private subscriptionRepositoryImpl: SubscriptionRepositoryImpl,
     ) { }
 
-    async execute(data: FetchProviderSubscriptionsRequestPayload): Promise<ApiResponse<FindSubscriptionsByProviderIdResProps>> {
+    async execute(data: FetchProviderSubscriptionsRequest): Promise<ApiResponse<FindSubscriptionsByProviderIdResponse>> {
         const { providerId, page, limit } = data;
         if (!providerId) throw new Error("Invalid request.");
 

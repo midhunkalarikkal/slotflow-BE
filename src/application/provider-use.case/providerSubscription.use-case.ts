@@ -1,7 +1,7 @@
 import { Validator } from "../../infrastructure/validator/validator";
 import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/provider.repository.impl";
 import { SubscriptionRepositoryImpl } from "../../infrastructure/database/subscription/subscription.repository.impl";
-import { ApiResponse, FetchProviderSubscriptionsRequestPayload, FindSubscriptionsByProviderIdResProps } from "../../infrastructure/dtos/common.dto";
+import { ApiResponse, FetchProviderSubscriptionsRequest, FindSubscriptionsByProviderIdResponse } from "../../infrastructure/dtos/common.dto";
 
 
 export class ProviderFetchAllSubscriptionsUseCase {
@@ -10,7 +10,7 @@ export class ProviderFetchAllSubscriptionsUseCase {
         private subscriptionRepositoryImpl: SubscriptionRepositoryImpl,
     ) { }
 
-    async execute(data: FetchProviderSubscriptionsRequestPayload): Promise<ApiResponse<FindSubscriptionsByProviderIdResProps>> {
+    async execute(data: FetchProviderSubscriptionsRequest): Promise<ApiResponse<FindSubscriptionsByProviderIdResponse>> {
         const { providerId, page, limit } = data;
         if(!providerId) throw new Error("Invalid request");
 

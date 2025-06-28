@@ -10,6 +10,104 @@ import { ProviderService } from "../../domain/entities/providerService.entity";
 import { FontendAvailabilityForResponse } from "../../domain/entities/serviceAvailability.entity";
 import { FindAllSubscriptionsResProps, findSubscriptionFullDetailsResProps } from "../../domain/repositories/ISubscription.repository";
 
+// **************** used in adminProvider.use-case **************** \\
+
+type AdminProviderBaseType = Pick<Provider, "_id" | "username" | "email" | "isBlocked" | "isAdminVerified" | "trustedBySlotflow">;
+
+// **** adminFetchAllProviders
+// Used as the return type of fetch all providers
+// Used in AdminProviderListUseCase, the findAllProviders method in ProviderRepositoryImpl, 
+// and the findAllProviders method in IProviderRepository as the response type with ApiResponse
+export type AdiminFetchAllProviders = Array<AdminProviderBaseType>;
+
+
+
+// **** adminApproveProvider
+// Used as the request interface of admin approve provider
+export interface AdminApproveProviderRequest  {
+    providerId: Provider["_id"];
+}
+// Used as the response type of admin approve provider
+export type AdminApproveProviderResponse = AdminProviderBaseType;
+
+
+
+// **** adminChangeProvierBlockStatus
+// Used as the request interface of admin change provider block status
+export interface AdminChangeProviderStatusRequest {
+    providerId: Provider["_id"];
+    isBlocked: Provider["isBlocked"];
+}
+// Used as the request interface of admin change provider block status
+export type AdminChangeProviderStatusResponse = AdminProviderBaseType;
+
+
+
+// **** adminChangeProviderTrustTag
+// Used as the request interface of admin change provider trust tag 
+export interface AdminChangeProviderTrustTagRequest  {
+    providerId: Provider["_id"];
+    trustedBySlotflow: Provider["trustedBySlotflow"];
+};
+// Used as the request type of admin change provider trust tag 
+export type AdminChangeProviderTrustTagResponse = AdminProviderBaseType;
+
+
+
+// **** adminFetchProviderProfileDetails
+// Used as the request interface of admin fetch provider profile details
+export interface AdminFetchProviderDetailsRequest {
+    providerId: Provider["_id"];
+}
+// Used as the return type of admin fetch provider profile details
+export type AdminFetchProviderDetailsResponse = Pick<Provider, "_id" | "username" | "email" | "isBlocked" | "isEmailVerified" | "isAdminVerified" | "phone" | "profileImage" | "trustedBySlotflow" | "createdAt"> | {};
+
+
+
+// **** adminFetchProviderAddress
+// Used as the request interface of admin fetch provider address
+export interface AdminFetchProviderAddressRequest {
+    providerId: Provider["_id"];
+}
+// Used as the request type of admin fetch provider address
+export type AdminFetchProviderAddressResponse = Pick<Address, "userId" | "addressLine" | "phone" | "place" | "city" | "district" | "pincode" | "state" | "country" | "googleMapLink"> | {};
+
+
+
+// **** adminFetchProviderAddress
+// Used as the request interface of admin fetch provider service
+export type AdminFetchProviderServiceRequest = {
+    providerId: Provider["_id"];
+}
+// Used as the request interface of admin fetch provider service
+type FindProviderServiceProps = Omit<ProviderService, "serviceCategory">;
+export interface FindProviderServiceResProps extends FindProviderServiceProps {
+    serviceCategory: Pick<Service, "serviceName">
+}
+export type AdminFetchProviderServiceResponse = FindProviderServiceResProps | {};
+
+
+
+// **** adminFetchProviderServiceAvailability
+// Used as the request interface of admin fetch provider service availability
+export interface AdminFetchProviderServiceAvailabilityRequest {
+    providerId: Provider["_id"];
+    date: Date
+}
+// Used as the return interface of admin fetch provider service availability
+export type AdminFetchProviderServiceAvailabilityResponse = FontendAvailabilityForResponse | {};
+
+
+
+
+
+// admin fetch provider payments use case request payload interface
+export interface AdminFetchProviderPaymentsRequest extends ApiPaginationRequest{
+    providerId: Provider["_id"];
+}
+// admin fetch provider payments use case response interface
+export type AdminFetchProviderPaymentsResponse = Array<Pick<Payment, "paymentStatus" | "paymentMethod" | "paymentGateway" | "paymentFor" | "discountAmount" | "totalAmount" | "createdAt" | "_id">>;
+
 
 // **** used in adminUser.use-case **** \\
 
@@ -122,97 +220,3 @@ export interface AdminFetchAllPaymentsUseCaseResponse extends CommonResponse {
 
 
 
-// **** used in adminProvider.use-case **** \\
-
-// Data type returned for the Admin Providers table
-// Used in AdminProviderListUseCase, the findAllProviders method in ProviderRepositoryImpl, 
-// and the findAllProviders method in IProviderRepository as the response type with ApiResponse
-export type AdiminFetchAllProviders = Array<Pick<Provider, "_id" | "username" | "email" | "isBlocked" | "isAdminVerified" | "trustedBySlotflow">>;
-
-
-// admin approve provider isAdminVerified use case request payload interface
-export interface AdminApproveProviderUseCaseRequestPayload  {
-    providerId: Provider["_id"];
-}
-// admin approve provider isAdminVerified use case response interface 
-export interface AdminApproveProviderUseCaseResponse extends CommonResponse {
-    updatedProvider: Pick<Provider, "_id" | "username" | "email" | "isBlocked" | "isAdminVerified" | "trustedBySlotflow">;
-}
-
-
-// admin change provider block status use case request payload interface
-export interface AdminChangeProviderStatusUseCaseRequestPaylod {
-    providerId: Provider["_id"];
-    isBlocked: Provider["isBlocked"];
-}
-// admin change provider block status use case response interface 
-export interface AdminChangeProviderStatusUseCaseResponse extends CommonResponse {
-    updatedProvider: Pick<Provider, "_id" | "username" | "email" | "isBlocked" | "isAdminVerified" | "trustedBySlotflow">;
-}
-
-
-// admin change provider trustedBySlotflow status use case request payload interface
-export interface AdminChangeProviderTrustTagUseCaseRequestPayload  {
-    providerId: Provider["_id"];
-    trustedBySlotflow: Provider["trustedBySlotflow"];
-};
-// admin change provider trustedBySlotflow status use case response interface 
-export interface AdminChangeProviderTrustTagUseCaseResponse extends CommonResponse {
-    updatedProvider: Pick<Provider, "_id" | "username" | "email" | "isBlocked" | "isAdminVerified" | "trustedBySlotflow">;
-}
-
-
-// admin fetch a specific provider details use case request payload interface
-export interface AdminFetchProviderDetailsUseCaseRequestPayload {
-    providerId: Provider["_id"];
-}
-// admin fetch a specific provider details use case response interface
-export interface AdminFetchProviderDetailsUseCaseResponse extends CommonResponse {
-    provider: Pick<Provider, "_id" | "username" | "email" | "isBlocked" | "isEmailVerified" | "isAdminVerified" | "phone" | "profileImage" | "trustedBySlotflow" | "createdAt"> | {};
-}
-
-
-// admin fetch a specific provider address details use case request payload interface
-export interface AdminFetchProviderAddressUseCaseRequestPayload {
-    providerId: Provider["_id"];
-}
-// admin fetch a specific provider address details use case response interface
-export interface AdminFetchProviderAddressUseCaseResponse extends CommonResponse {
-    address: Pick<Address, "userId" | "addressLine" | "phone" | "place" | "city" | "district" | "pincode" | "state" | "country" | "googleMapLink"> | {};
-}
-
-
-// admin fetch provider service details use case request payload interface
-export type AdminFetchProviderServiceUseCaseRequestPayload = {
-    providerId: Provider["_id"];
-}
-// admin fetch provider service details use case response interface 
-type FindProviderServiceProps = Omit<ProviderService, "serviceCategory">;
-export interface FindProviderServiceResProps extends FindProviderServiceProps {
-    serviceCategory: Pick<Service, "serviceName">
-}
-export interface AdminFetchProviderServiceUseCaseResponse extends CommonResponse {
-    service: FindProviderServiceResProps | {};
-}
-
-
-// admin fetch provider service availability details use case request payload interface
-export interface AdminFetchProviderServiceAvailabilityUseCaseRequestPayload {
-    providerId: Provider["_id"];
-    date: Date
-}
-// admin fetch provider service availability details use case response interface
-export interface AdminFetchProviderServiceAvailabilityUseCaseResponse extends CommonResponse {
-    availability: FontendAvailabilityForResponse | {};
-}
-
-
-
-
-
-// admin fetch provider payments use case request payload interface
-export interface AdminFetchProviderPaymentsRequest extends ApiPaginationRequest{
-    providerId: Provider["_id"];
-}
-// admin fetch provider payments use case response interface
-export type AdminFetchProviderPaymentsResponse = Array<Pick<Payment, "paymentStatus" | "paymentMethod" | "paymentGateway" | "paymentFor" | "discountAmount" | "totalAmount" | "createdAt" | "_id">>;

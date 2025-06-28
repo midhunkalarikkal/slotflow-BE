@@ -26,10 +26,10 @@ export interface ApiPaginationRequest {
 
 
 // Used for fetching subscriptions with planName and plan price of a specific provider for the provider side and admin side
-export interface FetchProviderSubscriptionsRequestPayload extends ApiPaginationRequest {
+export interface FetchProviderSubscriptionsRequest extends ApiPaginationRequest {
     providerId: Provider["_id"];
 }
-export type FindSubscriptionsByProviderIdResProps = Array<
+export type FindSubscriptionsByProviderIdResponse = Array<
   Pick<Subscription, "_id" | "startDate" | "endDate" | "subscriptionStatus"> &
   Pick<Plan, "planName" | "price">>;
 export type PopulatedSubscription = Omit<Subscription, 'subscriptionPlanId'> & {

@@ -3,7 +3,7 @@ import { ISubscription, SubscriptionModel } from "./subscription.model";
 import { AdminFetchAllSubscriptionsResponse } from "../../dtos/admin.dto";
 import { Subscription } from "../../../domain/entities/subscription.entity";
 import { CreateSubscriptionPayloadProps, findSubscriptionFullDetailsResProps, ISubscriptionRepository } from "../../../domain/repositories/ISubscription.repository";
-import { ApiPaginationRequest, ApiResponse, FetchProviderSubscriptionsRequestPayload, FindSubscriptionsByProviderIdResProps, PopulatedSubscription } from "../../dtos/common.dto";
+import { ApiPaginationRequest, ApiResponse, FetchProviderSubscriptionsRequest, FindSubscriptionsByProviderIdResponse, PopulatedSubscription } from "../../dtos/common.dto";
 
 export class SubscriptionRepositoryImpl implements ISubscriptionRepository {
     private mapToEntity(subscription: ISubscription): Subscription {
@@ -38,7 +38,7 @@ export class SubscriptionRepositoryImpl implements ISubscriptionRepository {
         }
     }
 
-    async findSubscriptionsByProviderId(data: FetchProviderSubscriptionsRequestPayload): Promise<ApiResponse<FindSubscriptionsByProviderIdResProps>> {
+    async findSubscriptionsByProviderId(data: FetchProviderSubscriptionsRequest): Promise<ApiResponse<FindSubscriptionsByProviderIdResponse>> {
         try {
             const { providerId, page, limit } = data;
             const skip = (page - 1) * limit;

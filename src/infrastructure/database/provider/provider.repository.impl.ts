@@ -1,10 +1,10 @@
 import { Types } from "mongoose";
 import { IProvider, ProviderModel } from "./provider.model";
 import { AdiminFetchAllProviders } from "../../dtos/admin.dto";
-import { ApiPaginationRequest, ApiResponse } from "../../dtos/common.dto";
+import { CreateProviderRequest } from "../../dtos/provider.dto";
 import { Provider } from "../../../domain/entities/provider.entity";
-import {  CreateProviderReqProps, IProviderRepository } from '../../../domain/repositories/IProvider.repository';
-
+import { ApiPaginationRequest, ApiResponse } from "../../dtos/common.dto";
+import {  IProviderRepository } from '../../../domain/repositories/IProvider.repository';
 
 export class ProviderRepositoryImpl implements IProviderRepository {
     private mapToEntity(provider: IProvider): Provider {
@@ -29,7 +29,7 @@ export class ProviderRepositoryImpl implements IProviderRepository {
         )
     }
 
-    async createProvider(provider: CreateProviderReqProps): Promise<Provider | null> {
+    async createProvider(provider: CreateProviderRequest): Promise<Provider | null> {
         try {
             if(!provider) throw new Error("Invalid request.");
             const createdProvider = await ProviderModel.create(provider);
@@ -39,7 +39,7 @@ export class ProviderRepositoryImpl implements IProviderRepository {
         }
     }
 
-    async verifyProvider(verificationToken: string): Promise<Provider | null> {
+    async verifyProvider(verificationToken: Provider["verificationToken"]): Promise<Provider | null> {
         try {
             if(!verificationToken) throw new Error("Invalid request.");
             const User = await ProviderModel.findOne({ verificationToken });
@@ -59,7 +59,7 @@ export class ProviderRepositoryImpl implements IProviderRepository {
         }
     }
 
-    async findProviderByEmail(email: string): Promise<Provider | null> {
+    async findProviderByEmail(email: Provider["email"]): Promise<Provider | null> {
         try {
             if(!email) throw new Error("Invalid request.");
             const provider = await ProviderModel.findOne({ email });

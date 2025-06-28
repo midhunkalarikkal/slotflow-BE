@@ -3,7 +3,7 @@ import { Plan } from "../entities/plan.entity";
 import { Payment } from "../entities/payment.entity";
 import { Subscription } from "../entities/subscription.entity";
 import { AdminFetchAllSubscriptionsResponse } from "../../infrastructure/dtos/admin.dto";
-import { ApiPaginationRequest, ApiResponse, FetchProviderSubscriptionsRequestPayload, FindSubscriptionsByProviderIdResProps } from "../../infrastructure/dtos/common.dto";
+import { ApiPaginationRequest, ApiResponse, FetchProviderSubscriptionsRequest, FindSubscriptionsByProviderIdResponse } from "../../infrastructure/dtos/common.dto";
 
 export type CreateSubscriptionPayloadProps = Pick<Subscription, "providerId" | "subscriptionPlanId" | "startDate" | "endDate" | "subscriptionStatus" | "paymentId" >;
 
@@ -24,7 +24,7 @@ export interface ISubscriptionRepository {
 
     findSubscriptionById(subscriptionId: Types.ObjectId): Promise<Subscription | null>;
 
-    findSubscriptionsByProviderId(data: FetchProviderSubscriptionsRequestPayload): Promise<ApiResponse<FindSubscriptionsByProviderIdResProps>>;
+    findSubscriptionsByProviderId(data: FetchProviderSubscriptionsRequest): Promise<ApiResponse<FindSubscriptionsByProviderIdResponse>>;
 
     findAllSubscriptions({ page, limit }: ApiPaginationRequest): Promise<ApiResponse<AdminFetchAllSubscriptionsResponse>>
 

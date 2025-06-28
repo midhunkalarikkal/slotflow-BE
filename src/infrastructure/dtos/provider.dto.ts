@@ -1,18 +1,21 @@
-import { ApiPaginationRequest, CommonResponse } from "./common.dto";
 import { Plan } from "../../domain/entities/plan.entity";
+import { Booking } from "../../domain/entities/booking.entity";
 import { Address } from "../../domain/entities/address.entity";
 import { Payment } from "../../domain/entities/payment.entity";
 import { Service } from "../../domain/entities/service.entity";
 import { Provider } from "../../domain/entities/provider.entity";
+import { ApiPaginationRequest, CommonResponse } from "./common.dto";
 import { Subscription } from "../../domain/entities/subscription.entity";
 import { ProviderService } from "../../domain/entities/providerService.entity";
 import { FontendAvailabilityForResponse, FrontendAvailabilityForRequest } from "../../domain/entities/serviceAvailability.entity";
-import { Booking } from "../../domain/entities/booking.entity";
-
-// **** used in providerAddress.use-case **** \\
 
 
+// type for creating a provider
+export type CreateProviderRequest = Pick<Provider, "username" | "email" | "password" | "verificationToken">;
 
+
+
+// **** used in providerAddress.use-case 
 // provider fetch address use case request payload interface
 export interface ProviderFetchAddressUseCaseRequestPayload {
     providerId: Provider["_id"];
@@ -26,8 +29,7 @@ export interface ProviderFetchAddressUseCaseResponse extends CommonResponse {
 
 
 
-// **** used in providerAppService.use-case **** \\
-
+// **** used in providerAppService.use-case 
 // provder fetch all app services response props
 export type ProviderFetchAllAppServicesResProps = Array<Pick<Service, "_id" | "serviceName">>;
 
@@ -35,7 +37,7 @@ export type ProviderFetchAllAppServicesResProps = Array<Pick<Service, "_id" | "s
 
 
 
-// **** used in providerPayment.use-case **** \\
+// **** used in providerPayment.use-case 
 
 // provider fetch all payments use case request interface
 export interface ProviderFetchAllPaymentUseCaseRequestPayload {
@@ -50,7 +52,7 @@ export interface ProviderFetchAllPaymentUseCaseResponse extends CommonResponse {
 
 
 
-// **** used in providerPlan.use-case **** \\
+// **** used in providerPlan.use-case 
 
 // provider fetch all plans use case response interface 
 export interface ProviderFetchAllPlansUseCaseResponse extends CommonResponse {
@@ -61,7 +63,7 @@ export interface ProviderFetchAllPlansUseCaseResponse extends CommonResponse {
 
 
 
-// **** used in providerProfile.use-case **** \\
+// **** used in providerProfile.use-case 
 
 // provider fetch profile detals use case request payload interface
 export interface ProviderFetchProfileDetailsUseCaseRequestPayload {
@@ -96,7 +98,7 @@ export interface ProviderUpdateProviderInfoUseCaseResponse extends CommonRespons
 
 
 
-// **** used in providerService.use-case **** \\
+// **** used in providerService.use-case 
 
 // provider add service details use case request payload interface
 type AddServiceDetailsUseCaseRequestPayload = Pick<ProviderService, "providerId" | "serviceCategory" | "serviceName" | "serviceDescription" | "servicePrice" | "providerAdhaar" | "providerExperience">;
@@ -122,7 +124,7 @@ export interface ProviderFetchProviderServiceUseCaseResponse extends CommonRespo
 
 
 
-// **** used in providerServiceAvailability **** \\
+// **** used in providerServiceAvailability 
 
 // provider add service availability use case reques tpayload
 export interface ProviderAddServiceAvailabilityUseCaseRewuestPayload {
@@ -145,7 +147,7 @@ export interface ProviderFetchServiceAvailabilityUseCaseResponse extends CommonR
 
 
 
-// **** used in providerStripeSubscription.use-case **** \\
+// **** used in providerStripeSubscription.use-case 
 
 // provider stripe subscription create sessionId use case  request payload interface
 export interface ProviderStripeSubscriptionCreateSessionIdUseCaseRequestPayload {
@@ -169,7 +171,7 @@ export interface ProviderSaveSubscriptionUseCaseRequestPayload {
 
 
 
-// **** used in providerSubscription.use-case **** \\
+// **** used in providerSubscription.use-case 
 
 
 // provider trial subscription use case reuest payload
@@ -181,7 +183,7 @@ export interface ProviderTrialSubscriptionUseCaseRequestPayload {
 
 
 
-// **** used in providerBooking.use-case **** \\
+// **** used in providerBooking.use-case 
 
 // provider fetch bookings use case request payload interface
 export interface ProviderFetchBookingAppointmentsUseCaseRequestPayload {

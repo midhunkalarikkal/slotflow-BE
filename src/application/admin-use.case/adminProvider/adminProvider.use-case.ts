@@ -1,16 +1,17 @@
 import { 
     AdiminFetchAllProviders, 
-    AdminApproveProviderUseCaseResponse, 
-    AdminChangeProviderStatusUseCaseResponse, 
-    AdminApproveProviderUseCaseRequestPayload, 
-    AdminChangeProviderTrustTagUseCaseResponse, 
-    AdminChangeProviderStatusUseCaseRequestPaylod, 
-    AdminChangeProviderTrustTagUseCaseRequestPayload,
+    AdminApproveProviderRequest, 
+    AdminApproveProviderResponse, 
+    AdminChangeProviderStatusRequest, 
+    AdminChangeProviderStatusResponse, 
+    AdminChangeProviderTrustTagRequest,
+    AdminChangeProviderTrustTagResponse, 
 } from "../../../infrastructure/dtos/admin.dto";
 import { Validator } from "../../../infrastructure/validator/validator";
 import { OTPService } from "../../../infrastructure/services/otp.service";
 import { ApiPaginationRequest, ApiResponse } from "../../../infrastructure/dtos/common.dto";
 import { ProviderRepositoryImpl } from "../../../infrastructure/database/provider/provider.repository.impl";
+
 
 export class AdminProviderListUseCase {
     constructor(private providerRepositoryImpl: ProviderRepositoryImpl) { }
@@ -20,14 +21,13 @@ export class AdminProviderListUseCase {
         if (!result) throw new Error("Providers fetching failed");
         return { data: result.data, totalPages: result.totalPages, currentPage: result.currentPage, totalCount: result.totalCount };
     }
-
 }
 
 
 export class AdminApproveProviderUseCase {
     constructor(private providerRepositoryImpl: ProviderRepositoryImpl) { }
 
-    async execute(data: AdminApproveProviderUseCaseRequestPayload): Promise<AdminApproveProviderUseCaseResponse> {
+    async execute(data: AdminApproveProviderRequest): Promise<ApiResponse<AdminApproveProviderResponse>> {
         const { providerId } = data;
         if (!providerId) throw new Error("Invalid request");
 
@@ -48,7 +48,7 @@ export class AdminApproveProviderUseCase {
             isAdminVerified: updatedProvider.isAdminVerified,
             trustedBySlotflow: updatedProvider.trustedBySlotflow,
         };
-        return { success: true, message: "Provider approved successfully.", updatedProvider: updatedProviderData };
+        return { success: true, message: "Provider approved successfully.", data: updatedProviderData };
     }
 }
 
@@ -56,7 +56,7 @@ export class AdminApproveProviderUseCase {
 export class AdminChangeProviderBlockStatusUseCase {
     constructor(private providerRepositoryImpl: ProviderRepositoryImpl) { }
 
-    async execute(data: AdminChangeProviderStatusUseCaseRequestPaylod): Promise<AdminChangeProviderStatusUseCaseResponse> {
+    async execute(data: AdminChangeProviderStatusRequest): Promise<ApiResponse<AdminChangeProviderStatusResponse>> {
         const { providerId, isBlocked } = data;
         if (!providerId || isBlocked === null) throw new Error("Invalid request");
 
@@ -76,7 +76,7 @@ export class AdminChangeProviderBlockStatusUseCase {
             isAdminVerified: updatedProvider.isAdminVerified,
             trustedBySlotflow: updatedProvider.trustedBySlotflow,
         };
-        return { success: true, message: `Provider ${isBlocked ? "blocked" : "Unblocked"} successfully.`, updatedProvider: updatedProviderData };
+        return { success: true, message: `Provider ${isBlocked ? "blocked" : "Unblocked"} successfully.`, data: updatedProviderData };
     }
 }
 
@@ -84,7 +84,7 @@ export class AdminChangeProviderBlockStatusUseCase {
 export class AdminChangeProviderTrustTagUseCase {
     constructor(private providerRepositoryImpl: ProviderRepositoryImpl) { }
 
-    async execute(data: AdminChangeProviderTrustTagUseCaseRequestPayload): Promise<AdminChangeProviderTrustTagUseCaseResponse> {
+    async execute(data: AdminChangeProviderTrustTagRequest): Promise<ApiResponse<AdminChangeProviderTrustTagResponse>> {
         const { providerId, trustedBySlotflow } = data;
         if (!providerId || trustedBySlotflow === null) throw new Error("Invalid request");
 
@@ -104,7 +104,7 @@ export class AdminChangeProviderTrustTagUseCase {
             isAdminVerified: updatedProvider.isAdminVerified,
             trustedBySlotflow: updatedProvider.trustedBySlotflow,
         };
-        return { success: true, message: `Provider trust tag ${trustedBySlotflow ? "Given" : "Removed"} successfully.`, updatedProvider: updatedProviderData };
+        return { success: true, message: `Provider trust tag ${trustedBySlotflow ? "Given" : "Removed"} successfully.`, data: updatedProviderData };
     }
 }
 
