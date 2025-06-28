@@ -1,7 +1,7 @@
 import { Types } from "mongoose";
 import { Request, Response } from "express";
 import { HandleError } from "../../infrastructure/error/error";
-import { SaveStripePaymentZodSchema } from "../../infrastructure/zod/common.zod";
+import { RequestQueryCommonZodSchema, SaveStripePaymentZodSchema } from "../../infrastructure/zod/common.zod";
 import { ProviderPlanSubscribeZodSchema } from "../../infrastructure/zod/provider.zod";
 import { PlanRepositoryImpl } from "../../infrastructure/database/plan/plan.repository.impl";
 import { PaymentRepositoryImpl } from "../../infrastructure/database/payment/payment.repository.impl";
@@ -62,9 +62,11 @@ export class ProviderSubscriptionController {
 
     async fetchProviderSubscriptions(req: Request, res: Response) {
         try {
+            const validateQueryData = RequestQueryCommonZodSchema.parse(req.query);
+            const { page, limit } = validateQueryData;
             const providerId = req.user.userOrProviderId;
             if (!providerId) throw new Error("Invalid request.");
-            const result = await this.providerFetchAllSubscriptionsUseCase.execute({ providerId: new Types.ObjectId(providerId) });
+            const result = await this.providerFetchAllSubscriptionsUseCase.execute({ providerId: new Types.ObjectId(providerId), page, limit });
             res.status(200).json(result);
         } catch (error) {
             HandleError.handle(error, res);

@@ -22,17 +22,16 @@ export class ProviderServiceRepositoryImpl implements IProviderServiceRepository
 
     async createProviderService(providerService: CreateProviderServiceReqProps): Promise<ProviderService | null> {
         try {
-            if (!providerService) throw new Error("Invalid request.");
             const newProviderService = await ProviderServiceModel.create(providerService);
             return newProviderService ? this.mapToEntity(newProviderService) : null;
         } catch (error) {
+            console.log("providerService.repository.impl.ts createProviderService method error", error);
             throw new Error("Service details adding error.");
         }
     }
 
     async findProviderServiceByProviderId(providerId: Types.ObjectId): Promise<FindProviderServiceResProps | {}> {
         try {
-            if (!providerId) throw new Error("Invalid request.");
             const service = await ProviderServiceModel.findOne({ providerId })
                 .populate({
                     path: "serviceCategory",

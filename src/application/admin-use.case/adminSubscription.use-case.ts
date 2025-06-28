@@ -1,20 +1,21 @@
 import { Validator } from "../../infrastructure/validator/validator";
 import { SubscriptionRepositoryImpl } from "../../infrastructure/database/subscription/subscription.repository.impl";
 import { 
-    AdminFetchAllSubscriptionsUseCaseResponse, 
     AdminFetchSubscriptionDetailsUseCaseResponse, 
-    AdminFetchSubscriptionDetailsUseCaseRequestPayload, 
+    AdminFetchSubscriptionDetailsUseCaseRequestPayload,
+    AdminFetchAllSubscriptionsResponse, 
 } from "../../infrastructure/dtos/admin.dto";
+import { ApiPaginationRequest, ApiResponse } from "../../infrastructure/dtos/common.dto";
 
 export class AdminFetchAllSubscriptionsUseCase {
     constructor(
         private subscriptionRepositoryImpl: SubscriptionRepositoryImpl,
     ) { }
 
-    async execute(): Promise<AdminFetchAllSubscriptionsUseCaseResponse> {
-        const subscriptions = await this.subscriptionRepositoryImpl.findAllSubscriptions();
-        if(!subscriptions) throw new Error("Subscriptions fetching error");
-        return { success: true, message: "Subscriptions fetched", subscriptions };
+    async execute({ page, limit}: ApiPaginationRequest): Promise<ApiResponse<AdminFetchAllSubscriptionsResponse>> {
+        const result = await this.subscriptionRepositoryImpl.findAllSubscriptions({ page, limit });
+        if (!result) throw new Error("Subscriptions fetching failed, ");
+        return { data: result.data, totalPages: result.totalPages, currentPage: result.currentPage, totalCount: result.totalCount };
     }
 }
 

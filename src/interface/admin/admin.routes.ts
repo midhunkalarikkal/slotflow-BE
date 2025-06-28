@@ -29,7 +29,7 @@ router.patch('/changeServiceBlockStatus',authMiddleware, adminServiceController.
 
 router.get('/plans', authMiddleware,adminPlanController.getAllPLans);
 router.post('/addNewPlan', authMiddleware, adminPlanController.addNewPlan);
-router.patch('/changePlanBlockStatus/', authMiddleware, adminPlanController.changePlanBlockStatus);
+router.patch('/changePlanBlockStatus', authMiddleware, adminPlanController.changePlanBlockStatus);
 
 router.get('/getSubscriptions', authMiddleware, adminSubscriptionController.getAllSubscriptions);
 router.get('/getSubscription/:subscriptionId', authMiddleware, adminSubscriptionController.getSubscriptionDetails);

@@ -1,3 +1,4 @@
+import dayjs from "dayjs";
 import { generateSignedUrl } from "../../../config/aws_s3";
 import { Validator } from "../../../infrastructure/validator/validator";
 import { AddressRepositoryImpl } from "../../../infrastructure/database/address/address.repository.impl";
@@ -15,13 +16,11 @@ import {
     AdminFetchProviderDetailsUseCaseRequestPayload,
     AdminFetchProviderAddressUseCaseRequestPayload,
     AdminFetchProviderServiceUseCaseRequestPayload,
-    AdminFetchProviderSubscriptionsUseCaseResponse,
     AdminFetchProviderPaymentsUseCaseRequestPayload,
     AdminFetchProviderServiceAvailabilityUseCaseResponse,
-    AdminFetchProviderSubscriptionsUseCaseRequestPayload,
     AdminFetchProviderServiceAvailabilityUseCaseRequestPayload,
 } from "../../../infrastructure/dtos/admin.dto";
-import dayjs from "dayjs";
+import { ApiResponse, FetchProviderSubscriptionsRequestPayload, FindSubscriptionsByProviderIdResProps } from "../../../infrastructure/dtos/common.dto";
 
 
 export class AdminFetchProviderDetailsUseCase {
@@ -148,8 +147,8 @@ export class AdminFetchProviderSubscriptionsUseCase {
         private subscriptionRepositoryImpl: SubscriptionRepositoryImpl,
     ) { }
 
-    async execute(data: AdminFetchProviderSubscriptionsUseCaseRequestPayload): Promise<AdminFetchProviderSubscriptionsUseCaseResponse> {
-        const { providerId } = data;
+    async execute(data: FetchProviderSubscriptionsRequestPayload): Promise<ApiResponse<FindSubscriptionsByProviderIdResProps>> {
+        const { providerId, page, limit } = data;
         if (!providerId) throw new Error("Invalid request.");
 
         Validator.validateObjectId(providerId, "providerId");
@@ -157,10 +156,11 @@ export class AdminFetchProviderSubscriptionsUseCase {
         const provider = await this.providerRepositoryImpl.findProviderById(providerId);
         if (!provider) throw new Error("No user found.");
 
-        const subscriptions = await this.subscriptionRepositoryImpl.findSubscriptionsByProviderId(providerId);
-        if (!subscriptions) throw new Error("Subscriptions fetching error.");
+        const result = await this.subscriptionRepositoryImpl.findSubscriptionsByProviderId({providerId, page, limit});
+        if (!result) throw new Error("Subscriptions fetching error.");
 
-        return { success: true, message: "Subscriptions fetched successfully.", subscriptions };
+        return { data: result.data, totalPages: result.totalPages, currentPage: result.currentPage, totalCount: result.totalCount };
+
     }
 }
 

@@ -1,4 +1,4 @@
-import { CommonResponse } from "./common.dto";
+import { ApiPaginationRequest, CommonResponse } from "./common.dto";
 import { Plan } from "../../domain/entities/plan.entity";
 import { Address } from "../../domain/entities/address.entity";
 import { Payment } from "../../domain/entities/payment.entity";
@@ -11,11 +11,6 @@ import { Booking } from "../../domain/entities/booking.entity";
 
 // **** used in providerAddress.use-case **** \\
 
-// provider add address use case request payload type
-type AddAddressUseCaseRequestPayload = Pick<Address, "addressLine" | "place" | "phone" | "city" | "country" | "district" | "pincode" | "state" | "googleMapLink">;
-export interface ProvideAddAddressUseCaseRequestPayload extends AddAddressUseCaseRequestPayload {
-    providerId: Provider["_id"];
-}
 
 
 // provider fetch address use case request payload interface
@@ -34,9 +29,7 @@ export interface ProviderFetchAddressUseCaseResponse extends CommonResponse {
 // **** used in providerAppService.use-case **** \\
 
 // provder fetch all app services response props
-export interface ProviderFetchAllAppServicesResProps extends CommonResponse {
-    services: Array<Pick<Service, "_id" | "serviceName">> | [];
-}
+export type ProviderFetchAllAppServicesResProps = Array<Pick<Service, "_id" | "serviceName">>;
 
 
 
@@ -177,22 +170,6 @@ export interface ProviderSaveSubscriptionUseCaseRequestPayload {
 
 
 // **** used in providerSubscription.use-case **** \\
-
-// provider fetch subscriptions use case request payload interface
-export interface ProviderFetchProviderSubscriptionsUseCaseRequestPayload {
-    providerId: Provider["_id"];
-}
-// provider fetch subscriptions use case response interface
-type SubscripionsResProps = Pick<Subscription, "startDate" | "endDate" | "subscriptionStatus">;
-interface AdminFetchProviderSubscriptions extends SubscripionsResProps {
-    subscriptionPlanId?: {
-        _id: string;
-        planName: string;
-    };
-}
-export interface ProviderFetchProviderSubscriptionsUseCaseResponse extends CommonResponse {
-    subscriptions: AdminFetchProviderSubscriptions[] | [];
-}
 
 
 // provider trial subscription use case reuest payload

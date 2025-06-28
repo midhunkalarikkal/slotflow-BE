@@ -42,15 +42,14 @@ const ProviderServiceSchema = new Schema<IProviderService>({
     servicePrice: {
         type: Number,
         required: [true, "Aadhaar number is required"],
-        min: [100000, "Invalid Aadhaar number. Must be exactly 6 digits."],
-        max: [999999, "Invalid Aadhaar number. Must be exactly 6 digits."],
+        min: [1, "Invalid service price."],
+        max: [999999, "Invalid service price."],
     },
     providerAdhaar: {
         type: Number,
         required: [true, "Aadhaar number is required"],
-        min: [100000, "Invalid Aadhaar number. Must be exactly 6 digits."],
+        min: [100000, "Invalid Aadhaar number. Must be exactly 6 digit."],
         max: [999999, "Invalid Aadhaar number. Must be exactly 6 digits."],
-        match: [/^\d{6}$/, "Invalid adhaar number. Please enter exactly 6 digits."]
     },
     providerExperience: {
         type: String,

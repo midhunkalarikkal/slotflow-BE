@@ -4,6 +4,7 @@ import { HandleError } from "../../infrastructure/error/error";
 import { AdminGetSubscriptionDetailsParamsZodSchmea } from "../../infrastructure/zod/admin.zod";
 import { SubscriptionRepositoryImpl } from "../../infrastructure/database/subscription/subscription.repository.impl";
 import { AdminFetchAllSubscriptionsUseCase, AdminFetchSubscriptionDetailsUseCase } from "../../application/admin-use.case/adminSubscription.use-case";
+import { RequestQueryCommonZodSchema } from "../../infrastructure/zod/common.zod";
 
 const subscriptionRepositoryImpl = new SubscriptionRepositoryImpl();
 
@@ -21,7 +22,9 @@ export class AdminSubscriptionController {
 
     async getAllSubscriptions(req:Request, res: Response) {
         try{
-            const result = await this.adminFetchAllSubscriptionsUseCase.execute();
+            const validateQueryData = RequestQueryCommonZodSchema.parse(req.query);
+            const { page, limit } = validateQueryData;
+            const result = await this.adminFetchAllSubscriptionsUseCase.execute({ page, limit });
             res.status(200).json(result);
         }catch (error) {
             HandleError.handle(error,res);

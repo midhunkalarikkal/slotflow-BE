@@ -1,10 +1,9 @@
 import { Validator } from "../../infrastructure/validator/validator";
-import { CommonResponse } from "../../infrastructure/dtos/common.dto";
+import { AddAddressRequest, ApiResponse, CommonResponse } from "../../infrastructure/dtos/common.dto";
 import { AddressRepositoryImpl } from "../../infrastructure/database/address/address.repository.impl";
 import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/provider.repository.impl";
 import { 
     ProviderFetchAddressUseCaseResponse, 
-    ProvideAddAddressUseCaseRequestPayload, 
     ProviderFetchAddressUseCaseRequestPayload, 
 } from "../../infrastructure/dtos/provider.dto";
 
@@ -15,11 +14,11 @@ export class ProviderAddAddressUseCase {
         private addressRepositoryImpl: AddressRepositoryImpl,
     ){}
 
-    async execute(data: ProvideAddAddressUseCaseRequestPayload): Promise<CommonResponse> {
-        const { providerId, addressLine, phone, place, city, district, pincode, state, country, googleMapLink } = data;
-        if(!providerId || !addressLine || !phone || !place || !city || !district || !pincode || !state || !country || !googleMapLink) throw new Error("Invalid request.");
+    async execute(data: AddAddressRequest): Promise<ApiResponse> {
+        const { userId, addressLine, phone, place, city, district, pincode, state, country, googleMapLink } = data;
+        if(!userId || !addressLine || !phone || !place || !city || !district || !pincode || !state || !country || !googleMapLink) throw new Error("Invalid request.");
 
-        Validator.validateObjectId(providerId,"providerId");
+        Validator.validateObjectId(userId,"providerId");
         Validator.validateAddressLine(addressLine);
         Validator.validatePhone(phone);
         Validator.validatePlace(place);
@@ -30,10 +29,10 @@ export class ProviderAddAddressUseCase {
         Validator.validateCountry(country);
         Validator.validateGoogleMapLink(googleMapLink);
 
-        const provider = await this.providerRepositoryImpl.findProviderById(providerId);
+        const provider = await this.providerRepositoryImpl.findProviderById(userId);
         if(!provider) throw new Error("Please logout and try again.");
 
-        const address = await this.addressRepositoryImpl.createAddress({userId: providerId, addressLine, phone, place, city, district, pincode, state, country, googleMapLink});
+        const address = await this.addressRepositoryImpl.createAddress({userId: userId, addressLine, phone, place, city, district, pincode, state, country, googleMapLink});
         if(!address) throw new Error("Address adding error.");
 
         if (provider && address && address._id) {

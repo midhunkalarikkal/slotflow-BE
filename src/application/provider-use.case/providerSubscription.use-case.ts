@@ -1,7 +1,7 @@
 import { Validator } from "../../infrastructure/validator/validator";
 import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/provider.repository.impl";
 import { SubscriptionRepositoryImpl } from "../../infrastructure/database/subscription/subscription.repository.impl";
-import { ProviderFetchProviderSubscriptionsUseCaseRequestPayload, ProviderFetchProviderSubscriptionsUseCaseResponse } from "../../infrastructure/dtos/provider.dto";
+import { ApiResponse, FetchProviderSubscriptionsRequestPayload, FindSubscriptionsByProviderIdResProps } from "../../infrastructure/dtos/common.dto";
 
 
 export class ProviderFetchAllSubscriptionsUseCase {
@@ -10,8 +10,8 @@ export class ProviderFetchAllSubscriptionsUseCase {
         private subscriptionRepositoryImpl: SubscriptionRepositoryImpl,
     ) { }
 
-    async execute(data: ProviderFetchProviderSubscriptionsUseCaseRequestPayload): Promise<ProviderFetchProviderSubscriptionsUseCaseResponse> {
-        const { providerId } = data;
+    async execute(data: FetchProviderSubscriptionsRequestPayload): Promise<ApiResponse<FindSubscriptionsByProviderIdResProps>> {
+        const { providerId, page, limit } = data;
         if(!providerId) throw new Error("Invalid request");
 
         Validator.validateObjectId(providerId, "providerId");
@@ -19,9 +19,9 @@ export class ProviderFetchAllSubscriptionsUseCase {
         const provider = await this.providerRepositoryImpl.findProviderById(providerId);
         if(!provider) throw new Error("Invalid request.");
 
-        const providerSubscriptions = await this.subscriptionRepositoryImpl.findSubscriptionsByProviderId(providerId);
-        if(!providerSubscriptions) throw new Error("Subscriptions fetching error.");
+        const result = await this.subscriptionRepositoryImpl.findSubscriptionsByProviderId({providerId, page, limit });
+        if(!result) throw new Error("Subscriptions fetching error.");
 
-        return { success: true, message: "Fetched all subscriptions.", subscriptions: providerSubscriptions};
+        return { data: result.data, totalPages: result.totalPages, currentPage: result.currentPage, totalCount: result.totalCount };
     }
 }

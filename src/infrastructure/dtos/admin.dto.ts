@@ -1,4 +1,4 @@
-import { CommonResponse } from "./common.dto";
+import { ApiPaginationRequest, CommonResponse } from "./common.dto";
 import { User } from "../../domain/entities/user.entity";
 import { Plan } from "../../domain/entities/plan.entity";
 import { Service } from "../../domain/entities/service.entity";
@@ -36,9 +36,7 @@ export interface AdminChangeUserStatusUseCaseResponse extends CommonResponse {
 // **** used in adminSubscription.use-case **** \\
 
 // Admin fetch all subscriptions use case response interface 
-export interface AdminFetchAllSubscriptionsUseCaseResponse extends CommonResponse {
-    subscriptions: Array<FindAllSubscriptionsResProps>
-}
+export type AdminFetchAllSubscriptionsResponse = Array<Pick<Subscription, "_id" | "createdAt" | "providerId" | "startDate" | "endDate" | "subscriptionStatus">>;
 
 // admin fetch subscription details use case request payload interface 
 export interface AdminFetchSubscriptionDetailsUseCaseRequestPayload {
@@ -56,10 +54,7 @@ export interface AdminFetchSubscriptionDetailsUseCaseResponse extends CommonResp
 // **** used in adminService.use-case **** \\
 
 // admin fetch all services use case response interface 
-export interface AdminServiceListUseCaseResponse extends CommonResponse {
-    services: Array<Pick<Service, "_id" | "serviceName" | "isBlocked">>;
-}
-
+export type AdminServiceListResponse = Array<Pick<Service, "_id" | "serviceName" | "isBlocked">>;
 
 // admin add new service use case request payload interface
 export interface AdminAddServiceUseCaseRequestPayload {
@@ -212,21 +207,7 @@ export interface AdminFetchProviderServiceAvailabilityUseCaseResponse extends Co
 }
 
 
-// admin fetch provider subscriptions use case request payload interface
-export interface AdminFetchProviderSubscriptionsUseCaseRequestPayload {
-    providerId: Provider["_id"];
-}
-// admin fetch provider subscriptions use case response interface
-type SubscripionsResProps = Pick<Subscription, "startDate" | "endDate" | "subscriptionStatus">;
-interface AdminFetchProviderSubscriptions extends SubscripionsResProps {
-    subscriptionPlanId?: {
-        _id: string;
-        planName: string;
-    };
-}
-export interface AdminFetchProviderSubscriptionsUseCaseResponse extends CommonResponse {
-    subscriptions: AdminFetchProviderSubscriptions[] | [];
-}
+
 
 
 // admin fetch provider payments use case request payload interface

@@ -2,15 +2,13 @@ import { Types } from "mongoose";
 import { Plan } from "../entities/plan.entity";
 import { Payment } from "../entities/payment.entity";
 import { Subscription } from "../entities/subscription.entity";
+import { AdminFetchAllSubscriptionsResponse } from "../../infrastructure/dtos/admin.dto";
+import { ApiPaginationRequest, ApiResponse, FetchProviderSubscriptionsRequestPayload, FindSubscriptionsByProviderIdResProps } from "../../infrastructure/dtos/common.dto";
 
 export type CreateSubscriptionPayloadProps = Pick<Subscription, "providerId" | "subscriptionPlanId" | "startDate" | "endDate" | "subscriptionStatus" | "paymentId" >;
 
-type FindSubscriptions = Pick<Subscription, | "startDate" | "endDate" | "subscriptionStatus">;
-export interface FindSubscriptionsByProviderIdResProps extends FindSubscriptions , Partial<Pick<Plan, "planName">>{
-}
-
 type FindAllSubscriptions= Pick<Subscription, "_id" | "createdAt" | "providerId" | "startDate" | "endDate" | "subscriptionStatus">;
-export interface FindAllSubscriptionsResProps extends FindAllSubscriptions , Partial<Pick<Plan, "planName" | "price">>{};
+export type FindAllSubscriptionsResProps = FindAllSubscriptions & Partial<Pick<Plan, "planName" | "price">>;
 
 type SubscriptionProps = Pick<Subscription, "startDate" | "endDate" | "subscriptionStatus" | "createdAt">;
 type PaymentsProps = Pick<Payment, "transactionId" | "discountAmount" | "initialAmount" | "paymentFor" | "paymentGateway" | "paymentMethod" | "paymentStatus" | "totalAmount">;
@@ -26,9 +24,9 @@ export interface ISubscriptionRepository {
 
     findSubscriptionById(subscriptionId: Types.ObjectId): Promise<Subscription | null>;
 
-    findSubscriptionsByProviderId(providerId: Types.ObjectId): Promise<Array<FindSubscriptionsByProviderIdResProps> | []>;
+    findSubscriptionsByProviderId(data: FetchProviderSubscriptionsRequestPayload): Promise<ApiResponse<FindSubscriptionsByProviderIdResProps>>;
 
-    findAllSubscriptions(): Promise<Array<FindAllSubscriptionsResProps> | []>
+    findAllSubscriptions({ page, limit }: ApiPaginationRequest): Promise<ApiResponse<AdminFetchAllSubscriptionsResponse>>
 
     findSubscriptionFullDetails(subscriptionId: Types.ObjectId): Promise<findSubscriptionFullDetailsResProps | {}>;
 }

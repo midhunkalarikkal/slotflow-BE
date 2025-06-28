@@ -31,18 +31,16 @@ export const ProviderAddServiceDetailsZodSchema = z.object({
 
 // **** Provider service availability controller **** \\
 // Provider add service availability
-export const ProviderAddServiceAvailabilityZodSchema = z.object({
-    availabilities: z.array(
-        z.object({
-            day: enumField("Availability day", daysArray),
-            duration: enumField("Availability duration", validSlotDuration),
-            startTime: stringField("Availability startTime",8,8,/^(0[1-9]|1[0-2]):[0-5][0-9] (AM|PM)$/,"Invlid availability startTime"), 
-            endTime: stringField("Availability endTime",8,8,/^(0[1-9]|1[0-2]):[0-5][0-9] (AM|PM)$/,"Invalid availability endTime"),
-            modes: stringArrayField("Availability modes",1,2,6,7, /^(Online|Offline)$/,"Mode must be either 'Online' or 'Offline'"),
-            slots: stringArrayField("Availability slots",1,200,8,8,/^(0[1-9]|1[0-2]):[0-5][0-9] (AM|PM)$/,"Invalid slot format. Format must be hh:mm AM/PM")
-        })
-    )
-})
+export const ProviderAddServiceAvailabilityZodSchema = z.array(
+    z.object({
+        day: enumField("Availability day", daysArray),
+        duration: enumField("Availability duration", validSlotDuration),
+        startTime: stringField("Availability startTime", 8, 8, /^(0[1-9]|1[0-2]):[0-5][0-9] (AM|PM)$/, "Invlid availability startTime"),
+        endTime: stringField("Availability endTime", 8, 8, /^(0[1-9]|1[0-2]):[0-5][0-9] (AM|PM)$/, "Invalid availability endTime"),
+        modes: stringArrayField("Availability modes", 1, 2, 6, 7, /^(online|offline)$/, "Mode must be either 'Online' or 'Offline'"),
+        slots: stringArrayField("Availability slots", 1, 200, 8, 8, /^(0[1-9]|1[0-2]):[0-5][0-9] (AM|PM)$/, "Invalid slot format. Format must be hh:mm AM/PM")
+    })
+)
 
 
 
@@ -52,6 +50,6 @@ export const ProviderAddServiceAvailabilityZodSchema = z.object({
 // Provider plan subscription duration validation
 export const ProviderPlanSubscribeZodSchema = z.object({
     planId: objectIdField("Plan ID"),
-    planDuration: enumField("Subscription plan duration",subscriptionMonthArray),
+    planDuration: enumField("Subscription plan duration", subscriptionMonthArray),
 });
 

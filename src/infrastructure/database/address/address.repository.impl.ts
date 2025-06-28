@@ -1,7 +1,8 @@
 import { Types } from "mongoose";
 import { AddressModel, IAddress } from "./address.model";
 import { Address } from "../../../domain/entities/address.entity";
-import { CreateAddressReqProps, IAddressRepository } from "../../../domain/repositories/IAddress.repository";
+import { IAddressRepository } from "../../../domain/repositories/IAddress.repository";
+import { AddAddressRequest } from "../../dtos/common.dto";
 
 export class AddressRepositoryImpl implements IAddressRepository {
     private mapToEntity(address: IAddress): Address {
@@ -22,11 +23,12 @@ export class AddressRepositoryImpl implements IAddressRepository {
             )
         }
 
-    async createAddress(address: CreateAddressReqProps): Promise<Address> {
+    async createAddress(address: AddAddressRequest): Promise<Address> {
         try{
             const newAddress = await AddressModel.create(address);
             return this.mapToEntity(newAddress);
         }catch(error){
+            console.error("Address adding error : ",error);
             throw new Error("Address adding error.");
         }
     }

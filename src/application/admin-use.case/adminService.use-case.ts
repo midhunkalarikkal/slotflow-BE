@@ -2,21 +2,22 @@ import { Validator } from "../../infrastructure/validator/validator";
 import { ServiceRepositoryImpl } from "../../infrastructure/database/appservice/service.repository.impl";
 import { 
     AdminAddServiceUseCaseResponse, 
-    AdminServiceListUseCaseResponse, 
     AdminAddServiceUseCaseRequestPayload, 
     AdminChangeServiceStatusUseCaseResponse, 
-    AdminChnageServiceIsBlockedStatusUseCaseRequestPayload, 
+    AdminChnageServiceIsBlockedStatusUseCaseRequestPayload,
+    AdminServiceListResponse, 
 } from "../../infrastructure/dtos/admin.dto";
+import { ApiPaginationRequest, ApiResponse } from "../../infrastructure/dtos/common.dto";
 
 export class AdminServiceListUseCase {
     constructor(
         private seriveRepositoryImpl: ServiceRepositoryImpl
     ) { }
 
-    async execute(): Promise<AdminServiceListUseCaseResponse> {
-        const services = await this.seriveRepositoryImpl.findAllServices();
-        if (!services) throw new Error("Fetching error, please try again.");
-        return { success: true, message: "Fetched providers.", services };
+    async execute({ page, limit }: ApiPaginationRequest): Promise<ApiResponse<AdminServiceListResponse>> {
+        const result = await this.seriveRepositoryImpl.findAllServices({ page, limit });
+        if (!result) throw new Error("Services fetching failed, ");
+        return { data: result.data, totalPages: result.totalPages, currentPage: result.currentPage, totalCount: result.totalCount };
     }
 }
 
@@ -49,6 +50,7 @@ export class AdminChnageServiceBlockStatusUseCase {
 
     async execute(data: AdminChnageServiceIsBlockedStatusUseCaseRequestPayload): Promise<AdminChangeServiceStatusUseCaseResponse> {
         const {serviceId, isBlocked} = data;
+        console.log("isBlocked : ",isBlocked);
         if(!serviceId || isBlocked === null) throw new Error("Invalid request.");
         
         Validator.validateObjectId(serviceId, "serviceId");
@@ -60,6 +62,6 @@ export class AdminChnageServiceBlockStatusUseCase {
         const updatedService = await this.seriveRepositoryImpl.updateService(serviceId, existingService);
         if (!updatedService) throw new Error("Service status changing error.");
         const { createdAt, updatedAt, ...rest } = updatedService;
-        return { success: true, message: `Service ${status ? "Blocked" : "Unblocked"} successfully.`, updatedService: rest }
+        return { success: true, message: `Service ${isBlocked ? "Blocked" : "Unblocked"} successfully.`, updatedService: rest }
     }
 }

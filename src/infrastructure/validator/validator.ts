@@ -123,13 +123,11 @@ export class Validator {
             throw new Error("Adhaar number is required.");
         }
 
-        if (typeof providerAdhaar !== "string") {
-            throw new Error("Invalid adhaar number. Must be a string.");
+        if (providerAdhaar.length !== 6) {
+            throw new Error("Invalid adhaar number. Must be 6 digits.");
         }
 
-        if (!/^\d{6}$/.test(providerAdhaar)) {
-            throw new Error("Invalid adhaar number. Please enter exactly 6 digits.");
-        }
+        
     }
 
     // Provider experience

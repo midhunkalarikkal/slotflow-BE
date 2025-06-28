@@ -4,6 +4,7 @@ import { HandleError } from "../../infrastructure/error/error";
 import { ServiceRepositoryImpl } from "../../infrastructure/database/appservice/service.repository.impl";
 import { AdminAddServiceUseCase, AdminChnageServiceBlockStatusUseCase, AdminServiceListUseCase } from "../../application/admin-use.case/adminService.use-case";
 import { AdminAddServiceXZodSchema, AdminChangeServiceBlockStatusZodSchema } from "../../infrastructure/zod/admin.zod";
+import { RequestQueryCommonZodSchema } from "../../infrastructure/zod/common.zod";
 
 const serviceRepositoryImpl = new ServiceRepositoryImpl();
 
@@ -24,7 +25,9 @@ class AdminServiceController {
 
     async getAllServices(req: Request, res: Response) {
         try{
-            const result = await this.adminServiceListUseCase.execute();
+            const validateQueryData = RequestQueryCommonZodSchema.parse(req.query);
+            const { page, limit } = validateQueryData;
+            const result = await this.adminServiceListUseCase.execute({ page, limit });
             res.status(200).json(result);
         }catch(error){
             HandleError.handle(error, res);
@@ -47,7 +50,6 @@ class AdminServiceController {
         try{
             const validateData = AdminChangeServiceBlockStatusZodSchema.parse(req.body);
             const { serviceId, isBlocked } = validateData;
-            if(!serviceId || !isBlocked) throw new Error("Invalid request.");
             const result = await this.adminChnageServiceBlockStatusUseCase.execute({serviceId: new Types.ObjectId(serviceId), isBlocked });
             res.status(200).json(result);
         }catch(error){

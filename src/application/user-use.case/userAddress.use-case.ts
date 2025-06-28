@@ -1,11 +1,10 @@
 import { Types } from "mongoose";
 import { Validator } from "../../infrastructure/validator/validator";
-import { CommonResponse } from "../../infrastructure/dtos/common.dto";
+import { AddAddressRequest, ApiResponse, CommonResponse } from "../../infrastructure/dtos/common.dto";
 import { UserRepositoryImpl } from "../../infrastructure/database/user/user.repository.impl";
 import { AddressRepositoryImpl } from "../../infrastructure/database/address/address.repository.impl";
 import { 
     UserFetchAddressUseCaseResponse, 
-    UserAddAddressUseCaseRequestPayload, 
     UserFetchUserAddressUseCaseRequestPayload, 
 } from "../../infrastructure/dtos/user.dto";
 
@@ -39,7 +38,7 @@ export class UserAddAddressUseCase {
         private addressRepositoryImpl: AddressRepositoryImpl,
     ) { }
 
-    async execute(data: UserAddAddressUseCaseRequestPayload): Promise<CommonResponse> {
+    async execute(data: AddAddressRequest): Promise<ApiResponse> {
         const {userId, addressLine, phone, place, city, district, pincode, state, country, googleMapLink} = data;
         if (!userId || !addressLine || !phone || !place || !city || !district || !pincode || !state || !country || !googleMapLink) throw new Error("Invalid request.");
         

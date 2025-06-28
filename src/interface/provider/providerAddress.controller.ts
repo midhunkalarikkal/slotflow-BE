@@ -26,8 +26,7 @@ class ProviderAddressController {
             const providerId = req.user.userOrProviderId;
             const validateData = AddAddressZodSchema.parse(req.body);
             const { addressLine, phone, place, city, district, pincode, state,  country, googleMapLink } = validateData;
-            if(!providerId || !phone || !place || !city || !district || !pincode || !state || !country || !googleMapLink) throw new Error("Invalid request.");
-            const result = await this.providerAddAddressUseCase.execute({providerId: new Types.ObjectId(providerId), addressLine, phone, place, city, district, pincode, state,  country, googleMapLink});
+            const result = await this.providerAddAddressUseCase.execute({userId: new Types.ObjectId(providerId), addressLine, phone, place, city, district, pincode, state,  country, googleMapLink});
             res.status(200).json(result);
         } catch (error) {
             HandleError.handle(error, res);
