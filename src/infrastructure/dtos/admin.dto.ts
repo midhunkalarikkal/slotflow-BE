@@ -211,10 +211,8 @@ export interface AdminFetchProviderServiceAvailabilityUseCaseResponse extends Co
 
 
 // admin fetch provider payments use case request payload interface
-export interface AdminFetchProviderPaymentsUseCaseRequestPayload {
+export interface AdminFetchProviderPaymentsRequest extends ApiPaginationRequest{
     providerId: Provider["_id"];
 }
 // admin fetch provider payments use case response interface
-export interface AdminFetchProviderPaymentsUseCaseResponse extends CommonResponse {
-    payments: Array<Pick<Payment, "paymentStatus" | "paymentMethod" | "paymentGateway" | "paymentFor" | "discountAmount" | "totalAmount" | "createdAt" | "_id">> | [];
-}
+export type AdminFetchProviderPaymentsResponse = Array<Pick<Payment, "paymentStatus" | "paymentMethod" | "paymentGateway" | "paymentFor" | "discountAmount" | "totalAmount" | "createdAt" | "_id">>;

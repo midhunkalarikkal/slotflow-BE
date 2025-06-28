@@ -1,9 +1,9 @@
 import { Types } from "mongoose";
 import { IPayment, PaymentModel } from "./payment.model";
 import { Payment } from "../../../domain/entities/payment.entity";
-import { CreatePaymentForBookingProps, CreatePaymentForSubscriptionProps, FindAllPaymentsByProviderIdResProps, FindAllPaymentsByUserIdResProps, IPaymentRepository, UpdateForCancelBookingRefundReqProps } from "../../../domain/repositories/IPayment.repository";
+import { CreatePaymentForBookingProps, CreatePaymentForSubscriptionProps, FindAllPaymentsByUserIdResProps, IPaymentRepository, UpdateForCancelBookingRefundReqProps } from "../../../domain/repositories/IPayment.repository";
 import { ApiPaginationRequest, ApiResponse } from "../../dtos/common.dto";
-import { AdminFetchAllPayments } from "../../dtos/admin.dto";
+import { AdminFetchAllPayments, AdminFetchProviderPaymentsRequest, AdminFetchProviderPaymentsResponse } from "../../dtos/admin.dto";
 
 export class PaymentRepositoryImpl implements IPaymentRepository {
     private mapToEntity(payment: IPayment): Payment {
@@ -50,11 +50,30 @@ export class PaymentRepositoryImpl implements IPaymentRepository {
         }
     }
 
-    async findAllPaymentsByProviderId(providerId: Types.ObjectId): Promise<Array<FindAllPaymentsByProviderIdResProps> | []> {
+    async findAllPaymentsByProviderId(data: AdminFetchProviderPaymentsRequest): Promise<ApiResponse<AdminFetchProviderPaymentsResponse>> {
         try {
-            const payments = await PaymentModel.find({ providerId: providerId }).sort({ createdAt: 1 })
-                .select("_id paymentStatus paymentMethod paymentGateway paymentFor discountAmount totalAmount createdAt");
-            return payments;
+            const { providerId, page, limit} = data;
+            const skip = ( page - 1 ) * limit;
+            const [payments, totalCount] = await Promise.all([
+                PaymentModel.find({ providerId: providerId }, {
+                    _id: 1,
+                    discountAmount: 1,
+                    totalAmount: 1,
+                    paymentFor: 1,
+                    paymentGateway: 1,
+                    paymentStatus: 1,
+                    paymentMethod: 1,
+                    createdAt: 1,
+                }).skip(skip).limit(limit).sort({ createdAt: 1 }).lean(),
+                PaymentModel.countDocuments(),
+            ]);
+            const totalPages = Math.ceil(totalCount / limit);
+            return {
+                data: payments.map(this.mapToEntity),
+                totalPages,
+                currentPage: page,
+                totalCount
+            }
         } catch (error) {
             throw new Error("Finding payments error.");
         }

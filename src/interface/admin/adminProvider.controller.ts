@@ -169,8 +169,10 @@ class AdminProviderController {
         try{
             const validateParams = AdminProviderIdZodSchema.parse(req.params);
             const { providerId } = validateParams;
+            const validateQueryData = RequestQueryCommonZodSchema.parse(req.query);
+            const { page, limit } = validateQueryData;
             if(!providerId) throw new Error("Invalid request.");
-            const result = await this.adminFetchProviderPaymentsUseCase.execute({providerId : new Types.ObjectId(providerId)});
+            const result = await this.adminFetchProviderPaymentsUseCase.execute({providerId : new Types.ObjectId(providerId), page, limit });
             res.status(200).json(result);
         }catch (error) {
             HandleError.handle(error,res);

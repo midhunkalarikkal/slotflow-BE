@@ -12,11 +12,11 @@ import {
     AdminFetchProviderServiceUseCaseResponse,
     AdminFetchProviderAddressUseCaseResponse,
     AdminFetchProviderDetailsUseCaseResponse,
-    AdminFetchProviderPaymentsUseCaseResponse,
+    AdminFetchProviderPaymentsResponse,
     AdminFetchProviderDetailsUseCaseRequestPayload,
     AdminFetchProviderAddressUseCaseRequestPayload,
     AdminFetchProviderServiceUseCaseRequestPayload,
-    AdminFetchProviderPaymentsUseCaseRequestPayload,
+    AdminFetchProviderPaymentsRequest,
     AdminFetchProviderServiceAvailabilityUseCaseResponse,
     AdminFetchProviderServiceAvailabilityUseCaseRequestPayload,
 } from "../../../infrastructure/dtos/admin.dto";
@@ -171,8 +171,8 @@ export class AdminFetchProviderPaymentsUseCase {
         private paymentRepositoryImpl: PaymentRepositoryImpl,
     ) { }
 
-    async execute(data: AdminFetchProviderPaymentsUseCaseRequestPayload): Promise<AdminFetchProviderPaymentsUseCaseResponse> {
-        const { providerId } = data;
+    async execute(data: AdminFetchProviderPaymentsRequest): Promise<ApiResponse<AdminFetchProviderPaymentsResponse>> {
+        const { providerId, page, limit } = data;
         if (!providerId) throw new Error("Invalid request.");
 
         Validator.validateObjectId(providerId, "providerId");
@@ -180,10 +180,10 @@ export class AdminFetchProviderPaymentsUseCase {
         const provider = await this.providerRepositoryImpl.findProviderById(providerId);
         if (!provider) throw new Error("No user found.");
 
-        const payments = await this.paymentRepositoryImpl.findAllPaymentsByProviderId(providerId);
-        if (!payments) throw new Error("Payments fetching error.");
+        const result = await this.paymentRepositoryImpl.findAllPaymentsByProviderId({providerId, page, limit });
+        if (!result) throw new Error("Payments fetching error.");
 
-        return { success: true, message: "Payments fetched successfully.", payments };
+        return { data: result.data, totalPages: result.totalPages, currentPage: result.currentPage, totalCount: result.totalCount };
     }
 
 }
