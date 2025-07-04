@@ -8,17 +8,17 @@ import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/p
 import { 
     ProviderUpdateprofileImageResponse, 
     ProviderUpdateprofileImageRequestPayload, 
-    ProviderFetchProfileDetailsUseCaseResponse, 
-    ProviderFetchProfileDetailsUseCaseRequestPayload,
-    ProviderUpdateProviderInfoUseCaseRequestPayload,
-    ProviderUpdateProviderInfoUseCaseResponse, 
+    ProviderFetchProfileDetailsResponse, 
+    ProviderFetchProfileDetailsRequest,
+    ProviderUpdateProviderInfoRequest,
+    ProviderUpdateProviderInfoResponse, 
 } from "../../infrastructure/dtos/provider.dto";
 
 
 export class ProviderFetchProfileDetailsUseCase {
     constructor(private providerRepositoryImpl: ProviderRepositoryImpl) { }
 
-    async execute(data: ProviderFetchProfileDetailsUseCaseRequestPayload): Promise<ProviderFetchProfileDetailsUseCaseResponse> {
+    async execute(data: ProviderFetchProfileDetailsRequest): Promise<ProviderFetchProfileDetailsResponse> {
         const { providerId } = data;
         if (!providerId) throw new Error("Invalid request.");
 
@@ -84,7 +84,7 @@ export class ProviderUpdateProviderInfoUseCase {
         private providerRepositoryImpl: ProviderRepositoryImpl
     ) { }
 
-    async execute(data: ProviderUpdateProviderInfoUseCaseRequestPayload) : Promise<ProviderUpdateProviderInfoUseCaseResponse> {
+    async execute(data: ProviderUpdateProviderInfoRequest) : Promise<ProviderUpdateProviderInfoResponse> {
         const { providerId, username, phone } = data;
         if(!providerId || !username || !phone) throw new Error("Invalid request");
 

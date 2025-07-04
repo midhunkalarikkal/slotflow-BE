@@ -3,7 +3,7 @@ import { Types } from "mongoose";
 import { Validator } from "../../infrastructure/validator/validator";
 import { CommonResponse } from "../../infrastructure/dtos/common.dto";
 import { PlanRepositoryImpl } from "../../infrastructure/database/plan/plan.repository.impl";
-import { ProviderTrialSubscriptionUseCaseRequestPayload } from "../../infrastructure/dtos/provider.dto";
+import { ProviderTrialSubscriptionRequest } from "../../infrastructure/dtos/provider.dto";
 import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/provider.repository.impl";
 import { SubscriptionRepositoryImpl } from "../../infrastructure/database/subscription/subscription.repository.impl";
 
@@ -14,7 +14,7 @@ export class ProviderTrialSubscriptionUseCase {
         private planRepositoryImpl: PlanRepositoryImpl,
     ) { }
 
-    async execute(data: ProviderTrialSubscriptionUseCaseRequestPayload): Promise<CommonResponse> {
+    async execute(data: ProviderTrialSubscriptionRequest): Promise<CommonResponse> {
         const { providerId } = data;
         if (!providerId) throw new Error("Invalid request.");
 

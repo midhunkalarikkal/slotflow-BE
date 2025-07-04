@@ -3,8 +3,8 @@ import { AddAddressRequest, ApiResponse, CommonResponse } from "../../infrastruc
 import { AddressRepositoryImpl } from "../../infrastructure/database/address/address.repository.impl";
 import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/provider.repository.impl";
 import { 
-    ProviderFetchAddressUseCaseResponse, 
-    ProviderFetchAddressUseCaseRequestPayload, 
+    ProviderFetchAddressResponse, 
+    ProviderFetchAddressRequest, 
 } from "../../infrastructure/dtos/provider.dto";
 
 
@@ -49,7 +49,7 @@ export class ProviderAddAddressUseCase {
 export class ProviderFetchAddressUseCase {
     constructor(private addressRepositoryImpl: AddressRepositoryImpl) { }
 
-    async execute(data: ProviderFetchAddressUseCaseRequestPayload): Promise<ProviderFetchAddressUseCaseResponse> {
+    async execute(data: ProviderFetchAddressRequest): Promise<ProviderFetchAddressResponse> {
         const { providerId } = data;
 
         Validator.validateObjectId(providerId, "providerId");

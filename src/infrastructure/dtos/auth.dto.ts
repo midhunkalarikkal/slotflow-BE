@@ -4,14 +4,14 @@ import { CommonResponse } from "./common.dto";
 
 // **** Register usec case **** \\
 // user or provider register usecase request payload interface
-export interface RegisterUseCaseRequestPayload {
+export interface RegisterRequest {
     username: string;
     email: string;
     password: string;
     role: string;
 }
 // user or provider register usecase response interface
-export interface RegisterUseCaseResponse extends CommonResponse {
+export interface RegisterResponse extends CommonResponse {
   authUser: {
     verificationToken: string, 
     role: string, 
@@ -22,7 +22,7 @@ export interface RegisterUseCaseResponse extends CommonResponse {
 
 // **** OTP Verification use case **** \\
 // user or provider OTP Verification usecase request payload interface
-export interface OTPVerificationUseCaseRequestPayload {
+export interface OTPVerificationRequest {
     otp: string;
     verificationToken: string;
     role: string;
@@ -31,7 +31,7 @@ export interface OTPVerificationUseCaseRequestPayload {
 
 // **** Resend OTP use case **** \\
 // user or provider Resend use case request payload interface
-export interface ResendOtpUseCaseRequestPayload {
+export interface ResendOtpRequest {
     role: string;
     verificationToken?: string;
     email?: string;
@@ -40,13 +40,13 @@ export interface ResendOtpUseCaseRequestPayload {
 
 // **** Login use case **** \\
 // user or provider login use case request payload interface
-export interface LoginUseCaseRequestPayload {
+export interface LoginRequest {
     email: string;
     password: string;
     role: string;
 }
 // user or provider login use case response interface
-export interface LoginUseCaseResponse extends CommonResponse {
+export interface LoginResponse extends CommonResponse {
     authUser: { 
         username: string, 
         profileImage: string | null, 
@@ -63,7 +63,7 @@ export interface LoginUseCaseResponse extends CommonResponse {
 
 // **** Update password use case **** \\
 // user or provider update password use case request payload interface
-export interface UpdatePasswordUseCaseRequestPayload {
+export interface UpdatePasswordRequest {
     role: string;
     verificationToken: string;
     password: string;
@@ -72,11 +72,11 @@ export interface UpdatePasswordUseCaseRequestPayload {
 
 // **** Check status **** \\
 // check user status use case request payload interface
-export interface CheckUserStatusUseCaseRequestPayload {
+export interface CheckUserStatusRequest {
     id: Types.ObjectId;
     role: string;
 }
 // check user status use case response interface
-export interface CheckUserStatusUseCaseResponse extends CommonResponse {
+export interface CheckUserStatusResponse extends CommonResponse {
     status: number;
 }

@@ -1,5 +1,5 @@
 import { Types } from "mongoose";
-import { CheckUserStatusUseCaseRequestPayload, CheckUserStatusUseCaseResponse } from "../../infrastructure/dtos/auth.dto";
+import { CheckUserStatusRequest, CheckUserStatusResponse } from "../../infrastructure/dtos/auth.dto";
 import { UserRepositoryImpl } from "../../infrastructure/database/user/user.repository.impl";
 import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/provider.repository.impl";
 import { Validator } from "../../infrastructure/validator/validator";
@@ -9,7 +9,7 @@ import { Validator } from "../../infrastructure/validator/validator";
 export class CheckUserStatusUseCase {
     constructor(private userRepository: UserRepositoryImpl, private providerRepository: ProviderRepositoryImpl){}
 
-    async execute(data: CheckUserStatusUseCaseRequestPayload) : Promise<CheckUserStatusUseCaseResponse> {
+    async execute(data: CheckUserStatusRequest) : Promise<CheckUserStatusResponse> {
         const { id, role } = data;
 
         Validator.validateObjectId(id);

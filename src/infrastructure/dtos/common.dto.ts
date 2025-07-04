@@ -11,6 +11,8 @@ export interface CommonResponse {
     message: string;
 };
 
+
+
 export interface ApiResponse<T = unknown> {
     success?: boolean;
     message?: string;
@@ -19,6 +21,8 @@ export interface ApiResponse<T = unknown> {
     totalCount?: number;
     data?: T;
 }
+
+
 
 // Common request interface for the usecases
 export interface ApiPaginationRequest {
@@ -42,9 +46,9 @@ export type PopulatedSubscription = Omit<Subscription, 'subscriptionPlanId'> & {
 };
 
 
+
 //// **** Used for adding address for user or provider
 export type AddAddressRequest = Pick<Address, "userId" | "addressLine" | "place" | "phone" | "city" | "country" | "district" | "pincode" | "state" | "googleMapLink">;
-
 
 
 
@@ -53,6 +57,5 @@ export interface userIdAndProviderId {
   userId?: User["_id"];
   providerId?: Provider["_id"];
 }
-export interface FetchPaymentsRequest extends ApiPaginationRequest, userIdAndProviderId {
-}
+export interface FetchPaymentsRequest extends ApiPaginationRequest, userIdAndProviderId {}
 export type FetchPaymentResponse = Array<Pick<Payment, "_id" | "createdAt" | "totalAmount" | "paymentFor" | "paymentGateway" | "paymentStatus" | "paymentMethod" | "discountAmount">>;

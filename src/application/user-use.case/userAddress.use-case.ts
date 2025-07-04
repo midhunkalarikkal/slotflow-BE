@@ -4,8 +4,8 @@ import { AddAddressRequest, ApiResponse, CommonResponse } from "../../infrastruc
 import { UserRepositoryImpl } from "../../infrastructure/database/user/user.repository.impl";
 import { AddressRepositoryImpl } from "../../infrastructure/database/address/address.repository.impl";
 import { 
-    UserFetchAddressUseCaseResponse, 
-    UserFetchUserAddressUseCaseRequestPayload, 
+    UserFetchAddressResponse, 
+    UserFetchUserAddressRequest, 
 } from "../../infrastructure/dtos/user.dto";
 
 
@@ -15,7 +15,7 @@ export class UserFetchAddressUseCase {
         private addressRepositoryImpl: AddressRepositoryImpl,
     ) { }
 
-    async execute(data: UserFetchUserAddressUseCaseRequestPayload): Promise<UserFetchAddressUseCaseResponse> {
+    async execute(data: UserFetchUserAddressRequest): Promise<UserFetchAddressResponse> {
         const { userId } = data;
         if (!userId) throw new Error("Invalid request.");
 

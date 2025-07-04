@@ -3,14 +3,14 @@ import { Provider } from "../../domain/entities/provider.entity";
 import { CommonResponse } from "../../infrastructure/dtos/common.dto";
 import { validateOrThrow } from "../../infrastructure/validator/validator";
 import { PasswordHasher } from "../../infrastructure/security/password-hashing";
-import { UpdatePasswordUseCaseRequestPayload } from "../../infrastructure/dtos/auth.dto";
+import { UpdatePasswordRequest } from "../../infrastructure/dtos/auth.dto";
 import { UserRepositoryImpl } from "../../infrastructure/database/user/user.repository.impl";
 import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/provider.repository.impl";
 
 export class UpdatePasswordUseCase {
     constructor(private userRepositoryImpl: UserRepositoryImpl, private providerRepositoryImpl: ProviderRepositoryImpl) { }
 
-    async execute(data: UpdatePasswordUseCaseRequestPayload): Promise<CommonResponse> {
+    async execute(data: UpdatePasswordRequest): Promise<CommonResponse> {
         const { role, verificationToken, password } = data;
 
         if (!role || !verificationToken || !password) throw new Error("Invalid Request");

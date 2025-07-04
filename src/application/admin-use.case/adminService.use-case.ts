@@ -1,8 +1,8 @@
 import { 
-    AdminAddServiceUseCaseResponse, 
-    AdminAddServiceUseCaseRequestPayload, 
-    AdminChangeServiceStatusUseCaseResponse, 
-    AdminChnageServiceIsBlockedStatusUseCaseRequestPayload,
+    AdminAddServiceResponse, 
+    AdminAddServiceRequest, 
+    AdminChangeServiceStatusResponse, 
+    AdminChnageServiceIsBlockedStatusRequest,
     AdminServiceListResponse, 
 } from "../../infrastructure/dtos/admin.dto";
 import { Validator } from "../../infrastructure/validator/validator";
@@ -27,7 +27,7 @@ export class AdminAddServiceUseCase {
         private seriveRepositoryImpl: ServiceRepositoryImpl
     ) { }
 
-    async execute(data: AdminAddServiceUseCaseRequestPayload): Promise<AdminAddServiceUseCaseResponse> {
+    async execute(data: AdminAddServiceRequest): Promise<AdminAddServiceResponse> {
         const { serviceName } = data;
         if(!serviceName) throw new Error("Invalid request.");
 
@@ -48,7 +48,7 @@ export class AdminChnageServiceBlockStatusUseCase {
         private seriveRepositoryImpl: ServiceRepositoryImpl
     ) { }
 
-    async execute(data: AdminChnageServiceIsBlockedStatusUseCaseRequestPayload): Promise<AdminChangeServiceStatusUseCaseResponse> {
+    async execute(data: AdminChnageServiceIsBlockedStatusRequest): Promise<AdminChangeServiceStatusResponse> {
         const {serviceId, isBlocked} = data;
         console.log("isBlocked : ",isBlocked);
         if(!serviceId || isBlocked === null) throw new Error("Invalid request.");

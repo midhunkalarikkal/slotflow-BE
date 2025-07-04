@@ -1,8 +1,8 @@
 import { 
-    AdminCreatePlanUseCaseResponse, 
-    AdminAddNewPlanUseCaseRequestPayload, 
-    AdminChangePlanStatusUseCaseResponse, 
-    AdminChangePlanIsBlockedStatusUseCaseRequestPayload,
+    AdminCreatePlanResponse, 
+    AdminAddNewPlanRequest, 
+    AdminChangePlanStatusResponse, 
+    AdminChangePlanIsBlockedStatusRequest,
     AdminPlanListResponse, 
 } from "../../infrastructure/dtos/admin.dto";
 import { Validator } from "../../infrastructure/validator/validator";
@@ -24,7 +24,7 @@ export class AdminPlanListUseCase {
 export class AdminCreatePlanUseCase {
     constructor(private planRepositoryImpl: PlanRepositoryImpl) { }
 
-    async execute(data : AdminAddNewPlanUseCaseRequestPayload): Promise<AdminCreatePlanUseCaseResponse> {
+    async execute(data : AdminAddNewPlanRequest): Promise<AdminCreatePlanResponse> {
         const {planName, description, price, features, maxBookingPerMonth, adVisibility} = data;
         if (!planName || !description || price < 0 || !features || maxBookingPerMonth < 0) throw new Error("Invalid plan data.");
 
@@ -54,7 +54,7 @@ export class AdminCreatePlanUseCase {
 export class AdminChangePlanBlockStatusUseCase {
     constructor(private planRepositoryImpl: PlanRepositoryImpl) { }
 
-    async execute(data: AdminChangePlanIsBlockedStatusUseCaseRequestPayload): Promise<AdminChangePlanStatusUseCaseResponse> {
+    async execute(data: AdminChangePlanIsBlockedStatusRequest): Promise<AdminChangePlanStatusResponse> {
         const {planId, isBlocked} = data;
         if(!planId || isBlocked === null) throw new Error("Invalid request");
 

@@ -1,8 +1,8 @@
 import { Validator } from "../../infrastructure/validator/validator";
 import { SubscriptionRepositoryImpl } from "../../infrastructure/database/subscription/subscription.repository.impl";
 import { 
-    AdminFetchSubscriptionDetailsUseCaseResponse, 
-    AdminFetchSubscriptionDetailsUseCaseRequestPayload,
+    AdminFetchSubscriptionDetailsResponse, 
+    AdminFetchSubscriptionDetailsRequest,
     AdminFetchAllSubscriptionsResponse, 
 } from "../../infrastructure/dtos/admin.dto";
 import { ApiPaginationRequest, ApiResponse } from "../../infrastructure/dtos/common.dto";
@@ -24,7 +24,7 @@ export class AdminFetchSubscriptionDetailsUseCase {
         private subscriptionRepositoryImpl: SubscriptionRepositoryImpl,
     ) { }
 
-    async execute(data: AdminFetchSubscriptionDetailsUseCaseRequestPayload): Promise<AdminFetchSubscriptionDetailsUseCaseResponse> {
+    async execute(data: AdminFetchSubscriptionDetailsRequest): Promise<AdminFetchSubscriptionDetailsResponse> {
         const { subscriptionId } = data;
         if(!subscriptionId) throw new Error("Invalid request.");
         

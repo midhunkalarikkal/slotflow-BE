@@ -9,17 +9,17 @@ import { ProviderServiceRepositoryImpl } from "../../infrastructure/database/pro
 import { ServiceAvailabilityRepositoryImpl } from "../../infrastructure/database/serviceAvailability/serviceAvailability.repository.impl";
 import {
   FindProviderServiceResponse,
-  UserFetchProviderServiceUseCaseResponse,
-  UserFetchServiceProvidersUseCaseResponse,
-  FindProvidersUsingServiceCategoryIdsResProps,
-  UserFetchServiceProviderAddressUseCaseResponse,
-  UserFetchServiceProviderDetailsUseCaseResponse,
-  UserFetchServiceProvidersUseCaseRequestPayload,
-  UserFetchProviderServiceAvailabilityUseCaseResponse,
-  UserFetchServiceProviderAddressUseCaseRequestPayload,
-  UserFetchServiceProviderDetailsUseCaseRequestPayload,
-  UserFetchServiceproviderServiceUsecaseRequestPayload,
-  UserFetchProviderServiceAvailabilityUseCaseRequestPayload
+  UserFetchProviderServiceResponse,
+  UserFetchServiceProvidersResponse,
+  FindProvidersUsingServiceCategoryIdsResponse,
+  UserFetchServiceProviderAddressResponse,
+  UserFetchServiceProviderDetailsResponse,
+  UserFetchServiceProvidersRequest,
+  UserFetchProviderServiceAvailabilityResponse,
+  UserFetchServiceProviderAddressRequest,
+  UserFetchServiceProviderDetailsRequest,
+  UserFetchServiceproviderServiceRequest,
+  UserFetchProviderServiceAvailabilityRequest
 } from "../../infrastructure/dtos/user.dto";
 import dayjs from "dayjs";
 
@@ -29,7 +29,7 @@ export class UserFetchServiceProvidersUseCase {
     private providerServiceRepositoryImpl: ProviderServiceRepositoryImpl,
   ) { }
 
-  async execute(data: UserFetchServiceProvidersUseCaseRequestPayload): Promise<UserFetchServiceProvidersUseCaseResponse> {
+  async execute(data: UserFetchServiceProvidersRequest): Promise<UserFetchServiceProvidersResponse> {
     const { userId, serviceIds } = data;
     if (!userId || !serviceIds) throw new Error("Invalid request.");
 
@@ -41,7 +41,7 @@ export class UserFetchServiceProvidersUseCase {
     const providers = await this.providerServiceRepositoryImpl.findProvidersUsingServiceCategoryIds(serviceIds);
     if (!providers) throw new Error("Providers fetching error.");
 
-    const updatedproviders: FindProvidersUsingServiceCategoryIdsResProps[] = await Promise.all(
+    const updatedproviders: FindProvidersUsingServiceCategoryIdsResponse[] = await Promise.all(
       providers.map(async (provider) => {
         let profileImageUrl = provider.provider.profileImage;
 
@@ -66,7 +66,7 @@ export class UserFetchServiceProviderProfileDetailsUseCase {
     private providerRepositoryImpl: ProviderRepositoryImpl,
   ) { }
 
-  async execute(data: UserFetchServiceProviderDetailsUseCaseRequestPayload): Promise<UserFetchServiceProviderDetailsUseCaseResponse> {
+  async execute(data: UserFetchServiceProviderDetailsRequest): Promise<UserFetchServiceProviderDetailsResponse> {
     const { userId, providerId } = data;
     if (!userId || !providerId) throw new Error("Invalid request");
 
@@ -98,7 +98,7 @@ export class UserFetchServiceProviderAddressUseCase {
     private addressRepositoryImpl: AddressRepositoryImpl,
   ) { }
 
-  async execute(data: UserFetchServiceProviderAddressUseCaseRequestPayload): Promise<UserFetchServiceProviderAddressUseCaseResponse> {
+  async execute(data: UserFetchServiceProviderAddressRequest): Promise<UserFetchServiceProviderAddressResponse> {
     const { userId, providerId } = data;
     if (!userId || !providerId) throw new Error("Invalid request");
 
@@ -124,7 +124,7 @@ export class UserFetchServiceProviderServiceDetailsUseCase {
     private providerServiceRepositoryImpl: ProviderServiceRepositoryImpl,
   ) { }
 
-  async execute(data: UserFetchServiceproviderServiceUsecaseRequestPayload): Promise<UserFetchProviderServiceUseCaseResponse> {
+  async execute(data: UserFetchServiceproviderServiceRequest): Promise<UserFetchProviderServiceResponse> {
     const { userId, providerId } = data;
     if (!userId || !providerId) throw new Error("Invalid request");
 
@@ -157,7 +157,7 @@ export class UserFetchServiceProviderServiceAvailabilityUseCase {
     private serviceAvailabilityRepositoryImpl: ServiceAvailabilityRepositoryImpl,
   ) { }
 
-  async execute(data: UserFetchProviderServiceAvailabilityUseCaseRequestPayload): Promise<UserFetchProviderServiceAvailabilityUseCaseResponse> {
+  async execute(data: UserFetchProviderServiceAvailabilityRequest): Promise<UserFetchProviderServiceAvailabilityResponse> {
     const { userId, providerId, date } = data;
     if (!userId || !providerId || !date) throw new Error("Invalid request.");
     const currentDateTime = dayjs();

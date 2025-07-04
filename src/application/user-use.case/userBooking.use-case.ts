@@ -6,10 +6,10 @@ import { UserRepositoryImpl } from "../../infrastructure/database/user/user.repo
 import { BookingRepositoryImpl } from "../../infrastructure/database/booking/booking.repository.impl";
 import { PaymentRepositoryImpl } from "../../infrastructure/database/payment/payment.repository.impl";
 import { 
-    UserCancelBookingUseCaseResProps, 
-    UserFetchAllBookingsUseCaseResponse, 
-    UserCancelBookingUseCaseRequestPayload, 
-    UserFetchAppointmentBookingsUseCaseRequestPayload 
+    UserCancelBookingResponse, 
+    UserFetchAllBookingsResponse, 
+    UserCancelBookingRequest, 
+    UserFetchAppointmentBookingsRequest 
 } from "../../infrastructure/dtos/user.dto";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
@@ -20,7 +20,7 @@ export class UserFetchBookingsUseCase {
         private bookingRepositoryImpl: BookingRepositoryImpl
     ) { }
 
-    async execute(data: UserFetchAppointmentBookingsUseCaseRequestPayload): Promise<UserFetchAllBookingsUseCaseResponse> {
+    async execute(data: UserFetchAppointmentBookingsRequest): Promise<UserFetchAllBookingsResponse> {
         const { userId } = data;
         if (!userId) throw new Error("Invalid request");
 
@@ -41,7 +41,7 @@ export class UserCancelBookingUseCase {
         private paymentRepositoryImpl: PaymentRepositoryImpl,
     ) { }
 
-    async execute(data: UserCancelBookingUseCaseRequestPayload): Promise<UserCancelBookingUseCaseResProps> {
+    async execute(data: UserCancelBookingRequest): Promise<UserCancelBookingResponse> {
         const { userId, bookingId } = data;
         if (!userId || !bookingId) throw new Error("Invalid request");
 

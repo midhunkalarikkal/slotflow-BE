@@ -4,7 +4,6 @@ import { User } from "../../domain/entities/user.entity";
 import { Address } from "../../domain/entities/address.entity";
 import { Booking } from "../../domain/entities/booking.entity";
 import { Service } from "../../domain/entities/service.entity";
-import { Payment } from "../../domain/entities/payment.entity";
 import { Provider } from "../../domain/entities/provider.entity";
 import { ProviderService } from "../../domain/entities/providerService.entity";
 import { FontendAvailabilityForResponse, TimeSlotForFrontendResponse } from "../../domain/entities/serviceAvailability.entity";
@@ -12,18 +11,18 @@ import { FontendAvailabilityForResponse, TimeSlotForFrontendResponse } from "../
 // **** used in userAddress.use-case **** \\
 
 // user fetch user address use case request payload interface
-export interface UserFetchUserAddressUseCaseRequestPayload {
+export interface UserFetchUserAddressRequest {
     userId: User["_id"];
 }
 // user fetch user address use case response interface
-export interface UserFetchAddressUseCaseResponse extends CommonResponse {
+export interface UserFetchAddressResponse extends CommonResponse {
     address: Pick<Address, "addressLine" | "phone" | "place" | "city" | "district" | "pincode" | "state" | "country" | "googleMapLink"> | {};
 }
 
 
 // user add new address use case request payload interface
-type AddressRequestPayload = Pick<Address, "addressLine" | "city" | "country" | "district" | "googleMapLink" | "phone" | "place" | "pincode" | "state"> 
-export interface UserAddAddressUseCaseRequestPayload extends AddressRequestPayload{
+type AddressRequest = Pick<Address, "addressLine" | "city" | "country" | "district" | "googleMapLink" | "phone" | "place" | "pincode" | "state"> 
+export interface UserAddAddressRequest extends AddressRequest{
     userId: User["_id"]
 } 
 
@@ -34,7 +33,7 @@ export interface UserAddAddressUseCaseRequestPayload extends AddressRequestPaylo
 // **** used in userBooking.use-case **** \\
 
 // user appointment booking via stripe creating session id use case request payload
-export interface UserAppointmentBookingViaStripeUseCaseRequestPayload {
+export interface UserAppointmentBookingViaStripeRequest {
     userId: User["_id"];
     providerId: Provider["_id"]; 
     slotId: TimeSlotForFrontendResponse["_id"]; 
@@ -42,35 +41,35 @@ export interface UserAppointmentBookingViaStripeUseCaseRequestPayload {
     date: Date
 }
 // user appointment booking via stripe creating session id use case response
-export interface UserAppointmentBookingViaStripeUseCaseResponse extends CommonResponse {
+export interface UserAppointmentBookingViaStripeResponse extends CommonResponse {
     sessionId: string;
 }
 
 
 // use save appointment booking after stripe payment use case request payload
-export interface UserSaveAppoinmentBookingUseCaseRequestPayload {
+export interface UserSaveAppoinmentBookingRequest {
     userId: User["_id"];
     sessionId: string;
 }
 
 
 // user fetch bookings use case request payload interface
-export interface UserFetchAppointmentBookingsUseCaseRequestPayload {
+export interface UserFetchAppointmentBookingsRequest {
     userId: User["_id"];
 }
 // user fetch bookings use case response interface
-type FindAllBookingsResponseProps = Pick<Booking, "_id" | "appointmentDate" | "appointmentMode" | "appointmentStatus" | "appointmentTime" | "createdAt" | "paymentId">;
-export interface UserFetchAllBookingsUseCaseResponse extends CommonResponse {
-    bookings: Array<FindAllBookingsResponseProps>
+type FindAllBookingsResponse = Pick<Booking, "_id" | "appointmentDate" | "appointmentMode" | "appointmentStatus" | "appointmentTime" | "createdAt" | "paymentId">;
+export interface UserFetchAllBookingsResponse extends CommonResponse {
+    bookings: Array<FindAllBookingsResponse>
 }
 
 // user can cel booking use case request payload interface
-export interface UserCancelBookingUseCaseRequestPayload {
+export interface UserCancelBookingRequest {
     userId: User["_id"];
     bookingId: Booking["_id"];
 }
 // user cancel booking use case response interface
-export interface UserCancelBookingUseCaseResProps extends CommonResponse {
+export interface UserCancelBookingResponse extends CommonResponse {
     updatedBooking : Pick<Booking, "_id" | "appointmentDate" | "appointmentMode" | "appointmentStatus" | "appointmentTime" | "createdAt">;
 }
 
@@ -81,30 +80,30 @@ export interface UserCancelBookingUseCaseResProps extends CommonResponse {
 // **** used in userProfile.use-case **** \\
 
 // user fetch profile use case request payload interface
-export interface UserFetchProfileUseCaseRequestPayload {
+export interface UserFetchProfileRequest {
     userId: User["_id"];
 }
 // user fetch profile details use case response interface
-export interface UserFetchProfileDetails extends CommonResponse {
+export interface UserFetchProfileDetailsResponse extends CommonResponse {
     profileDetails: Pick<User, "username" | "email" | "isBlocked" | "isEmailVerified" | "phone" | "createdAt"> | {};
 }
 
 // user update profile image use case request payload interface 
-export interface UsrUpdateProfileImageUseCaseRequestPayload {
+export interface UsrUpdateProfileImageRequest {
     userId: User["_id"],
     file: Express.Multer.File
 }
 // user update profile image use case response interface
-export interface UserUpdateProfileImageResProps extends CommonResponse, Pick<User, "profileImage"> { };
+export interface UserUpdateProfileImageResponse extends CommonResponse, Pick<User, "profileImage"> { };
 
 // user update user info request payload interface
-export interface UserUpdateUserInfoUseCaseRequestPayload {
+export interface UserUpdateUserInfoRequest {
     userId: User["_id"];
     username: User["username"];
     phone: User["phone"];
 }
 // user update user info use case response interface
-export interface UserUpdateUserInfoUseCaseResponse extends CommonResponse {
+export interface UserUpdateUserInfoResponse extends CommonResponse {
     userInfo: Pick<User, "username" | "phone">
 }
 
@@ -114,12 +113,12 @@ export interface UserUpdateUserInfoUseCaseResponse extends CommonResponse {
 // **** used in userProvider.use-case **** \\
 
 // user fetch service providers use case request payload interface
-export interface UserFetchServiceProvidersUseCaseRequestPayload {
+export interface UserFetchServiceProvidersRequest {
     userId: User["_id"];
     serviceIds: ProviderService["_id"][]
 }
 // user fetch service providers use case response interface
-export interface FindProvidersUsingServiceCategoryIdsResProps {
+export interface FindProvidersUsingServiceCategoryIdsResponse {
     _id: Types.ObjectId,
     provider: {
         _id: Types.ObjectId,
@@ -134,35 +133,35 @@ export interface FindProvidersUsingServiceCategoryIdsResProps {
         categoryName: string
     }
 }
-export interface UserFetchServiceProvidersUseCaseResponse extends CommonResponse {
-    providers: Array<FindProvidersUsingServiceCategoryIdsResProps>
+export interface UserFetchServiceProvidersResponse extends CommonResponse {
+    providers: Array<FindProvidersUsingServiceCategoryIdsResponse>
 }
 
 
 // user fetch provider details use case request payload interface
-export interface UserFetchServiceProviderDetailsUseCaseRequestPayload {
+export interface UserFetchServiceProviderDetailsRequest {
     userId: User["_id"];
     providerId: Provider["_id"];
 }
 // user fetch provider details use case response interface
-export interface UserFetchServiceProviderDetailsUseCaseResponse extends CommonResponse {
+export interface UserFetchServiceProviderDetailsResponse extends CommonResponse {
     provider: Pick<Provider, "_id" | "username" | "email" | "profileImage" | "trustedBySlotflow" | "phone">
 }
 
 
 // user fetch provider address use case request payload interface
-export interface UserFetchServiceProviderAddressUseCaseRequestPayload {
+export interface UserFetchServiceProviderAddressRequest {
     userId: User["_id"];
     providerId: Provider["_id"];
 }
 // user fetch provider address use case response interface
-export interface UserFetchServiceProviderAddressUseCaseResponse extends CommonResponse {
+export interface UserFetchServiceProviderAddressResponse extends CommonResponse {
     address: Pick<Address, "userId" | "addressLine" | "phone" | "place" | "city" | "district" | "pincode" | "state" | "country" | "googleMapLink">
 }
 
 
 // user fetch provider service use case request payload interface
-export interface UserFetchServiceproviderServiceUsecaseRequestPayload {
+export interface UserFetchServiceproviderServiceRequest {
     userId: User["_id"];
     providerId: Provider["_id"];
 }
@@ -171,19 +170,19 @@ type FindProviderServiceProps = Omit<ProviderService, "serviceCategory">;
 export interface FindProviderServiceResponse extends FindProviderServiceProps {
     serviceCategory: Pick<Service, "serviceName">
 }
-export interface UserFetchProviderServiceUseCaseResponse extends CommonResponse {
+export interface UserFetchProviderServiceResponse extends CommonResponse {
     service: FindProviderServiceResponse | {};
 }
 
 
 // user fetch provider service availability use case request payload interface
-export interface UserFetchProviderServiceAvailabilityUseCaseRequestPayload {
+export interface UserFetchProviderServiceAvailabilityRequest {
     userId: User["_id"];
     providerId: Provider["_id"];
     date: Date
 }
 // user fetch provider servide availability use case response interface
-export interface UserFetchProviderServiceAvailabilityUseCaseResponse extends CommonResponse {
+export interface UserFetchProviderServiceAvailabilityResponse extends CommonResponse {
     availability: FontendAvailabilityForResponse | {};
 }
 

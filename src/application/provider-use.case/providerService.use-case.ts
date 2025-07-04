@@ -8,7 +8,7 @@ import { Validator } from '../../infrastructure/validator/validator';
 import { CommonResponse } from '../../infrastructure/dtos/common.dto';
 import { ProviderRepositoryImpl } from '../../infrastructure/database/provider/provider.repository.impl';
 import { ProviderServiceRepositoryImpl } from '../../infrastructure/database/providerService/providerService.repository.impl';
-import { ProviderAddServiceDetailsUseCaseRequestPayload, ProviderFetchProviderServiceUseCaseRequestPayload, ProviderFetchProviderServiceUseCaseResponse, ProviderFindProviderServiceResProps } from '../../infrastructure/dtos/provider.dto';
+import { ProviderAddServiceDetailsRequest, ProviderFetchProviderServiceRequest, ProviderFetchProviderServiceResponse, ProviderFindProviderServiceResProps } from '../../infrastructure/dtos/provider.dto';
 
 
 export class ProviderAddServiceDetailsUseCase {
@@ -19,7 +19,7 @@ export class ProviderAddServiceDetailsUseCase {
         private s3: S3Client
     ){}
 
-    async execute(data: ProviderAddServiceDetailsUseCaseRequestPayload): Promise<CommonResponse> {
+    async execute(data: ProviderAddServiceDetailsRequest): Promise<CommonResponse> {
         const { providerId, serviceCategory, serviceName, serviceDescription, servicePrice, providerAdhaar, providerExperience, file } = data;
         if(!providerId || !serviceCategory || !serviceName || !serviceDescription || !servicePrice || !providerAdhaar || !providerExperience || !file) throw new Error("Invalid Request.");
         
@@ -74,7 +74,7 @@ export class ProviderFetchServiceDetailsUseCase {
     
     constructor(private provderServiceRepositoryImpl: ProviderServiceRepositoryImpl) { }
 
-    async execute(data: ProviderFetchProviderServiceUseCaseRequestPayload): Promise<ProviderFetchProviderServiceUseCaseResponse> {
+    async execute(data: ProviderFetchProviderServiceRequest): Promise<ProviderFetchProviderServiceResponse> {
         const { providerId } = data;
         if (!providerId) throw new Error("Invalid request.");
 

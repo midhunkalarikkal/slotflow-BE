@@ -8,9 +8,9 @@ import { PaymentRepositoryImpl } from "../../infrastructure/database/payment/pay
 import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/provider.repository.impl";
 import { SubscriptionRepositoryImpl } from "../../infrastructure/database/subscription/subscription.repository.impl";
 import { 
-    ProviderSaveSubscriptionUseCaseRequestPayload, 
-    ProviderStripeSubscriptionCreateSessionIdUseCaseResponse, 
-    ProviderStripeSubscriptionCreateSessionIdUseCaseRequestPayload, 
+    ProviderSaveSubscriptionRequest, 
+    ProviderStripeSubscriptionCreateSessionIdResponse, 
+    ProviderStripeSubscriptionCreateSessionIdRequest, 
 } from "../../infrastructure/dtos/provider.dto";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
@@ -22,7 +22,7 @@ export class ProviderStripeSubscriptionCreateSessionIdUseCase {
             private subscriptionRepositoryImpl: SubscriptionRepositoryImpl,
         ) { }
     
-        async execute(data: ProviderStripeSubscriptionCreateSessionIdUseCaseRequestPayload): Promise<ProviderStripeSubscriptionCreateSessionIdUseCaseResponse> {
+        async execute(data: ProviderStripeSubscriptionCreateSessionIdRequest): Promise<ProviderStripeSubscriptionCreateSessionIdResponse> {
             const { providerId, planId, duration } = data;
             if (!providerId || !planId || !duration) throw new Error("Invalid request.");
 
@@ -84,7 +84,7 @@ export class ProviderSaveSubscriptionUseCase {
         private subscriptionRepositoryImpl: SubscriptionRepositoryImpl,
     ) { }
 
-    async execute(data: ProviderSaveSubscriptionUseCaseRequestPayload): Promise<CommonResponse> {
+    async execute(data: ProviderSaveSubscriptionRequest): Promise<CommonResponse> {
         const { providerId, sessionId } = data;
         if (!providerId || !sessionId) throw new Error("Invalid request.");
 

@@ -6,14 +6,14 @@ import { Provider } from "../../domain/entities/provider.entity";
 import { validateOrThrow } from "../../infrastructure/validator/validator";
 import { PasswordHasher } from "../../infrastructure/security/password-hashing";
 import { UserRepositoryImpl } from "../../infrastructure/database/user/user.repository.impl";
-import { LoginUseCaseRequestPayload, LoginUseCaseResponse } from "../../infrastructure/dtos/auth.dto";
+import { LoginRequest, LoginResponse } from "../../infrastructure/dtos/auth.dto";
 import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/provider.repository.impl";
 
 
 export class LoginUseCase {
     constructor(private userRepositoryImpl: UserRepositoryImpl, private providerRepositoryImpl: ProviderRepositoryImpl) { }
 
-    async execute(data: LoginUseCaseRequestPayload): Promise<LoginUseCaseResponse> {
+    async execute(data: LoginRequest): Promise<LoginResponse> {
         const { email, password, role } = data;
         if (!email || !password || !role) throw new Error("Invalid request.");
 

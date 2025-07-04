@@ -10,9 +10,9 @@ import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/p
 import { ProviderServiceRepositoryImpl } from "../../infrastructure/database/providerService/providerService.repository.impl";
 import { ServiceAvailabilityRepositoryImpl } from "../../infrastructure/database/serviceAvailability/serviceAvailability.repository.impl";
 import { 
-    UserAppointmentBookingViaStripeUseCaseResponse, 
-    UserSaveAppoinmentBookingUseCaseRequestPayload, 
-    UserAppointmentBookingViaStripeUseCaseRequestPayload, 
+    UserAppointmentBookingViaStripeResponse, 
+    UserSaveAppoinmentBookingRequest, 
+    UserAppointmentBookingViaStripeRequest, 
 } from "../../infrastructure/dtos/user.dto";
 import { Validator } from "../../infrastructure/validator/validator";
 
@@ -27,7 +27,7 @@ export class UserAppointmentBookingViaStripeUseCase {
         private bookingRepositoryImpl: BookingRepositoryImpl,
     ) { }
 
-    async execute(data: UserAppointmentBookingViaStripeUseCaseRequestPayload): Promise<UserAppointmentBookingViaStripeUseCaseResponse> {
+    async execute(data: UserAppointmentBookingViaStripeRequest): Promise<UserAppointmentBookingViaStripeResponse> {
         const { userId, providerId, slotId, selectedServiceMode, date } = data;
         if (!userId || !providerId || !slotId || !selectedServiceMode || !date) throw new Error("Invalid request");
 
@@ -102,7 +102,7 @@ export class UserSaveBookingAfterStripePaymentUseCase {
         private serviceAvailabilityRepositoryImpl: ServiceAvailabilityRepositoryImpl,
     ) { }
 
-    async execute(data: UserSaveAppoinmentBookingUseCaseRequestPayload): Promise<CommonResponse> {
+    async execute(data: UserSaveAppoinmentBookingRequest): Promise<CommonResponse> {
         const { userId, sessionId } = data;
         if (!userId || !sessionId) throw new Error("Invalid request");
 

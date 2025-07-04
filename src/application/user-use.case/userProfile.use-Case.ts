@@ -6,19 +6,19 @@ import { extractS3Key } from "../../infrastructure/helpers/helper";
 import { validateOrThrow, Validator } from "../../infrastructure/validator/validator";
 import { UserRepositoryImpl } from "../../infrastructure/database/user/user.repository.impl";
 import { 
-    UserFetchProfileDetails, 
-    UserUpdateProfileImageResProps, 
-    UserFetchProfileUseCaseRequestPayload, 
-    UsrUpdateProfileImageUseCaseRequestPayload,
-    UserUpdateUserInfoUseCaseRequestPayload,
-    UserUpdateUserInfoUseCaseResponse, 
+    UserFetchProfileDetailsResponse, 
+    UserUpdateProfileImageResponse, 
+    UserFetchProfileRequest, 
+    UsrUpdateProfileImageRequest,
+    UserUpdateUserInfoRequest,
+    UserUpdateUserInfoResponse, 
 } from "../../infrastructure/dtos/user.dto";
 
 
 export class UserFetchProfileDetailsUseCase {
     constructor(private userRepositoryImpl: UserRepositoryImpl) { }
 
-    async execute(data: UserFetchProfileUseCaseRequestPayload): Promise<UserFetchProfileDetails> {
+    async execute(data: UserFetchProfileRequest): Promise<UserFetchProfileDetailsResponse> {
         const { userId } = data;
         if (!userId) throw new Error("Invalid request.");
 
@@ -37,7 +37,7 @@ export class UserUpdateProfileImageUseCase {
         private s3: S3Client,
     ) { }
 
-    async execute(data: UsrUpdateProfileImageUseCaseRequestPayload): Promise<UserUpdateProfileImageResProps> {
+    async execute(data: UsrUpdateProfileImageRequest): Promise<UserUpdateProfileImageResponse> {
         const { userId, file} = data;
         if (!userId || !file) throw new Error("Invalid request.");
 
@@ -82,7 +82,7 @@ export class UserUpdateProviderInfoUseCase {
         private userRepositoryImpl: UserRepositoryImpl 
     ) { }
 
-    async execute(data: UserUpdateUserInfoUseCaseRequestPayload) : Promise<UserUpdateUserInfoUseCaseResponse> {
+    async execute(data: UserUpdateUserInfoRequest) : Promise<UserUpdateUserInfoResponse> {
         const { userId, username, phone } = data;
         if(!userId || !username || !phone) throw new Error("Invalid request");
 

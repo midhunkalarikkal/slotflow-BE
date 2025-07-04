@@ -7,14 +7,14 @@ import { OTPService } from '../../infrastructure/services/otp.service';
 import { PasswordHasher } from '../../infrastructure/security/password-hashing';
 import { UserRepositoryImpl } from '../../infrastructure/database/user/user.repository.impl';
 import { ProviderRepositoryImpl } from '../../infrastructure/database/provider/provider.repository.impl';
-import { RegisterUseCaseRequestPayload, RegisterUseCaseResponse } from '../../infrastructure/dtos/auth.dto';
+import { RegisterRequest, RegisterResponse } from '../../infrastructure/dtos/auth.dto';
 
 
 export class RegisterUseCase {
 
   constructor(private userRepositoryImpl: UserRepositoryImpl, private providerRepositoryImpl: ProviderRepositoryImpl) { }
 
-  async execute(data: RegisterUseCaseRequestPayload): Promise<RegisterUseCaseResponse> {
+  async execute(data: RegisterRequest): Promise<RegisterResponse> {
     const { username, email, password, role } = data;
     if (!username || !email || !password || !role) throw new Error("Invalid request");
 

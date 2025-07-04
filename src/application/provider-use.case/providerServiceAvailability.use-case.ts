@@ -5,9 +5,9 @@ import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/p
 import { FrontendAvailabilityForRequest, FrontendAvailabilityUpdatedSlots, TimeSlot } from "../../domain/entities/serviceAvailability.entity";
 import { ServiceAvailabilityRepositoryImpl } from "../../infrastructure/database/serviceAvailability/serviceAvailability.repository.impl";
 import { 
-    ProviderFetchServiceAvailabilityUseCaseResponse, 
-    ProviderAddServiceAvailabilityUseCaseRewuestPayload, 
-    ProviderFetchServiceAvailabilityUseCaseRequestPayload, 
+    ProviderFetchServiceAvailabilityResponse, 
+    ProviderAddServiceAvailabilityRewuest, 
+    ProviderFetchServiceAvailabilityRequest, 
 } from "../../infrastructure/dtos/provider.dto";
 import dayjs from "dayjs";
 
@@ -17,7 +17,7 @@ export class ProviderAddServiceAvailabilitiesUseCase {
         private serviceAvailabilityRepositoryImpl: ServiceAvailabilityRepositoryImpl,
     ){}
 
-    async execute(data: ProviderAddServiceAvailabilityUseCaseRewuestPayload): Promise<CommonResponse> {
+    async execute(data: ProviderAddServiceAvailabilityRewuest): Promise<CommonResponse> {
         const { providerId, availabilities } = data;
         if(!providerId || !availabilities || availabilities.length  === 0) throw new Error("Invalid request.");
 
@@ -58,7 +58,7 @@ export class ProviderAddServiceAvailabilitiesUseCase {
 export class ProviderFetchServiceAvailabilityUseCase {
     constructor(private serviceAvailabilityRepositoryImpl: ServiceAvailabilityRepositoryImpl) { }
 
-    async execute(data: ProviderFetchServiceAvailabilityUseCaseRequestPayload): Promise<ProviderFetchServiceAvailabilityUseCaseResponse> {
+    async execute(data: ProviderFetchServiceAvailabilityRequest): Promise<ProviderFetchServiceAvailabilityResponse> {
         const { providerId, date } = data;
         if (!providerId || !date) throw new Error("Invalid request.");
         const currentDateTime = dayjs();

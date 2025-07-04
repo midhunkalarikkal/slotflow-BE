@@ -132,22 +132,22 @@ export type AdminChangeUserStatusResponse = AdminUserBaseInfo;
 export type AdminServiceListResponse = Array<Pick<Service, "_id" | "serviceName" | "isBlocked">>;
 
 // admin add new service use case request payload interface
-export interface AdminAddServiceUseCaseRequestPayload {
+export interface AdminAddServiceRequest {
     serviceName: Service["serviceName"];
 } 
 // admin add new service use case response interface
-export interface AdminAddServiceUseCaseResponse extends CommonResponse {
+export interface AdminAddServiceResponse extends CommonResponse {
     service: Pick<Service, "_id" | "serviceName" | "isBlocked">;
 }
 
 
 // admin change service isBlocked status use case request payload interface
-export interface AdminChnageServiceIsBlockedStatusUseCaseRequestPayload {
+export interface AdminChnageServiceIsBlockedStatusRequest {
     serviceId: Service["_id"];
     isBlocked: Service["isBlocked"];
 }
 // admin change service block status use case response interface
-export interface AdminChangeServiceStatusUseCaseResponse extends CommonResponse {
+export interface AdminChangeServiceStatusResponse extends CommonResponse {
     updatedService: Pick<Service, "_id" | "serviceName" | "isBlocked">;
 }
 
@@ -166,11 +166,11 @@ export interface AdminChangeServiceStatusUseCaseResponse extends CommonResponse 
 export type AdminFetchAllSubscriptionsResponse = Array<Pick<Subscription, "_id" | "createdAt" | "providerId" | "startDate" | "endDate" | "subscriptionStatus">>;
 
 // admin fetch subscription details use case request payload interface 
-export interface AdminFetchSubscriptionDetailsUseCaseRequestPayload {
+export interface AdminFetchSubscriptionDetailsRequest {
     subscriptionId: Subscription["_id"];
 }
 // admin fetch subscription details use case response interface 
-export interface AdminFetchSubscriptionDetailsUseCaseResponse extends CommonResponse {
+export interface AdminFetchSubscriptionDetailsResponse extends CommonResponse {
     subscriptionDetails: findSubscriptionFullDetailsResProps | {};
 }
 
@@ -192,20 +192,20 @@ export type AdminPlanListResponse = Array<Pick<Plan, "_id" | "planName" | "isBlo
 
 
 // admin create new plan request payload type 
-export type AdminAddNewPlanUseCaseRequestPayload = Pick<Plan, "planName" | "description" | "price" | "features" | "maxBookingPerMonth" | "adVisibility">;
+export type AdminAddNewPlanRequest = Pick<Plan, "planName" | "description" | "price" | "features" | "maxBookingPerMonth" | "adVisibility">;
 // admin create new plan use case response interface 
-export interface AdminCreatePlanUseCaseResponse extends CommonResponse {
+export interface AdminCreatePlanResponse extends CommonResponse {
     plan: Pick<Plan, "_id" | "planName" | "isBlocked">;
 }
 
 
 // admin change plan block status request payload type
-export type AdminChangePlanIsBlockedStatusUseCaseRequestPayload = {
+export type AdminChangePlanIsBlockedStatusRequest = {
     planId: Plan["_id"];
     isBlocked: Plan["isBlocked"]
 }
 // admin change plan block status use case response interface
-export interface AdminChangePlanStatusUseCaseResponse extends CommonResponse {
+export interface AdminChangePlanStatusResponse extends CommonResponse {
     updatedPlan: Pick<Plan, "_id" | "planName" | "isBlocked">;
 }
 

@@ -9,7 +9,7 @@ export interface FindProviderServiceResponse extends FindProviderServiceProps {
     serviceCategory: Pick<Service, "serviceName">
 }
 
-export  interface FindProvidersUsingServiceCategoryIdsResProps {
+export  interface FindProvidersUsingServiceCategoryIdsResponse {
     _id: Types.ObjectId,
     provider : {
         _id: Types.ObjectId,
@@ -31,5 +31,5 @@ export interface IProviderServiceRepository {
 
     findProviderServiceByProviderId(providerId: Types.ObjectId): Promise<FindProviderServiceResponse | {}>;
 
-    findProvidersUsingServiceCategoryIds(serviceCategoryIds: Types.ObjectId[]): Promise<Array<FindProvidersUsingServiceCategoryIdsResProps> | []>
+    findProvidersUsingServiceCategoryIds(serviceCategoryIds: Types.ObjectId[]): Promise<Array<FindProvidersUsingServiceCategoryIdsResponse> | []>
 }

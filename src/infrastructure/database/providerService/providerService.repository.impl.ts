@@ -1,7 +1,7 @@
 import { Types } from "mongoose";
 import { IProviderService, ProviderServiceModel } from "./providerService.model";
 import { ProviderService } from "../../../domain/entities/providerService.entity";
-import { CreateProviderServiceReqProps, FindProviderServiceResponse, FindProvidersUsingServiceCategoryIdsResProps, IProviderServiceRepository } from "../../../domain/repositories/IProviderService.repository";
+import { CreateProviderServiceReqProps, FindProviderServiceResponse, FindProvidersUsingServiceCategoryIdsResponse, IProviderServiceRepository } from "../../../domain/repositories/IProviderService.repository";
 
 export class ProviderServiceRepositoryImpl implements IProviderServiceRepository {
     private mapToEntity(providerService: IProviderService): ProviderService {
@@ -43,7 +43,7 @@ export class ProviderServiceRepositoryImpl implements IProviderServiceRepository
         }
     }
 
-    async findProvidersUsingServiceCategoryIds(serviceCategoryIds: Types.ObjectId[]): Promise<Array<FindProvidersUsingServiceCategoryIdsResProps> | []> {
+    async findProvidersUsingServiceCategoryIds(serviceCategoryIds: Types.ObjectId[]): Promise<Array<FindProvidersUsingServiceCategoryIdsResponse> | []> {
         try {
             const pipeline: any[] = [];
 

@@ -1,11 +1,9 @@
+import { CommonResponse } from "./common.dto";
 import { Plan } from "../../domain/entities/plan.entity";
 import { Booking } from "../../domain/entities/booking.entity";
 import { Address } from "../../domain/entities/address.entity";
-import { Payment } from "../../domain/entities/payment.entity";
 import { Service } from "../../domain/entities/service.entity";
 import { Provider } from "../../domain/entities/provider.entity";
-import { ApiPaginationRequest, CommonResponse } from "./common.dto";
-import { Subscription } from "../../domain/entities/subscription.entity";
 import { ProviderService } from "../../domain/entities/providerService.entity";
 import { FontendAvailabilityForResponse, FrontendAvailabilityForRequest } from "../../domain/entities/serviceAvailability.entity";
 
@@ -17,11 +15,11 @@ export type CreateProviderRequest = Pick<Provider, "username" | "email" | "passw
 
 // **** used in providerAddress.use-case 
 // provider fetch address use case request payload interface
-export interface ProviderFetchAddressUseCaseRequestPayload {
+export interface ProviderFetchAddressRequest {
     providerId: Provider["_id"];
 }
 // provider fetch address use case response interface
-export interface ProviderFetchAddressUseCaseResponse extends CommonResponse {
+export interface ProviderFetchAddressResponse extends CommonResponse {
     address: Pick<Address, "_id" | "addressLine" | "phone" | "place" | "city" | "district" | "pincode" | "state" | "country" | "googleMapLink"> | {};
 }
 
@@ -44,7 +42,7 @@ export type ProviderFetchAllAppServicesResProps = Array<Pick<Service, "_id" | "s
 // **** used in providerPlan.use-case 
 
 // provider fetch all plans use case response interface 
-export interface ProviderFetchAllPlansUseCaseResponse extends CommonResponse {
+export interface ProviderFetchAllPlansResponse extends CommonResponse {
     plans: Array<Pick<Plan, "_id" | "planName" | "price" | "features" | "description">> | [];
 }
 
@@ -55,11 +53,11 @@ export interface ProviderFetchAllPlansUseCaseResponse extends CommonResponse {
 // **** used in providerProfile.use-case 
 
 // provider fetch profile detals use case request payload interface
-export interface ProviderFetchProfileDetailsUseCaseRequestPayload {
+export interface ProviderFetchProfileDetailsRequest {
     providerId: Provider["_id"];
 }
 // provider fetch profile detals use case response interface
-export interface ProviderFetchProfileDetailsUseCaseResponse extends CommonResponse {
+export interface ProviderFetchProfileDetailsResponse extends CommonResponse {
     profileDetails: Pick<Provider, "username" | "email" | "isAdminVerified" | "isBlocked" | "isEmailVerified" | "phone" | "createdAt"> | {};
 }
 
@@ -74,13 +72,13 @@ export interface ProviderUpdateprofileImageResponse extends CommonResponse, Pick
 
 
 // provider update providerInfo request payload interface
-export interface ProviderUpdateProviderInfoUseCaseRequestPayload {
+export interface ProviderUpdateProviderInfoRequest {
     providerId: Provider["_id"];
     username: Provider["username"];
     phone: Provider["phone"];
 }
 // provider update provider info use case response interface
-export interface ProviderUpdateProviderInfoUseCaseResponse extends CommonResponse {
+export interface ProviderUpdateProviderInfoResponse extends CommonResponse {
     providerInfo: Pick<Provider, "username" | "phone">
 }
 
@@ -90,14 +88,14 @@ export interface ProviderUpdateProviderInfoUseCaseResponse extends CommonRespons
 // **** used in providerService.use-case 
 
 // provider add service details use case request payload interface
-type AddServiceDetailsUseCaseRequestPayload = Pick<ProviderService, "providerId" | "serviceCategory" | "serviceName" | "serviceDescription" | "servicePrice" | "providerAdhaar" | "providerExperience">;
-export interface ProviderAddServiceDetailsUseCaseRequestPayload extends AddServiceDetailsUseCaseRequestPayload {
+type AddServiceDetailsRequest = Pick<ProviderService, "providerId" | "serviceCategory" | "serviceName" | "serviceDescription" | "servicePrice" | "providerAdhaar" | "providerExperience">;
+export interface ProviderAddServiceDetailsRequest extends AddServiceDetailsRequest {
         file: Express.Multer.File
 }
 
 
 // provider fetch service details use case request payload
-export interface ProviderFetchProviderServiceUseCaseRequestPayload {
+export interface ProviderFetchProviderServiceRequest {
     providerId: Provider["_id"];
 }
 // provider fetch service details use case respomse interface
@@ -105,7 +103,7 @@ type FindProviderServiceProps = Pick<ProviderService, "_id" | "serviceName" | "s
 export interface ProviderFindProviderServiceResProps extends FindProviderServiceProps {
     serviceCategory: Pick<Service, "serviceName">;
 }
-export interface ProviderFetchProviderServiceUseCaseResponse extends CommonResponse {
+export interface ProviderFetchProviderServiceResponse extends CommonResponse {
     service: ProviderFindProviderServiceResProps | {};
 }
 
@@ -116,19 +114,19 @@ export interface ProviderFetchProviderServiceUseCaseResponse extends CommonRespo
 // **** used in providerServiceAvailability 
 
 // provider add service availability use case reques tpayload
-export interface ProviderAddServiceAvailabilityUseCaseRewuestPayload {
+export interface ProviderAddServiceAvailabilityRewuest {
     providerId: Provider["_id"];
     availabilities: FrontendAvailabilityForRequest[]
 }
 
 
 //  provider fetch service availability use case response interface 
-export interface ProviderFetchServiceAvailabilityUseCaseRequestPayload {
+export interface ProviderFetchServiceAvailabilityRequest {
     providerId: Provider["_id"];
     date: Date
 }
 //  provider fetch service availability use case response interface 
-export interface ProviderFetchServiceAvailabilityUseCaseResponse extends CommonResponse {
+export interface ProviderFetchServiceAvailabilityResponse extends CommonResponse {
     availability : FontendAvailabilityForResponse | {};
 }
 
@@ -139,19 +137,19 @@ export interface ProviderFetchServiceAvailabilityUseCaseResponse extends CommonR
 // **** used in providerStripeSubscription.use-case 
 
 // provider stripe subscription create sessionId use case  request payload interface
-export interface ProviderStripeSubscriptionCreateSessionIdUseCaseRequestPayload {
+export interface ProviderStripeSubscriptionCreateSessionIdRequest {
     providerId: Provider["_id"];
     planId: Plan["_id"];
     duration: string;
 }
 // provider stripe subscription create sessionId use case response interface
-export interface ProviderStripeSubscriptionCreateSessionIdUseCaseResponse extends CommonResponse {
+export interface ProviderStripeSubscriptionCreateSessionIdResponse extends CommonResponse {
     sessionId : string
 }
 
 
 // provider save subscription after stripe payment use case request payload interface
-export interface ProviderSaveSubscriptionUseCaseRequestPayload {
+export interface ProviderSaveSubscriptionRequest {
     providerId: Provider["_id"];
     sessionId: string
 }
@@ -162,9 +160,8 @@ export interface ProviderSaveSubscriptionUseCaseRequestPayload {
 
 // **** used in providerSubscription.use-case 
 
-
 // provider trial subscription use case reuest payload
-export interface ProviderTrialSubscriptionUseCaseRequestPayload {
+export interface ProviderTrialSubscriptionRequest {
     providerId: Provider["_id"];
 }
 
@@ -175,10 +172,10 @@ export interface ProviderTrialSubscriptionUseCaseRequestPayload {
 // **** used in providerBooking.use-case 
 
 // provider fetch bookings use case request payload interface
-export interface ProviderFetchBookingAppointmentsUseCaseRequestPayload {
+export interface ProviderFetchBookingAppointmentsRequest {
     providerId: Provider['_id']
 }
 // provider fetch bookings use case response interface
-export interface ProviderFetchBookingAppointmentsUseCaseResponse extends CommonResponse {
+export interface ProviderFetchBookingAppointmentsResponse extends CommonResponse {
     bookingAppointments : Array<Pick<Booking, "_id" | "appointmentDate" | "appointmentMode" | "appointmentStatus" | "appointmentTime" | "createdAt" >>;
 }

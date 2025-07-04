@@ -1,7 +1,7 @@
 import { Validator } from "../../infrastructure/validator/validator";
 import { BookingRepositoryImpl } from "../../infrastructure/database/booking/booking.repository.impl";
 import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/provider.repository.impl";
-import { ProviderFetchBookingAppointmentsUseCaseRequestPayload, ProviderFetchBookingAppointmentsUseCaseResponse } from "../../infrastructure/dtos/provider.dto";
+import { ProviderFetchBookingAppointmentsRequest, ProviderFetchBookingAppointmentsResponse } from "../../infrastructure/dtos/provider.dto";
 
 
 export class ProviderFetchBookingAppointmentsUseCase {
@@ -10,7 +10,7 @@ export class ProviderFetchBookingAppointmentsUseCase {
         private bookingRepositoryImpl: BookingRepositoryImpl,
     ) { }
 
-    async execute(data: ProviderFetchBookingAppointmentsUseCaseRequestPayload): Promise<ProviderFetchBookingAppointmentsUseCaseResponse> {
+    async execute(data: ProviderFetchBookingAppointmentsRequest): Promise<ProviderFetchBookingAppointmentsResponse> {
         const { providerId } = data;
         if(!providerId) throw new Error("Invalid request");
 
