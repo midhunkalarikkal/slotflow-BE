@@ -1,9 +1,9 @@
 import { Types } from "mongoose";
 import { IPayment, PaymentModel } from "./payment.model";
 import { Payment } from "../../../domain/entities/payment.entity";
-import { CreatePaymentForBookingProps, CreatePaymentForSubscriptionProps, FindAllPaymentsByUserIdResProps, IPaymentRepository, UpdateForCancelBookingRefundReqProps } from "../../../domain/repositories/IPayment.repository";
-import { ApiPaginationRequest, ApiResponse } from "../../dtos/common.dto";
-import { AdminFetchAllPayments, AdminFetchProviderPaymentsRequest, AdminFetchProviderPaymentsResponse } from "../../dtos/admin.dto";
+import { ApiResponse, FetchPaymentResponse, FetchPaymentsRequest, userIdAndProviderId } from "../../dtos/common.dto";
+import { AdminFetchProviderPaymentsRequest, AdminFetchProviderPaymentsResponse } from "../../dtos/admin.dto";
+import { CreatePaymentForBookingProps, CreatePaymentForSubscriptionProps, IPaymentRepository, UpdateForCancelBookingRefundReqProps } from "../../../domain/repositories/IPayment.repository";
 
 export class PaymentRepositoryImpl implements IPaymentRepository {
     private mapToEntity(payment: IPayment): Payment {
@@ -50,57 +50,22 @@ export class PaymentRepositoryImpl implements IPaymentRepository {
         }
     }
 
-    async findAllPaymentsByProviderId(data: AdminFetchProviderPaymentsRequest): Promise<ApiResponse<AdminFetchProviderPaymentsResponse>> {
-        try {
-            const { providerId, page, limit} = data;
-            const skip = ( page - 1 ) * limit;
-            const [payments, totalCount] = await Promise.all([
-                PaymentModel.find({ providerId: providerId }, {
-                    _id: 1,
-                    discountAmount: 1,
-                    totalAmount: 1,
-                    paymentFor: 1,
-                    paymentGateway: 1,
-                    paymentStatus: 1,
-                    paymentMethod: 1,
-                    createdAt: 1,
-                }).skip(skip).limit(limit).sort({ createdAt: 1 }).lean(),
-                PaymentModel.countDocuments(),
-            ]);
-            const totalPages = Math.ceil(totalCount / limit);
-            return {
-                data: payments.map(this.mapToEntity),
-                totalPages,
-                currentPage: page,
-                totalCount
-            }
-        } catch (error) {
-            throw new Error("Finding payments error.");
-        }
-    }
-
-    async findAllPaymentsByUserId(userId: Types.ObjectId): Promise<Array<FindAllPaymentsByUserIdResProps> | []> {
-        try {
-            const payments = await PaymentModel.find({ userId: userId }).sort({ createdAt: 1 })
-                .select("_id paymentStatus paymentMethod paymentGateway paymentFor discountAmount totalAmount createdAt");
-            return payments;
-        } catch (error) {
-            throw new Error("Finding payments error.");
-        }
-    }
-
-    async findAllPayments({ page, limit }: ApiPaginationRequest): Promise<ApiResponse<AdminFetchAllPayments>> {
+    async findAllPayments({ page, limit, userId, providerId }: FetchPaymentsRequest): Promise<ApiResponse<FetchPaymentResponse>> {
         try {
             const skip = (page - 1) * limit;
+            const filter: userIdAndProviderId = {};
+            if (userId) { filter.userId = userId;}
+            if (providerId) { filter.providerId = providerId;}
             const [payments, totalCount] = await Promise.all([
-                PaymentModel.find({}, {
-                    _id: 0,
+                PaymentModel.find(filter, {
+                    _id: 1,
                     createdAt: 1,
                     totalAmount: 1,
                     paymentFor: 1,
+                    paymentMethod: 1,
                     paymentGateway: 1,
                     paymentStatus: 1,
-                    paymentMethod: 1,
+                    discountAmount: 1,
                 }).skip(skip).limit(limit).sort({ createdAt: 1 }).lean(),
                 PaymentModel.countDocuments(),
             ]);
@@ -116,7 +81,7 @@ export class PaymentRepositoryImpl implements IPaymentRepository {
         }
     }
 
-    async findAllPaymentById(paymentId: Types.ObjectId): Promise<Payment | null> {
+    async findPaymentById(paymentId: Types.ObjectId): Promise<Payment | null> {
         try {
             const payment = await PaymentModel.findById(paymentId);
             return payment ? this.mapToEntity(payment) : null;

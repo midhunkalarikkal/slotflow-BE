@@ -1,14 +1,12 @@
 import dayjs from "dayjs";
 import {
-    FindProviderServiceResProps,
+    FindProviderServiceResponse,
     AdminFetchProviderServiceRequest,
     AdminFetchProviderDetailsRequest,
     AdminFetchProviderAddressRequest,
     AdminFetchProviderServiceResponse,
     AdminFetchProviderDetailsResponse,
-    AdminFetchProviderPaymentsRequest,
     AdminFetchProviderAddressResponse,
-    AdminFetchProviderPaymentsResponse,
     AdminFetchProviderServiceAvailabilityRequest,
     AdminFetchProviderServiceAvailabilityResponse,
 } from "../../../infrastructure/dtos/admin.dto";
@@ -20,7 +18,7 @@ import { ProviderRepositoryImpl } from "../../../infrastructure/database/provide
 import { SubscriptionRepositoryImpl } from "../../../infrastructure/database/subscription/subscription.repository.impl";
 import { ProviderServiceRepositoryImpl } from "../../../infrastructure/database/providerService/providerService.repository.impl";
 import { ServiceAvailabilityRepositoryImpl } from "../../../infrastructure/database/serviceAvailability/serviceAvailability.repository.impl";
-import { ApiResponse, FetchProviderSubscriptionsRequest, FindSubscriptionsByProviderIdResponse } from "../../../infrastructure/dtos/common.dto";
+import { ApiResponse, FetchPaymentResponse, FetchPaymentsRequest, FetchProviderSubscriptionsRequest, FindSubscriptionsByProviderIdResponse } from "../../../infrastructure/dtos/common.dto";
 
 
 export class AdminFetchProviderDetailsUseCase {
@@ -79,7 +77,7 @@ export class AdminFetchProviderServiceUseCase {
         if (!provider) throw new Error("No user found.");
 
         const serviceData = await this.providerServiceRepository.findProviderServiceByProviderId(providerId);
-        function isServiceData(obj: any): obj is FindProviderServiceResProps {
+        function isServiceData(obj: any): obj is FindProviderServiceResponse {
             return obj && typeof obj === 'object' && '_id' in obj;
         }
 
@@ -171,8 +169,7 @@ export class AdminFetchProviderPaymentsUseCase {
         private paymentRepositoryImpl: PaymentRepositoryImpl,
     ) { }
 
-    async execute(data: AdminFetchProviderPaymentsRequest): Promise<ApiResponse<AdminFetchProviderPaymentsResponse>> {
-        const { providerId, page, limit } = data;
+    async execute({providerId, page, limit }: FetchPaymentsRequest): Promise<ApiResponse<FetchPaymentResponse>> {
         if (!providerId) throw new Error("Invalid request.");
 
         Validator.validateObjectId(providerId, "providerId");
@@ -180,7 +177,7 @@ export class AdminFetchProviderPaymentsUseCase {
         const provider = await this.providerRepositoryImpl.findProviderById(providerId);
         if (!provider) throw new Error("No user found.");
 
-        const result = await this.paymentRepositoryImpl.findAllPaymentsByProviderId({providerId, page, limit });
+        const result = await this.paymentRepositoryImpl.findAllPayments({page, limit, providerId: providerId });
         if (!result) throw new Error("Payments fetching error.");
 
         return { data: result.data, totalPages: result.totalPages, currentPage: result.currentPage, totalCount: result.totalCount };

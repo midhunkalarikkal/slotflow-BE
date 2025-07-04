@@ -1,7 +1,7 @@
 import { Types } from "mongoose";
 import { IProviderService, ProviderServiceModel } from "./providerService.model";
 import { ProviderService } from "../../../domain/entities/providerService.entity";
-import { CreateProviderServiceReqProps, FindProviderServiceResProps, FindProvidersUsingServiceCategoryIdsResProps, IProviderServiceRepository } from "../../../domain/repositories/IProviderService.repository";
+import { CreateProviderServiceReqProps, FindProviderServiceResponse, FindProvidersUsingServiceCategoryIdsResProps, IProviderServiceRepository } from "../../../domain/repositories/IProviderService.repository";
 
 export class ProviderServiceRepositoryImpl implements IProviderServiceRepository {
     private mapToEntity(providerService: IProviderService): ProviderService {
@@ -30,7 +30,7 @@ export class ProviderServiceRepositoryImpl implements IProviderServiceRepository
         }
     }
 
-    async findProviderServiceByProviderId(providerId: Types.ObjectId): Promise<FindProviderServiceResProps | {}> {
+    async findProviderServiceByProviderId(providerId: Types.ObjectId): Promise<FindProviderServiceResponse | {}> {
         try {
             const service = await ProviderServiceModel.findOne({ providerId })
                 .populate({

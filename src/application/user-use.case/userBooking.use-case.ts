@@ -63,7 +63,7 @@ export class UserCancelBookingUseCase {
         }
 
         if (!booking.paymentId) throw new Error("No payment id found");
-        const payment = await this.paymentRepositoryImpl.findAllPaymentById(new Types.ObjectId(booking.paymentId));
+        const payment = await this.paymentRepositoryImpl.findPaymentById(new Types.ObjectId(booking.paymentId));
         if (!payment) throw new Error("No payment found for this booking");
 
         const mongooseSession = await mongoose.startSession();

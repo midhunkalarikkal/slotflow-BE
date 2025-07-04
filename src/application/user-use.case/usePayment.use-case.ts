@@ -1,10 +1,7 @@
 import { Validator } from "../../infrastructure/validator/validator";
 import { UserRepositoryImpl } from "../../infrastructure/database/user/user.repository.impl";
 import { PaymentRepositoryImpl } from "../../infrastructure/database/payment/payment.repository.impl";
-import { 
-    UserFetchAllPaymentsUseCaseRequestPayload, 
-    UserFetchAllPaymentsUseCaseResponse 
-} from "../../infrastructure/dtos/user.dto";
+import { ApiResponse, FetchPaymentResponse, FetchPaymentsRequest } from "../../infrastructure/dtos/common.dto";
 
 
 export class UserFetchAllPaymentsUseCase {
@@ -13,8 +10,7 @@ export class UserFetchAllPaymentsUseCase {
         private paymentRepositoryImpl: PaymentRepositoryImpl,
     ) { }
 
-    async execute(data: UserFetchAllPaymentsUseCaseRequestPayload): Promise<UserFetchAllPaymentsUseCaseResponse> {
-        const { userId } = data;
+ async execute({userId, page, limit}: FetchPaymentsRequest): Promise<ApiResponse<FetchPaymentResponse>> {
         if (!userId) throw new Error("Invalid request");
 
         Validator.validateObjectId(userId, "userId");
@@ -22,9 +18,9 @@ export class UserFetchAllPaymentsUseCase {
         const provider = await this.userRepositoryImpl.findUserById(userId);
         if (!provider) throw new Error("No user found.");
 
-        const payments = await this.paymentRepositoryImpl.findAllPaymentsByUserId(userId);
-        if (!payments) throw new Error("Payments fetching error.");
+        const result = await this.paymentRepositoryImpl.findAllPayments({page, limit, userId: userId});
+        if (!result) throw new Error("Payments fetching error.");
 
-        return { success: true, message: "Payments fetched", payments };
+        return { data: result.data, totalPages: result.totalPages, currentPage: result.currentPage, totalCount: result.totalCount };
     }
 }

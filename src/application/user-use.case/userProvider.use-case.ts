@@ -8,7 +8,7 @@ import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/p
 import { ProviderServiceRepositoryImpl } from "../../infrastructure/database/providerService/providerService.repository.impl";
 import { ServiceAvailabilityRepositoryImpl } from "../../infrastructure/database/serviceAvailability/serviceAvailability.repository.impl";
 import {
-  FindProviderServiceResProps,
+  FindProviderServiceResponse,
   UserFetchProviderServiceUseCaseResponse,
   UserFetchServiceProvidersUseCaseResponse,
   FindProvidersUsingServiceCategoryIdsResProps,
@@ -136,7 +136,7 @@ export class UserFetchServiceProviderServiceDetailsUseCase {
 
     const serviceData = await this.providerServiceRepositoryImpl.findProviderServiceByProviderId(new Types.ObjectId(providerId));
 
-    function isServiceData(obj: any): obj is FindProviderServiceResProps {
+    function isServiceData(obj: any): obj is FindProviderServiceResponse {
       return obj && typeof obj === 'object' && '_id' in obj;
     }
 

@@ -4,6 +4,7 @@ import { HandleError } from "../../infrastructure/error/error";
 import { UserRepositoryImpl } from "../../infrastructure/database/user/user.repository.impl";
 import { UserFetchAllPaymentsUseCase } from "../../application/user-use.case/usePayment.use-case";
 import { PaymentRepositoryImpl } from "../../infrastructure/database/payment/payment.repository.impl";
+import { RequestQueryCommonZodSchema } from "../../infrastructure/zod/common.zod";
 
 const userRepositoryImpl = new UserRepositoryImpl();
 const paymentRepositoryImpl = new PaymentRepositoryImpl();
@@ -13,21 +14,23 @@ const userFetchAllPaymentsUseCase = new UserFetchAllPaymentsUseCase(userReposito
 export class UserPaymentController {
     constructor(
         private userFetchAllPaymentsUseCase: UserFetchAllPaymentsUseCase,
-    ) { 
+    ) {
         this.fetchPayments = this.fetchPayments.bind(this);
     }
 
     async fetchPayments(req: Request, res: Response) {
         try {
             const userId = req.user.userOrProviderId;
-            if(!userId) throw new Error("Invalid request");
-            const result = await this.userFetchAllPaymentsUseCase.execute({userId: new Types.ObjectId(userId)});
+            const validateQueryData = RequestQueryCommonZodSchema.parse(req.query);
+            const { page, limit } = validateQueryData;
+            if (!userId) throw new Error("Invalid request");
+            const result = await this.userFetchAllPaymentsUseCase.execute({ userId: new Types.ObjectId(userId), page, limit });
             res.status(200).json(result);
-        }catch (error) {
+        } catch (error) {
             HandleError.handle(error, res);
         }
     }
-    
+
 }
 
 const userPaymentController = new UserPaymentController(userFetchAllPaymentsUseCase);

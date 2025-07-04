@@ -5,7 +5,7 @@ import { ProviderService } from "../entities/providerService.entity";
 export type CreateProviderServiceReqProps = Pick<ProviderService, "providerId" | "serviceCategory" | "serviceName" | "serviceDescription" | "servicePrice" | "providerAdhaar" | "providerExperience" | "providerCertificateUrl">;
 
 type FindProviderServiceProps = Omit<ProviderService, "serviceCategory">;
-export interface FindProviderServiceResProps extends FindProviderServiceProps {
+export interface FindProviderServiceResponse extends FindProviderServiceProps {
     serviceCategory: Pick<Service, "serviceName">
 }
 
@@ -29,7 +29,7 @@ export interface IProviderServiceRepository {
 
     createProviderService(providerService: CreateProviderServiceReqProps): Promise<ProviderService | null>;
 
-    findProviderServiceByProviderId(providerId: Types.ObjectId): Promise<FindProviderServiceResProps | {}>;
+    findProviderServiceByProviderId(providerId: Types.ObjectId): Promise<FindProviderServiceResponse | {}>;
 
     findProvidersUsingServiceCategoryIds(serviceCategoryIds: Types.ObjectId[]): Promise<Array<FindProvidersUsingServiceCategoryIdsResProps> | []>
 }

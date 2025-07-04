@@ -3,7 +3,7 @@ import { startSession, Types } from "mongoose";
 import { CommonResponse } from "../../infrastructure/dtos/common.dto";
 import { AppointmentStatus } from "../../domain/entities/booking.entity";
 import { UserRepositoryImpl } from "../../infrastructure/database/user/user.repository.impl";
-import { FindProviderServiceResProps } from "../../domain/repositories/IProviderService.repository";
+import { FindProviderServiceResponse } from "../../domain/repositories/IProviderService.repository";
 import { PaymentRepositoryImpl } from "../../infrastructure/database/payment/payment.repository.impl";
 import { BookingRepositoryImpl } from "../../infrastructure/database/booking/booking.repository.impl";
 import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/provider.repository.impl";
@@ -43,7 +43,7 @@ export class UserAppointmentBookingViaStripeUseCase {
         const providerService = await this.providerServiceRepositoryImpl.findProviderServiceByProviderId(providerId);
         if (!providerService) throw new Error("No service found");
 
-        function isServiceData(obj: any): obj is FindProviderServiceResProps {
+        function isServiceData(obj: any): obj is FindProviderServiceResponse {
             return obj && typeof obj === 'object' && '_id' in obj;
         }
 

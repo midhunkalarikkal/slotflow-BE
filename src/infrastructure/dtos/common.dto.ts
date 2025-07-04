@@ -1,5 +1,7 @@
 import { Plan } from "../../domain/entities/plan.entity";
+import { User } from "../../domain/entities/user.entity";
 import { Address } from "../../domain/entities/address.entity";
+import { Payment } from "../../domain/entities/payment.entity";
 import { Provider } from "../../domain/entities/provider.entity";
 import { Subscription } from "../../domain/entities/subscription.entity";
 
@@ -25,7 +27,7 @@ export interface ApiPaginationRequest {
 }
 
 
-// Used for fetching subscriptions with planName and plan price of a specific provider for the provider side and admin side
+//// **** Used for fetching subscriptions with planName and plan price of a specific provider for the provider side and admin side
 export interface FetchProviderSubscriptionsRequest extends ApiPaginationRequest {
     providerId: Provider["_id"];
 }
@@ -40,5 +42,17 @@ export type PopulatedSubscription = Omit<Subscription, 'subscriptionPlanId'> & {
 };
 
 
-// Used for adding address for user or provider
+//// **** Used for adding address for user or provider
 export type AddAddressRequest = Pick<Address, "userId" | "addressLine" | "place" | "phone" | "city" | "country" | "district" | "pincode" | "state" | "googleMapLink">;
+
+
+
+
+//// **** Used for payment fetching for admin, provider and user side
+export interface userIdAndProviderId {
+  userId?: User["_id"];
+  providerId?: Provider["_id"];
+}
+export interface FetchPaymentsRequest extends ApiPaginationRequest, userIdAndProviderId {
+}
+export type FetchPaymentResponse = Array<Pick<Payment, "_id" | "createdAt" | "totalAmount" | "paymentFor" | "paymentGateway" | "paymentStatus" | "paymentMethod" | "discountAmount">>;

@@ -37,17 +37,6 @@ export type ProviderFetchAllAppServicesResProps = Array<Pick<Service, "_id" | "s
 
 
 
-// **** used in providerPayment.use-case 
-
-// provider fetch all payments use case request interface
-export interface ProviderFetchAllPaymentUseCaseRequestPayload {
-    providerId: Provider["_id"];
-}
-// provider fetch all payments use case response interface 
-export interface ProviderFetchAllPaymentUseCaseResponse extends CommonResponse {
-    payments: Array<Pick<Payment, "paymentStatus" | "paymentMethod" | "paymentGateway" | "paymentFor" | "discountAmount" | "totalAmount" | "createdAt" | "_id">> | [];
-}
-
 
 
 

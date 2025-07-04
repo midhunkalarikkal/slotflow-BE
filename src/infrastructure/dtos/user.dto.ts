@@ -168,11 +168,11 @@ export interface UserFetchServiceproviderServiceUsecaseRequestPayload {
 }
 // user fetch provider service use case response interface
 type FindProviderServiceProps = Omit<ProviderService, "serviceCategory">;
-export interface FindProviderServiceResProps extends FindProviderServiceProps {
+export interface FindProviderServiceResponse extends FindProviderServiceProps {
     serviceCategory: Pick<Service, "serviceName">
 }
 export interface UserFetchProviderServiceUseCaseResponse extends CommonResponse {
-    service: FindProviderServiceResProps | {};
+    service: FindProviderServiceResponse | {};
 }
 
 
@@ -191,13 +191,3 @@ export interface UserFetchProviderServiceAvailabilityUseCaseResponse extends Com
 
 
 
-// **** used in userPayment.use-case **** \\
-
-// user fetch all payments use case request payload interface
-export interface UserFetchAllPaymentsUseCaseRequestPayload {
-    userId: User["_id"];
-}
-// user fetch all payments use case response interface
-export interface UserFetchAllPaymentsUseCaseResponse extends CommonResponse {
-    payments: Array<Pick<Payment, "paymentStatus" | "paymentMethod" | "paymentGateway" | "paymentFor" | "discountAmount" | "totalAmount" | "createdAt" | "_id">> | [];
-}

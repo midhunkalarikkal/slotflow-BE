@@ -1,11 +1,12 @@
 import { 
     AdminFetchAllUsers, 
-    AdminChangeUserStatusUseCaseResponse, 
-    AdminChangeUserIsBlockedStatusUseCaseRequestPayload,
+    AdminChangeUserStatusResponse, 
+    AdminChangeUserIsBlockedStatusRequest,
 } from "../../infrastructure/dtos/admin.dto";
 import { Validator } from "../../infrastructure/validator/validator";
 import { ApiPaginationRequest, ApiResponse } from "../../infrastructure/dtos/common.dto";
 import { UserRepositoryImpl } from "../../infrastructure/database/user/user.repository.impl";
+
 
 export class AdminUserListUseCase {
     constructor(private userRepositoryImpl: UserRepositoryImpl) { }
@@ -21,7 +22,7 @@ export class AdminUserListUseCase {
 export class AdminChangeUserBlockStatusUseCase {
     constructor(private userRepositoryImpl: UserRepositoryImpl) { }
 
-    async execute(data: AdminChangeUserIsBlockedStatusUseCaseRequestPayload): Promise<AdminChangeUserStatusUseCaseResponse> {
+    async execute(data: AdminChangeUserIsBlockedStatusRequest): Promise<ApiResponse<AdminChangeUserStatusResponse>> {
         const {userId, isBlocked} = data;
         if (!userId || isBlocked === null) throw new Error("Invalid request");
 
@@ -42,6 +43,6 @@ export class AdminChangeUserBlockStatusUseCase {
             isBlocked: updatedUser.isBlocked,
             isEmailVerified: updatedUser.isEmailVerified
         }
-        return { success: true, message: `User ${isBlocked ? "blocked" : "Unblocked"} successfully.`, updatedUser: updatedUserData };
+        return { success: true, message: `User ${isBlocked ? "blocked" : "Unblocked"} successfully.`, data: updatedUserData };
     }
 }

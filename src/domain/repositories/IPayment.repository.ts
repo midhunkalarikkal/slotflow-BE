@@ -1,11 +1,9 @@
 import { Types } from "mongoose";
 import { Payment } from "../entities/payment.entity";
-import { ApiPaginationRequest, ApiResponse } from "../../infrastructure/dtos/common.dto";
-import { AdminFetchAllPayments, AdminFetchProviderPaymentsRequest, AdminFetchProviderPaymentsResponse } from "../../infrastructure/dtos/admin.dto";
+import { ApiResponse, FetchPaymentResponse, FetchPaymentsRequest } from "../../infrastructure/dtos/common.dto";
 
 export type CreatePaymentForSubscriptionProps = Pick<Payment, "transactionId" | "paymentStatus" | "paymentMethod" | "paymentGateway" | "paymentFor" | "initialAmount" | "discountAmount" | "providerId" | "totalAmount" >;
 export type CreatePaymentForBookingProps = Pick<Payment, "transactionId" | "paymentStatus" | "paymentMethod" | "paymentGateway" | "paymentFor" | "initialAmount" | "discountAmount" | "userId" | "totalAmount" >;
-export type FindAllPaymentsByUserIdResProps = Pick<Payment, "paymentStatus" | "paymentMethod" | "paymentGateway" | "paymentFor" | "discountAmount" | "totalAmount" | "createdAt" | "_id">;
 export type UpdateForCancelBookingRefundReqProps = Pick<Payment, "_id" | "transactionId" | "paymentStatus" | "paymentMethod" | "paymentGateway" | "paymentFor" | "initialAmount" | "discountAmount" | "userId" | "totalAmount" | "refundAmount" | "chargeId" | "refundAt" | "refundId" | "refundReason" | 'refundStatus'>;
 
 export interface IPaymentRepository {
@@ -14,13 +12,9 @@ export interface IPaymentRepository {
     
     createPaymentForBooking(payment: CreatePaymentForBookingProps, options?: { session?: any }): Promise<Payment | null>;
     
-    findAllPaymentsByProviderId(data: AdminFetchProviderPaymentsRequest): Promise<ApiResponse<AdminFetchProviderPaymentsResponse>>;
-
-    findAllPaymentsByUserId(providerId: Types.ObjectId): Promise<Array<FindAllPaymentsByUserIdResProps> | []>;
+    findAllPayments({ page, limit, userId, providerId }: FetchPaymentsRequest): Promise<ApiResponse<FetchPaymentResponse>>;
     
-    findAllPayments({ page, limit }: ApiPaginationRequest): Promise<ApiResponse<AdminFetchAllPayments>>;
-    
-    findAllPaymentById(paymentId: Types.ObjectId): Promise<Payment | null>;
+    findPaymentById(paymentId: Types.ObjectId): Promise<Payment | null>;
 
     updateForCancelBookingRefund(payment: UpdateForCancelBookingRefundReqProps, options?: { session?: any }): Promise<Payment | null>;
 
