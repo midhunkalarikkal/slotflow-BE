@@ -27,18 +27,6 @@ export interface ProviderFetchAddressResponse extends CommonResponse {
 
 
 
-// **** used in providerAppService.use-case 
-// provder fetch all app services response props
-export type ProviderFetchAllAppServicesResProps = Array<Pick<Service, "_id" | "serviceName">>;
-
-
-
-
-
-
-
-
-
 // **** used in providerPlan.use-case 
 
 // provider fetch all plans use case response interface 

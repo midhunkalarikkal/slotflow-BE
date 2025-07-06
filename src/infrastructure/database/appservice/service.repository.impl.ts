@@ -2,9 +2,8 @@ import { Types } from "mongoose";
 import { IService, ServiceModel } from "./service.model";
 import { Service } from "../../../domain/entities/service.entity";
 import { IServiceRepository } from "../../../domain/repositories/IService.repository";
-import { ApiPaginationRequest, ApiResponse } from "../../dtos/common.dto";
+import { ApiPaginationRequest, ApiResponse, FetchAllAppServicesResponse } from "../../dtos/common.dto";
 import { AdminServiceListResponse } from "../../dtos/admin.dto";
-import { ProviderFetchAllAppServicesResProps } from "../../dtos/provider.dto";
 
 export class ServiceRepositoryImpl implements IServiceRepository {
     private mapToEntity(service: IService): Service {
@@ -76,7 +75,7 @@ export class ServiceRepositoryImpl implements IServiceRepository {
         }
     }
 
-    async findAllServiceNames(): Promise<ProviderFetchAllAppServicesResProps> {
+    async findAllServiceNames(): Promise<FetchAllAppServicesResponse> {
         try {
             const services = await ServiceModel.find({}, {
                     _id: 1,

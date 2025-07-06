@@ -5,6 +5,7 @@ import { Payment } from "../../domain/entities/payment.entity";
 import { Provider } from "../../domain/entities/provider.entity";
 import { Subscription } from "../../domain/entities/subscription.entity";
 import { Booking } from "../../domain/entities/booking.entity";
+import { Service } from "../../domain/entities/service.entity";
 
 // Common response interface for the usecases
 export interface CommonResponse {
@@ -48,7 +49,7 @@ export type AddAddressRequest = Pick<Address, "userId" | "addressLine" | "place"
 
 
 
-//// **** Used for payments fetching for admin, provider and user side
+//// **** Used for fetching payments for admin, provider and user side
 export interface userIdAndProviderId {
   userId?: User["_id"];
   providerId?: Provider["_id"];
@@ -58,10 +59,14 @@ export type FetchPaymentResponse = Array<Pick<Payment, "_id" | "createdAt" | "to
 
 
 
-//// **** Used for bookings fetching for admin, provider and user side
+//// **** Used for fetching bookings for admin, provider and user side
 export interface userIdAndServiceProviderId {
   userId?: User["_id"];
   serviceProviderId?: Provider["_id"];
 }
 export interface FetchBookingsRequest extends ApiPaginationRequest, userIdAndServiceProviderId {}
 export type FetchBookingsResponse = Array<Pick<Booking, "_id" | "appointmentDate" | "appointmentMode" | "appointmentStatus" | "appointmentTime" | "createdAt" >>;
+
+//// **** Used for fetching AppServices for provider and user side
+export type FetchAllAppServicesResponse = Array<Pick<Service, "_id" | "serviceName">>;
+

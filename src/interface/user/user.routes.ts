@@ -6,6 +6,7 @@ import { userAddressController } from './userAddress.controller';
 import { userPaymentController } from "./userPayment.controller";
 import { userBookingController } from "./userBooking.controller";
 import { userProviderController } from "./userProvider.controller";
+import { userAppServiceController } from "./userAppService.controller";
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
@@ -18,6 +19,8 @@ router.put('/updateUserInfo', authMiddleware, userProfileController.updateUserIn
 
 router.post('/addAddress', authMiddleware, userAddressController.addAddress);
 router.get('/getAddress', authMiddleware, userAddressController.getAddress);
+
+router.get('/getAllServices', authMiddleware, userAppServiceController.fetchAllAppService);
 
 router.get('/getServiceProviders/:selectedServices?', authMiddleware, userProviderController.fetchServiceProviders);
 router.get('/getServiceProviderProfileDetails/:providerId', authMiddleware, userProviderController.fetchServiceProviderProfileDetails);
