@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import { HandleError } from "../../infrastructure/error/error";
+import { RequestQueryCommonZodSchema } from "../../infrastructure/zod/common.zod";
 import { PaymentRepositoryImpl } from "../../infrastructure/database/payment/payment.repository.impl";
 import { AdminFetchAllPaymentsUseCase } from "../../application/admin-use.case/adminPayment.use-case";
-import { RequestQueryCommonZodSchema } from "../../infrastructure/zod/common.zod";
 
 const paymentRepositoryImpl = new PaymentRepositoryImpl();
 

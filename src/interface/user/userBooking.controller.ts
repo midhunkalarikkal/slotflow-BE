@@ -1,7 +1,7 @@
 import { Types } from "mongoose";
 import { Request, Response } from "express";
 import { HandleError } from "../../infrastructure/error/error";
-import { SaveStripePaymentZodSchema } from "../../infrastructure/zod/common.zod";
+import { RequestQueryCommonZodSchema, SaveStripePaymentZodSchema } from "../../infrastructure/zod/common.zod";
 import { UserRepositoryImpl } from "../../infrastructure/database/user/user.repository.impl";
 import { PaymentRepositoryImpl } from "../../infrastructure/database/payment/payment.repository.impl";
 import { BookingRepositoryImpl } from "../../infrastructure/database/booking/booking.repository.impl";
@@ -40,8 +40,10 @@ export class UserBookingController {
     async fetchBookings(req: Request, res: Response) {
         try {
             const userId = req.user.userOrProviderId;
+            const validateQueryData = RequestQueryCommonZodSchema.parse(req.query);
+            const { page, limit } = validateQueryData;
             if(!userId) throw new Error("Invalid request");
-            const result = await this.userFetchBookingsUseCase.execute({userId: new Types.ObjectId(userId)});
+            const result = await this.userFetchBookingsUseCase.execute({userId: new Types.ObjectId(userId), page, limit});
             res.status(200).json(result);
         } catch(error) {
             HandleError.handle(error, res);

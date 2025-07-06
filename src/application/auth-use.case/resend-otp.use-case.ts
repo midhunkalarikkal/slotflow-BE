@@ -8,7 +8,7 @@ import { UserRepositoryImpl } from '../../infrastructure/database/user/user.repo
 import { ProviderRepositoryImpl } from '../../infrastructure/database/provider/provider.repository.impl';
 
 
-interface ResendOtpResProps extends CommonResponse {
+interface ResendOtpResponse extends CommonResponse {
   authUser: {
     verificationToken: string, 
     role: string 
@@ -20,7 +20,7 @@ export class ResendOtpUseCase {
 
   constructor(private userRepositoryImpl: UserRepositoryImpl, private providerRepositoryImpl: ProviderRepositoryImpl) { }
 
-  async execute(data: ResendOtpRequest): Promise<ResendOtpResProps> {
+  async execute(data: ResendOtpRequest): Promise<ResendOtpResponse> {
     const { role, verificationToken, email } = data;
     if(!role || (!verificationToken && !email)) throw new Error("Invalid request.");
 

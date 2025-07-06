@@ -16,8 +16,8 @@ router.get('/getProfileDetails', authMiddleware, userProfileController.getProfil
 router.post('/updateProfileImage', authMiddleware, upload.single("profileImage"), userProfileController.updateProfileImage);
 router.put('/updateUserInfo', authMiddleware, userProfileController.updateUserInfo);
 
-router.get('/getAddress', authMiddleware, userAddressController.getAddress);
 router.post('/addAddress', authMiddleware, userAddressController.addAddress);
+router.get('/getAddress', authMiddleware, userAddressController.getAddress);
 
 router.get('/getServiceProviders/:selectedServices?', authMiddleware, userProviderController.fetchServiceProviders);
 router.get('/getServiceProviderProfileDetails/:providerId', authMiddleware, userProviderController.fetchServiceProviderProfileDetails);

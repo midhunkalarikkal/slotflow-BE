@@ -68,7 +68,7 @@ export interface ProviderUpdateprofileImageRequestPayload {
     file: Express.Multer.File;
 }
 // provider update profile image use case response interface 
-export interface ProviderUpdateprofileImageResponse extends CommonResponse, Pick<Provider, "profileImage"> { }
+export type ProviderUpdateprofileImageResponse = Provider["profileImage"];
 
 
 // provider update providerInfo request payload interface

@@ -15,8 +15,7 @@ export class UserFetchAddressUseCase {
         private addressRepositoryImpl: AddressRepositoryImpl,
     ) { }
 
-    async execute(data: UserFetchUserAddressRequest): Promise<UserFetchAddressResponse> {
-        const { userId } = data;
+    async execute({userId}: UserFetchUserAddressRequest): Promise<ApiResponse<UserFetchAddressResponse>> {
         if (!userId) throw new Error("Invalid request.");
 
         Validator.validateObjectId(userId, "userId");
@@ -24,10 +23,10 @@ export class UserFetchAddressUseCase {
         const user = await this.userRepositoryImpl.findUserById(userId);
         if (!user) throw new Error("No user found.");
         const address = await this.addressRepositoryImpl.findAddressByUserId(userId);
-        if (address === null) return { success: true, message: "User Address not yet addedd.", address: {} }
+        if (address === null) return { success: true, message: "User Address not yet addedd.", data: {} }
         if (!address) throw new Error("Address fetching error.");
         const { _id, userId: uId, createdAt, updatedAt, ...rest } = address;
-        return { success: true, message: "User address fetched.", address: rest }
+        return { success: true, message: "User address fetched.", data: rest }
     }
 }
 

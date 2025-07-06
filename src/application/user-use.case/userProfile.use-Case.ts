@@ -13,12 +13,13 @@ import {
     UserUpdateUserInfoRequest,
     UserUpdateUserInfoResponse, 
 } from "../../infrastructure/dtos/user.dto";
+import { ApiResponse } from "../../infrastructure/dtos/common.dto";
 
 
 export class UserFetchProfileDetailsUseCase {
     constructor(private userRepositoryImpl: UserRepositoryImpl) { }
 
-    async execute(data: UserFetchProfileRequest): Promise<UserFetchProfileDetailsResponse> {
+    async execute(data: UserFetchProfileRequest): Promise<ApiResponse<UserFetchProfileDetailsResponse>> {
         const { userId } = data;
         if (!userId) throw new Error("Invalid request.");
 
@@ -27,7 +28,7 @@ export class UserFetchProfileDetailsUseCase {
         const user = await this.userRepositoryImpl.findUserById(userId);
         if (!user) throw new Error("User not found.");
         const { _id, password, profileImage, updatedAt, addressId, bookingsId, verificationToken, ...rest } = user;
-        return { success: true, message: "User profile details fetched.", profileDetails: rest };
+        return { success: true, message: "User profile details fetched.", data: rest };
     }
 }
 
@@ -37,7 +38,7 @@ export class UserUpdateProfileImageUseCase {
         private s3: S3Client,
     ) { }
 
-    async execute(data: UsrUpdateProfileImageRequest): Promise<UserUpdateProfileImageResponse> {
+    async execute(data: UsrUpdateProfileImageRequest): Promise<ApiResponse<UserUpdateProfileImageResponse>> {
         const { userId, file} = data;
         if (!userId || !file) throw new Error("Invalid request.");
 
@@ -68,7 +69,7 @@ export class UserUpdateProfileImageUseCase {
 
             const s3Key = await extractS3Key(updatedUser.profileImage);
             const signedUrl = await generateSignedUrl(s3Key);
-            return { success: true, message: "Profile Image updated successfully.", profileImage: signedUrl };
+            return { success: true, message: "Profile Image updated successfully.", data: signedUrl };
 
         } catch {
             throw new Error("Unexpected error occured while updating profile image.");
@@ -82,13 +83,13 @@ export class UserUpdateProviderInfoUseCase {
         private userRepositoryImpl: UserRepositoryImpl 
     ) { }
 
-    async execute(data: UserUpdateUserInfoRequest) : Promise<UserUpdateUserInfoResponse> {
+    async execute(data: UserUpdateUserInfoRequest) : Promise<ApiResponse<UserUpdateUserInfoResponse>> {
         const { userId, username, phone } = data;
         if(!userId || !username || !phone) throw new Error("Invalid request");
 
         Validator.validateObjectId(userId,"userId");
+        Validator.validatePhone(phone);
         validateOrThrow("username",username);
-        validateOrThrow("phone",phone);
 
         const user = await this.userRepositoryImpl.findUserById(userId);
         if(!user) throw new Error("No user found");
@@ -104,6 +105,6 @@ export class UserUpdateProviderInfoUseCase {
 
         const updatedData = { username: updatedUser.username, phone: updatedUser.phone };
 
-        return { success: true, message: "Info updated successfully", userInfo: updatedData }
+        return { success: true, message: "Info updated successfully", data: updatedData }
     }
 }

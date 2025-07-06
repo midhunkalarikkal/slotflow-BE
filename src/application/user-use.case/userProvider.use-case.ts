@@ -1,27 +1,29 @@
+import dayjs from "dayjs";
 import { Types } from "mongoose";
+import {
+  FindProviderServiceResponse,
+  UserFetchProviderServiceResponse,
+  UserFetchServiceProvidersResponse,
+  UserFetchServiceProvidersRequest,
+  UserFetchServiceProviderAddressRequest,
+  UserFetchServiceProviderDetailsRequest,
+  UserFetchServiceproviderServiceRequest,
+  UserFetchServiceProviderDetailsResponse,
+  UserFetchServiceProviderAddressResponse,
+  UserFetchProviderServiceAvailabilityRequest,
+  FindProvidersUsingServiceCategoryIdsResponse,
+  UserFetchProviderServiceAvailabilityResponse,
+} from "../../infrastructure/dtos/user.dto";
 import { generateSignedUrl } from "../../config/aws_s3";
 import { extractS3Key } from "../../infrastructure/helpers/helper";
+import { ApiResponse } from "../../infrastructure/dtos/common.dto";
 import { Validator } from "../../infrastructure/validator/validator";
 import { UserRepositoryImpl } from "../../infrastructure/database/user/user.repository.impl";
 import { AddressRepositoryImpl } from "../../infrastructure/database/address/address.repository.impl";
 import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/provider.repository.impl";
 import { ProviderServiceRepositoryImpl } from "../../infrastructure/database/providerService/providerService.repository.impl";
 import { ServiceAvailabilityRepositoryImpl } from "../../infrastructure/database/serviceAvailability/serviceAvailability.repository.impl";
-import {
-  FindProviderServiceResponse,
-  UserFetchProviderServiceResponse,
-  UserFetchServiceProvidersResponse,
-  FindProvidersUsingServiceCategoryIdsResponse,
-  UserFetchServiceProviderAddressResponse,
-  UserFetchServiceProviderDetailsResponse,
-  UserFetchServiceProvidersRequest,
-  UserFetchProviderServiceAvailabilityResponse,
-  UserFetchServiceProviderAddressRequest,
-  UserFetchServiceProviderDetailsRequest,
-  UserFetchServiceproviderServiceRequest,
-  UserFetchProviderServiceAvailabilityRequest
-} from "../../infrastructure/dtos/user.dto";
-import dayjs from "dayjs";
+
 
 export class UserFetchServiceProvidersUseCase {
   constructor(
@@ -29,8 +31,7 @@ export class UserFetchServiceProvidersUseCase {
     private providerServiceRepositoryImpl: ProviderServiceRepositoryImpl,
   ) { }
 
-  async execute(data: UserFetchServiceProvidersRequest): Promise<UserFetchServiceProvidersResponse> {
-    const { userId, serviceIds } = data;
+  async execute({ userId, serviceIds }: UserFetchServiceProvidersRequest): Promise<ApiResponse<Array<UserFetchServiceProvidersResponse>>> {
     if (!userId || !serviceIds) throw new Error("Invalid request.");
 
     Validator.validateObjectId(userId, "userId");
@@ -55,7 +56,7 @@ export class UserFetchServiceProvidersUseCase {
       })
     )
 
-    return { success: true, message: "Providers fetched successfully.", providers: updatedproviders };
+    return { success: true, message: "Providers fetched successfully.", data: updatedproviders };
   }
 }
 
@@ -66,8 +67,7 @@ export class UserFetchServiceProviderProfileDetailsUseCase {
     private providerRepositoryImpl: ProviderRepositoryImpl,
   ) { }
 
-  async execute(data: UserFetchServiceProviderDetailsRequest): Promise<UserFetchServiceProviderDetailsResponse> {
-    const { userId, providerId } = data;
+  async execute({ userId, providerId }: UserFetchServiceProviderDetailsRequest): Promise<ApiResponse<UserFetchServiceProviderDetailsResponse>> {
     if (!userId || !providerId) throw new Error("Invalid request");
 
     Validator.validateObjectId(userId, "userId");
@@ -87,7 +87,7 @@ export class UserFetchServiceProviderProfileDetailsUseCase {
 
     let { _id, username, email, phone, profileImage, trustedBySlotflow } = provider;
 
-    return { success: true, message: "Service provider details fetched", provider: { _id, username, email, phone, profileImage, trustedBySlotflow } }
+    return { success: true, message: "Service provider details fetched", data: { _id, username, email, phone, profileImage, trustedBySlotflow } }
   }
 }
 
@@ -98,8 +98,7 @@ export class UserFetchServiceProviderAddressUseCase {
     private addressRepositoryImpl: AddressRepositoryImpl,
   ) { }
 
-  async execute(data: UserFetchServiceProviderAddressRequest): Promise<UserFetchServiceProviderAddressResponse> {
-    const { userId, providerId } = data;
+  async execute({ userId, providerId }: UserFetchServiceProviderAddressRequest): Promise<ApiResponse<UserFetchServiceProviderAddressResponse>> {
     if (!userId || !providerId) throw new Error("Invalid request");
 
     Validator.validateObjectId(userId, "userId");
@@ -113,7 +112,7 @@ export class UserFetchServiceProviderAddressUseCase {
 
     let { createdAt, updatedAt, _id, ...rest } = address;
 
-    return { success: true, message: "Service provider address fetched", address: rest }
+    return { success: true, message: "Service provider address fetched", data: rest }
   }
 }
 
@@ -124,8 +123,7 @@ export class UserFetchServiceProviderServiceDetailsUseCase {
     private providerServiceRepositoryImpl: ProviderServiceRepositoryImpl,
   ) { }
 
-  async execute(data: UserFetchServiceproviderServiceRequest): Promise<UserFetchProviderServiceResponse> {
-    const { userId, providerId } = data;
+  async execute({ userId, providerId }: UserFetchServiceproviderServiceRequest): Promise<ApiResponse<UserFetchProviderServiceResponse>> {
     if (!userId || !providerId) throw new Error("Invalid request");
 
     Validator.validateObjectId(userId, "userId");
@@ -141,12 +139,12 @@ export class UserFetchServiceProviderServiceDetailsUseCase {
     }
 
     if (!isServiceData(serviceData)) {
-      return { success: true, message: "Service fetched successfully.", service: {} };
+      return { success: true, message: "Service fetched successfully.", data: {} };
     }
 
     const { serviceName, serviceDescription, servicePrice, providerExperience, serviceCategory } = serviceData;
 
-    return { success: true, message: "Service provider address fetched", service: { serviceName, serviceDescription, servicePrice, providerExperience, serviceCategory } }
+    return { success: true, message: "Service provider address fetched", data: { serviceName, serviceDescription, servicePrice, providerExperience, serviceCategory } }
   }
 }
 
@@ -157,8 +155,7 @@ export class UserFetchServiceProviderServiceAvailabilityUseCase {
     private serviceAvailabilityRepositoryImpl: ServiceAvailabilityRepositoryImpl,
   ) { }
 
-  async execute(data: UserFetchProviderServiceAvailabilityRequest): Promise<UserFetchProviderServiceAvailabilityResponse> {
-    const { userId, providerId, date } = data;
+  async execute({ userId, providerId, date }: UserFetchProviderServiceAvailabilityRequest): Promise<ApiResponse<UserFetchProviderServiceAvailabilityResponse>> {
     if (!userId || !providerId || !date) throw new Error("Invalid request.");
     const currentDateTime = dayjs();
     const selectedDate = dayjs(date).format('YYYY-MM-DD');
@@ -171,7 +168,7 @@ export class UserFetchServiceProviderServiceAvailabilityUseCase {
     if (!user) throw new Error("No user found");
 
     const availability = await this.serviceAvailabilityRepositoryImpl.findServiceAvailabilityByProviderId(new Types.ObjectId(providerId), date);
-    if (availability == null) return { success: true, message: "Service availability fetched successfully.", availability: {} };
+    if (availability == null) return { success: true, message: "Service availability fetched successfully.", data: {} };
 
     const updatedSlots = availability.slots.map((slot) => {
       const slotDateTime = dayjs(`${selectedDate} ${slot.time}`, 'YYYY-MM-DD hh:mm A');
@@ -182,6 +179,6 @@ export class UserFetchServiceProviderServiceAvailabilityUseCase {
       }
     });
 
-    return { success: true, message: "Service availability fetched successfully.", availability: { ...availability, slots: updatedSlots } };
+    return { success: true, message: "Service availability fetched successfully.", data: { ...availability, slots: updatedSlots } };
   }
 }

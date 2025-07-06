@@ -1,8 +1,8 @@
-import moment from "moment";
 import { Types } from "mongoose";
 import { BookingModel, IBooking } from "./booking.model";
-import { AppointmentStatus, Booking } from "../../../domain/entities/booking.entity";
-import { CreateBookingPayloadProps, FindAllBookingAppointmentsUsingProviderIdResponseProps, FindAllBookingsUsingUserIdResponseProps, IBookingRepository } from "../../../domain/repositories/IBooking.repository";
+import { Booking } from "../../../domain/entities/booking.entity";
+import { FetchBookingsRequest, ApiResponse, FetchBookingsResponse, userIdAndServiceProviderId } from "../../dtos/common.dto";
+import { CreateBookingPayloadProps, FindAllBookingAppointmentsUsingProviderIdResponseProps, IBookingRepository } from "../../../domain/repositories/IBooking.repository";
 
 export class BookingRepositoryImpl implements IBookingRepository {
     private mapToEntity(booking: IBooking): Booking {
@@ -26,7 +26,7 @@ export class BookingRepositoryImpl implements IBookingRepository {
             const newBooking = await BookingModel.create([booking], options);
             return this.mapToEntity(newBooking[0]);
         } catch (error) {
-            throw new Error("Appointment booking creating error");
+            throw new Error("Appointment booking creating failed");
         }
     }
 
@@ -41,20 +41,7 @@ export class BookingRepositoryImpl implements IBookingRepository {
             });
             return bookings;
         } catch (error) {
-            throw new Error("Booking fetching error");
-        }
-    }
-
-    async findAllBookingsUsingUserId(userId: Types.ObjectId): Promise<Array<FindAllBookingsUsingUserIdResponseProps> | []> {
-        try {
-            const bookings = await BookingModel.find({
-                userId: userId
-            }, {
-                appointmentDay: 1, appointmentDate: 1, appointmentMode: 1, appointmentStatus: 1, appointmentTime: 1, createdAt: 1
-            });
-            return bookings ? bookings.map((booking) => this.mapToEntity(booking)) : [];
-        } catch (error) {
-            throw new Error("Bookings fetching error");
+            throw new Error("Booking fetching failed");
         }
     }
 
@@ -63,7 +50,7 @@ export class BookingRepositoryImpl implements IBookingRepository {
             const booking = await BookingModel.findById(bookingId);
             return booking ? this.mapToEntity(booking) : null;
         } catch (error) {
-            throw new Error("Finding booking error");
+            throw new Error("Finding booking failed");
         }
     }
 
@@ -76,7 +63,7 @@ export class BookingRepositoryImpl implements IBookingRepository {
             );
             return updatedBooking ? this.mapToEntity(updatedBooking) : null;
         } catch (error) {
-            throw new Error("Booking updating error");
+            throw new Error("Booking updating failed");
         }
     }
 
@@ -89,7 +76,7 @@ export class BookingRepositoryImpl implements IBookingRepository {
             });
             return bookings ? bookings.map((booking) => this.mapToEntity(booking)) : [];
         } catch (error) {
-            throw new Error("Booking appointments fetching error");
+            throw new Error("Booking appointments fetching failed");
         }
     }
 
@@ -115,8 +102,37 @@ export class BookingRepositoryImpl implements IBookingRepository {
 
             return bookings.modifiedCount > 0 ? true : false;
         } catch {
-            console.log("booking fetching error");
+            console.log("booking fetching failed");
             return false;
+        }
+    }
+
+    async findAllBooking({ page, limit, userId, serviceProviderId }: FetchBookingsRequest): Promise<ApiResponse<FetchBookingsResponse>> {
+        try {
+            const skip = (page - 1) * limit;
+            const filter: userIdAndServiceProviderId = {};
+            if (userId) { filter.userId = userId;}
+            if (serviceProviderId) { filter.serviceProviderId = serviceProviderId;}
+            const [payments, totalCount] = await Promise.all([
+                BookingModel.find(filter, {
+                    _id: 1,
+                    appointmentDate: 1,
+                    appointmentMode: 1,
+                    appointmentStatus: 1,
+                    appointmentTime: 1,
+                    createdAt: 1,
+                }).skip(skip).limit(limit).sort({ createdAt: 1 }).lean(),
+                BookingModel.countDocuments(),
+            ]);
+            const totalPages = Math.ceil(totalCount / limit);
+            return {
+                data: payments.map(this.mapToEntity),
+                totalPages,
+                currentPage: page,
+                totalCount
+            }
+        }catch {
+            throw new Error("Bookings fetching failed")
         }
     }
 }

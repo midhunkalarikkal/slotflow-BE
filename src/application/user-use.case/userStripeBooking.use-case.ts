@@ -1,6 +1,6 @@
 import Stripe from "stripe";
 import { startSession, Types } from "mongoose";
-import { CommonResponse } from "../../infrastructure/dtos/common.dto";
+import { ApiResponse, CommonResponse } from "../../infrastructure/dtos/common.dto";
 import { AppointmentStatus } from "../../domain/entities/booking.entity";
 import { UserRepositoryImpl } from "../../infrastructure/database/user/user.repository.impl";
 import { FindProviderServiceResponse } from "../../domain/repositories/IProviderService.repository";
@@ -10,7 +10,6 @@ import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/p
 import { ProviderServiceRepositoryImpl } from "../../infrastructure/database/providerService/providerService.repository.impl";
 import { ServiceAvailabilityRepositoryImpl } from "../../infrastructure/database/serviceAvailability/serviceAvailability.repository.impl";
 import { 
-    UserAppointmentBookingViaStripeResponse, 
     UserSaveAppoinmentBookingRequest, 
     UserAppointmentBookingViaStripeRequest, 
 } from "../../infrastructure/dtos/user.dto";
@@ -27,8 +26,8 @@ export class UserAppointmentBookingViaStripeUseCase {
         private bookingRepositoryImpl: BookingRepositoryImpl,
     ) { }
 
-    async execute(data: UserAppointmentBookingViaStripeRequest): Promise<UserAppointmentBookingViaStripeResponse> {
-        const { userId, providerId, slotId, selectedServiceMode, date } = data;
+    async execute(payload: UserAppointmentBookingViaStripeRequest): Promise<ApiResponse<string>> {
+        const { userId, providerId, slotId, selectedServiceMode, date } = payload;
         if (!userId || !providerId || !slotId || !selectedServiceMode || !date) throw new Error("Invalid request");
 
         Validator.validateObjectId(userId, "userId");
@@ -87,7 +86,7 @@ export class UserAppointmentBookingViaStripeUseCase {
                 totalAmount: providerService.servicePrice * 100,
             }
         });
-        return { success: true, message: "Session id generated.", sessionId: session.id };
+        return { success: true, message: "Session id generated.", data: session.id };
 
     }
 
@@ -102,8 +101,7 @@ export class UserSaveBookingAfterStripePaymentUseCase {
         private serviceAvailabilityRepositoryImpl: ServiceAvailabilityRepositoryImpl,
     ) { }
 
-    async execute(data: UserSaveAppoinmentBookingRequest): Promise<CommonResponse> {
-        const { userId, sessionId } = data;
+    async execute({ userId, sessionId }: UserSaveAppoinmentBookingRequest): Promise<ApiResponse> {
         if (!userId || !sessionId) throw new Error("Invalid request");
 
         Validator.validateObjectId(userId, "userId");

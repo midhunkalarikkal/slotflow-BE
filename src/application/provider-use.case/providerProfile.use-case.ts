@@ -13,6 +13,7 @@ import {
     ProviderUpdateProviderInfoRequest,
     ProviderUpdateProviderInfoResponse, 
 } from "../../infrastructure/dtos/provider.dto";
+import { ApiResponse } from "../../infrastructure/dtos/common.dto";
 
 
 export class ProviderFetchProfileDetailsUseCase {
@@ -39,7 +40,7 @@ export class ProviderUpdateProfileImageUseCase {
         private s3: S3Client,
     ) { }
 
-    async execute(data: ProviderUpdateprofileImageRequestPayload): Promise<ProviderUpdateprofileImageResponse> {
+    async execute(data: ProviderUpdateprofileImageRequestPayload): Promise<ApiResponse<ProviderUpdateprofileImageResponse>> {
         const { providerId, file } = data;
         if (!providerId || !file) throw new Error("Invalid request.");
 
@@ -71,7 +72,7 @@ export class ProviderUpdateProfileImageUseCase {
 
             const s3Key = await extractS3Key(updatedProvider.profileImage);
             const signedUrl = await generateSignedUrl(s3Key);
-            return { success: true, message: "Profile Image updated successfully.", profileImage: signedUrl };
+            return { success: true, message: "Profile Image updated successfully.", data: signedUrl };
 
         } catch {
             throw new Error("Unexpected error occured while updating profile image.");

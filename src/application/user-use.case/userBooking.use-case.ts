@@ -2,15 +2,11 @@ import Stripe from "stripe";
 import mongoose, { Types } from "mongoose";
 import { Validator } from "../../infrastructure/validator/validator";
 import { AppointmentStatus } from "../../domain/entities/booking.entity";
+import { UserCancelBookingRequest } from "../../infrastructure/dtos/user.dto";
 import { UserRepositoryImpl } from "../../infrastructure/database/user/user.repository.impl";
 import { BookingRepositoryImpl } from "../../infrastructure/database/booking/booking.repository.impl";
 import { PaymentRepositoryImpl } from "../../infrastructure/database/payment/payment.repository.impl";
-import { 
-    UserCancelBookingResponse, 
-    UserFetchAllBookingsResponse, 
-    UserCancelBookingRequest, 
-    UserFetchAppointmentBookingsRequest 
-} from "../../infrastructure/dtos/user.dto";
+import { ApiResponse, FetchBookingsRequest, FetchBookingsResponse } from "../../infrastructure/dtos/common.dto";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
@@ -20,16 +16,15 @@ export class UserFetchBookingsUseCase {
         private bookingRepositoryImpl: BookingRepositoryImpl
     ) { }
 
-    async execute(data: UserFetchAppointmentBookingsRequest): Promise<UserFetchAllBookingsResponse> {
-        const { userId } = data;
+    async execute({ userId, page, limit }: FetchBookingsRequest): Promise<ApiResponse<FetchBookingsResponse>> {
         if (!userId) throw new Error("Invalid request");
 
         Validator.validateObjectId(userId, "userId");
 
-        const bookings = await this.bookingRepositoryImpl.findAllBookingsUsingUserId(userId);
-        if (!bookings) throw new Error("Bookings fetching error");
+        const result = await this.bookingRepositoryImpl.findAllBooking({page, limit, userId});
+        if (!result) throw new Error("Bookings fetching error");
 
-        return { success: true, message: "Bookings fetched", bookings }
+        return { data: result.data, totalPages: result.totalPages, currentPage: result.currentPage, totalCount: result.totalCount };
     }
 }
 
@@ -41,8 +36,7 @@ export class UserCancelBookingUseCase {
         private paymentRepositoryImpl: PaymentRepositoryImpl,
     ) { }
 
-    async execute(data: UserCancelBookingRequest): Promise<UserCancelBookingResponse> {
-        const { userId, bookingId } = data;
+    async execute({ userId, bookingId }: UserCancelBookingRequest): Promise<ApiResponse> {
         if (!userId || !bookingId) throw new Error("Invalid request");
 
         Validator.validateObjectId(userId, "userId");
@@ -120,9 +114,8 @@ export class UserCancelBookingUseCase {
                 await mongooseSession.commitTransaction();
                 mongooseSession.endSession();
 
-                const { paymentId, serviceProviderId, userId, updatedAt, ...data } = booking;
 
-                return { success: true, message: "Booking cancelled", updatedBooking: data }
+                return { success: true, message: "Booking cancelled" }
 
             } else {
                 throw new Error(`Refund not supported for payment gateway: ${payment.paymentGateway}`);
