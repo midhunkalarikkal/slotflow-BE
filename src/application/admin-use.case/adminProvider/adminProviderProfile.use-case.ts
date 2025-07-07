@@ -24,8 +24,8 @@ import { ApiResponse, FetchPaymentResponse, FetchPaymentsRequest, FetchProviderS
 export class AdminFetchProviderDetailsUseCase {
     constructor(private providerRepository: ProviderRepositoryImpl) { }
 
-    async execute(data: AdminFetchProviderDetailsRequest): Promise<ApiResponse<AdminFetchProviderDetailsResponse>> {
-        const { providerId } = data;
+    async execute({ providerId }: AdminFetchProviderDetailsRequest): Promise<ApiResponse<AdminFetchProviderDetailsResponse>> {
+
         if (!providerId) throw new Error("Invalid request.");
 
         Validator.validateObjectId(providerId, "providerId");
@@ -43,8 +43,8 @@ export class AdminFetchProviderAddressUseCase {
         private providerRepository: ProviderRepositoryImpl,
         private addressRepository: AddressRepositoryImpl,) { }
 
-    async execute(data: AdminFetchProviderAddressRequest): Promise<ApiResponse<AdminFetchProviderAddressResponse>> {
-        const { providerId } = data;
+    async execute({ providerId }: AdminFetchProviderAddressRequest): Promise<ApiResponse<AdminFetchProviderAddressResponse>> {
+
         if (!providerId) throw new Error("Invalid request.");
 
         Validator.validateObjectId(providerId, "providerId");
@@ -67,8 +67,8 @@ export class AdminFetchProviderServiceUseCase {
         private providerServiceRepository: ProviderServiceRepositoryImpl,
     ) { }
 
-    async execute(data: AdminFetchProviderServiceRequest): Promise<ApiResponse<AdminFetchProviderServiceResponse>> {
-        const { providerId } = data;
+    async execute({ providerId }: AdminFetchProviderServiceRequest): Promise<ApiResponse<AdminFetchProviderServiceResponse>> {
+
         if (!providerId) throw new Error("Invalid request.");
 
         Validator.validateObjectId(providerId, "providerId");
@@ -111,8 +111,8 @@ export class AdminfetchProviderServiceAvailabilityUseCase {
         private serviceAvailabilityRepositoryImpl: ServiceAvailabilityRepositoryImpl,
     ) { }
 
-    async execute(data: AdminFetchProviderServiceAvailabilityRequest): Promise<ApiResponse<AdminFetchProviderServiceAvailabilityResponse>> {
-        const { providerId, date } = data;
+    async execute({ providerId, date }: AdminFetchProviderServiceAvailabilityRequest): Promise<ApiResponse<AdminFetchProviderServiceAvailabilityResponse>> {
+
         if (!providerId || !date) throw new Error("Invalid request.");
         const currentDateTime = dayjs();
         const selectedDate = dayjs(date).format('YYYY-MM-DD');
@@ -145,8 +145,8 @@ export class AdminFetchProviderSubscriptionsUseCase {
         private subscriptionRepositoryImpl: SubscriptionRepositoryImpl,
     ) { }
 
-    async execute(data: FetchProviderSubscriptionsRequest): Promise<ApiResponse<FindSubscriptionsByProviderIdResponse>> {
-        const { providerId, page, limit } = data;
+    async execute({ providerId, page, limit }: FetchProviderSubscriptionsRequest): Promise<ApiResponse<FindSubscriptionsByProviderIdResponse>> {
+
         if (!providerId) throw new Error("Invalid request.");
 
         Validator.validateObjectId(providerId, "providerId");

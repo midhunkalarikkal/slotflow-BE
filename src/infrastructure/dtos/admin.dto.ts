@@ -26,9 +26,6 @@ export type AdiminFetchAllProviders = Array<AdminProviderBaseType>;
 export interface AdminApproveProviderRequest  {
     providerId: Provider["_id"];
 }
-// Used as the response type of admin approve provider
-export type AdminApproveProviderResponse = AdminProviderBaseType;
-
 
 
 // **** adminChangeProvierBlockStatus
@@ -37,9 +34,6 @@ export interface AdminChangeProviderStatusRequest {
     providerId: Provider["_id"];
     isBlocked: Provider["isBlocked"];
 }
-// Used as the request interface of admin change provider block status
-export type AdminChangeProviderStatusResponse = AdminProviderBaseType;
-
 
 
 // **** adminChangeProviderTrustTag
@@ -48,9 +42,6 @@ export interface AdminChangeProviderTrustTagRequest  {
     providerId: Provider["_id"];
     trustedBySlotflow: Provider["trustedBySlotflow"];
 };
-// Used as the request type of admin change provider trust tag 
-export type AdminChangeProviderTrustTagResponse = AdminProviderBaseType;
-
 
 
 // **** adminFetchProviderProfileDetails
