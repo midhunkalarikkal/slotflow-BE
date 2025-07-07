@@ -4,8 +4,6 @@ import { ApiResponse, FetchBookingsRequest, FetchBookingsResponse } from "../../
 
 export type CreateBookingPayloadProps = Pick<Booking, "serviceProviderId" | "userId" | "appointmentDate" | "appointmentTime" | "appointmentMode" | "appointmentStatus" | "slotId" | "paymentId">;
 
-export type FindAllBookingAppointmentsUsingProviderIdResponseProps = Pick<Booking, "_id" | "appointmentDate" | "appointmentTime" | "appointmentMode" | "appointmentStatus" | "createdAt" | "paymentId">;
-
 export interface IBookingRepository {
 
     createBooking(booking : CreateBookingPayloadProps, options : { session : any }) : Promise<Booking>;
@@ -16,9 +14,7 @@ export interface IBookingRepository {
 
     updateBooking(booking: Booking) : Promise<Booking | null>;
 
-    findAllBookingAppointmentsUsingProviderId(providerId: Types.ObjectId): Promise<Array<FindAllBookingAppointmentsUsingProviderIdResponseProps> | []>;
-
     findTodaysBookingForCronjob() : Promise<boolean> ;
 
-    findAllBooking({ page, limit, userId, serviceProviderId }: FetchBookingsRequest) : Promise<ApiResponse<FetchBookingsResponse>>
+    findAllBookings({ page, limit, userId, serviceProviderId }: FetchBookingsRequest) : Promise<ApiResponse<FetchBookingsResponse>>
 }

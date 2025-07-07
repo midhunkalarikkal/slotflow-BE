@@ -10,8 +10,8 @@ export class ProviderFetchAllSubscriptionsUseCase {
         private subscriptionRepositoryImpl: SubscriptionRepositoryImpl,
     ) { }
 
-    async execute(data: FetchProviderSubscriptionsRequest): Promise<ApiResponse<FindSubscriptionsByProviderIdResponse>> {
-        const { providerId, page, limit } = data;
+    async execute({ providerId, page, limit }: FetchProviderSubscriptionsRequest): Promise<ApiResponse<FindSubscriptionsByProviderIdResponse>> {
+
         if(!providerId) throw new Error("Invalid request");
 
         Validator.validateObjectId(providerId, "providerId");

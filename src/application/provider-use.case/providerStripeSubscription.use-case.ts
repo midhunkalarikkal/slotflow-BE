@@ -1,17 +1,17 @@
 import dayjs from "dayjs";
 import Stripe from "stripe";
 import { startSession, Types } from "mongoose";
+import { 
+    ProviderSaveSubscriptionRequest, 
+    ProviderStripeSubscriptionCreateSessionIdRequest, 
+    ProviderStripeSubscriptionCreateSessionIdResponse, 
+} from "../../infrastructure/dtos/provider.dto";
+import { ApiResponse } from "../../infrastructure/dtos/common.dto";
 import { Validator } from "../../infrastructure/validator/validator";
-import { CommonResponse } from "../../infrastructure/dtos/common.dto";
 import { PlanRepositoryImpl } from "../../infrastructure/database/plan/plan.repository.impl";
 import { PaymentRepositoryImpl } from "../../infrastructure/database/payment/payment.repository.impl";
 import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/provider.repository.impl";
 import { SubscriptionRepositoryImpl } from "../../infrastructure/database/subscription/subscription.repository.impl";
-import { 
-    ProviderSaveSubscriptionRequest, 
-    ProviderStripeSubscriptionCreateSessionIdResponse, 
-    ProviderStripeSubscriptionCreateSessionIdRequest, 
-} from "../../infrastructure/dtos/provider.dto";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
@@ -22,8 +22,8 @@ export class ProviderStripeSubscriptionCreateSessionIdUseCase {
             private subscriptionRepositoryImpl: SubscriptionRepositoryImpl,
         ) { }
     
-        async execute(data: ProviderStripeSubscriptionCreateSessionIdRequest): Promise<ProviderStripeSubscriptionCreateSessionIdResponse> {
-            const { providerId, planId, duration } = data;
+        async execute({ providerId, planId, duration }: ProviderStripeSubscriptionCreateSessionIdRequest): Promise<ApiResponse<ProviderStripeSubscriptionCreateSessionIdResponse>> {
+
             if (!providerId || !planId || !duration) throw new Error("Invalid request.");
 
             Validator.validateObjectId(providerId, "providerId");
@@ -73,7 +73,7 @@ export class ProviderStripeSubscriptionCreateSessionIdUseCase {
                     totalAmount: plan.price * planDuration * 100,
                 }
             });
-            return { success: true, message: "Session id generated.", sessionId: session.id };
+            return { success: true, message: "Session id generated.", data: session.id };
         }
 }
 
@@ -84,8 +84,8 @@ export class ProviderSaveSubscriptionUseCase {
         private subscriptionRepositoryImpl: SubscriptionRepositoryImpl,
     ) { }
 
-    async execute(data: ProviderSaveSubscriptionRequest): Promise<CommonResponse> {
-        const { providerId, sessionId } = data;
+    async execute({ providerId, sessionId }: ProviderSaveSubscriptionRequest): Promise<ApiResponse> {
+
         if (!providerId || !sessionId) throw new Error("Invalid request.");
 
         Validator.validateObjectId(providerId, "providerId");

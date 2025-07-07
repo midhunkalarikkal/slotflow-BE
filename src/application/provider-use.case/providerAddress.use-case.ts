@@ -1,11 +1,11 @@
+import { 
+    ProviderFetchAddressRequest, 
+    ProviderFetchAddressResponse, 
+} from "../../infrastructure/dtos/provider.dto";
 import { Validator } from "../../infrastructure/validator/validator";
 import { AddAddressRequest, ApiResponse } from "../../infrastructure/dtos/common.dto";
 import { AddressRepositoryImpl } from "../../infrastructure/database/address/address.repository.impl";
 import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/provider.repository.impl";
-import { 
-    ProviderFetchAddressResponse, 
-    ProviderFetchAddressRequest, 
-} from "../../infrastructure/dtos/provider.dto";
 
 
 export class ProviderAddAddressUseCase {
@@ -14,8 +14,9 @@ export class ProviderAddAddressUseCase {
         private addressRepositoryImpl: AddressRepositoryImpl,
     ){}
 
-    async execute(data: AddAddressRequest): Promise<ApiResponse> {
-        const { userId, addressLine, phone, place, city, district, pincode, state, country, googleMapLink } = data;
+    async execute(payload: AddAddressRequest): Promise<ApiResponse> {
+        
+        const { userId, addressLine, phone, place, city, district, pincode, state, country, googleMapLink } = payload;
         if(!userId || !addressLine || !phone || !place || !city || !district || !pincode || !state || !country || !googleMapLink) throw new Error("Invalid request.");
 
         Validator.validateObjectId(userId,"providerId");
@@ -49,16 +50,15 @@ export class ProviderAddAddressUseCase {
 export class ProviderFetchAddressUseCase {
     constructor(private addressRepositoryImpl: AddressRepositoryImpl) { }
 
-    async execute(data: ProviderFetchAddressRequest): Promise<ProviderFetchAddressResponse> {
-        const { providerId } = data;
+    async execute({ providerId }: ProviderFetchAddressRequest): Promise<ApiResponse<ProviderFetchAddressResponse>> {
 
         Validator.validateObjectId(providerId, "providerId");
         
         if (!providerId) throw new Error("Invalid request.");
         const address = await this.addressRepositoryImpl.findAddressByUserId(providerId);
-        if(address === null) return { success: true, message: "Provider address not yet addedd.", address: {} };
+        if(address === null) return { success: true, message: "Provider address not yet addedd.", data: {} };
         if (!address) throw new Error("Provider address fetching error.");
         const { userId, createdAt, updatedAt, ...rest } = address;
-        return { success: true, message: "Provider address fetched.", address: rest };
+        return { success: true, message: "Provider address fetched.", data: rest };
     }
 }

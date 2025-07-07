@@ -7,6 +7,7 @@ export class ProviderFetchAllAppServicesUseCase {
     constructor(private serviceRepositoryImpl: ServiceRepositoryImpl) { }
 
     async execute(): Promise<ApiResponse<FetchAllAppServicesResponse>> {
+        
         const services = await this.serviceRepositoryImpl.findAllServiceNames();
         if(services === null) return { success: true, message: "No servicec found.", data: [] };
         if (!services) throw new Error("No services found.");

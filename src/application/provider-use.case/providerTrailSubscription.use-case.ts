@@ -1,9 +1,9 @@
 import dayjs from "dayjs";
 import { Types } from "mongoose";
+import { ApiResponse } from "../../infrastructure/dtos/common.dto";
 import { Validator } from "../../infrastructure/validator/validator";
-import { CommonResponse } from "../../infrastructure/dtos/common.dto";
-import { PlanRepositoryImpl } from "../../infrastructure/database/plan/plan.repository.impl";
 import { ProviderTrialSubscriptionRequest } from "../../infrastructure/dtos/provider.dto";
+import { PlanRepositoryImpl } from "../../infrastructure/database/plan/plan.repository.impl";
 import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/provider.repository.impl";
 import { SubscriptionRepositoryImpl } from "../../infrastructure/database/subscription/subscription.repository.impl";
 
@@ -14,8 +14,8 @@ export class ProviderTrialSubscriptionUseCase {
         private planRepositoryImpl: PlanRepositoryImpl,
     ) { }
 
-    async execute(data: ProviderTrialSubscriptionRequest): Promise<CommonResponse> {
-        const { providerId } = data;
+    async execute({ providerId }: ProviderTrialSubscriptionRequest): Promise<ApiResponse> {
+
         if (!providerId) throw new Error("Invalid request.");
 
         Validator.validateObjectId(providerId, "providerId");

@@ -4,6 +4,7 @@ import { HandleError } from "../../infrastructure/error/error";
 import { BookingRepositoryImpl } from "../../infrastructure/database/booking/booking.repository.impl";
 import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/provider.repository.impl";
 import { ProviderFetchBookingAppointmentsUseCase } from "../../application/provider-use.case/providerBooking.use-case";
+import { RequestQueryCommonZodSchema } from "../../infrastructure/zod/common.zod";
 
 const bookingRepositoryImpl = new BookingRepositoryImpl();
 const providerRepositoryImpl = new ProviderRepositoryImpl();
@@ -20,8 +21,10 @@ export class ProviderBookingController {
     async fetchBookingAppointments(req: Request, res: Response) {
         try {
             const providerId = req.user.userOrProviderId;
+            const validateQueryData = RequestQueryCommonZodSchema.parse(req.query);
+            const { page, limit } = validateQueryData;
             if(!providerId) throw new Error("Invalid request");
-            const result = await this.providerFetchBookingAppointmentsUseCase.execute({providerId: new Types.ObjectId(providerId)});
+            const result = await this.providerFetchBookingAppointmentsUseCase.execute({serviceProviderId: new Types.ObjectId(providerId), page, limit});
             res.status(200).json(result);
         }catch (error){
             HandleError.handle(error,res);

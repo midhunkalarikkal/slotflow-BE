@@ -2,7 +2,7 @@ import { Types } from "mongoose";
 import { BookingModel, IBooking } from "./booking.model";
 import { Booking } from "../../../domain/entities/booking.entity";
 import { FetchBookingsRequest, ApiResponse, FetchBookingsResponse, userIdAndServiceProviderId } from "../../dtos/common.dto";
-import { CreateBookingPayloadProps, FindAllBookingAppointmentsUsingProviderIdResponseProps, IBookingRepository } from "../../../domain/repositories/IBooking.repository";
+import { CreateBookingPayloadProps, IBookingRepository } from "../../../domain/repositories/IBooking.repository";
 
 export class BookingRepositoryImpl implements IBookingRepository {
     private mapToEntity(booking: IBooking): Booking {
@@ -67,19 +67,6 @@ export class BookingRepositoryImpl implements IBookingRepository {
         }
     }
 
-    async findAllBookingAppointmentsUsingProviderId(providerId: Types.ObjectId): Promise<Array<FindAllBookingAppointmentsUsingProviderIdResponseProps> | []> {
-        try {
-            const bookings = await BookingModel.find({
-                serviceProviderId: providerId
-            }, {
-                appointmentDay: 1, appointmentDate: 1, appointmentMode: 1, appointmentStatus: 1, appointmentTime: 1, createdAt: 1
-            });
-            return bookings ? bookings.map((booking) => this.mapToEntity(booking)) : [];
-        } catch (error) {
-            throw new Error("Booking appointments fetching failed");
-        }
-    }
-
     async findTodaysBookingForCronjob(): Promise<boolean> {
         try {
 
@@ -107,7 +94,7 @@ export class BookingRepositoryImpl implements IBookingRepository {
         }
     }
 
-    async findAllBooking({ page, limit, userId, serviceProviderId }: FetchBookingsRequest): Promise<ApiResponse<FetchBookingsResponse>> {
+    async findAllBookings({ page, limit, userId, serviceProviderId }: FetchBookingsRequest): Promise<ApiResponse<FetchBookingsResponse>> {
         try {
             const skip = (page - 1) * limit;
             const filter: userIdAndServiceProviderId = {};

@@ -4,8 +4,8 @@ import { Upload } from "@aws-sdk/lib-storage";
 import { aws_s3Config } from '../../config/env';
 import { generateSignedUrl } from '../../config/aws_s3';
 import { extractS3Key } from '../../infrastructure/helpers/helper';
+import { ApiResponse } from '../../infrastructure/dtos/common.dto';
 import { Validator } from '../../infrastructure/validator/validator';
-import { CommonResponse } from '../../infrastructure/dtos/common.dto';
 import { ProviderRepositoryImpl } from '../../infrastructure/database/provider/provider.repository.impl';
 import { ProviderServiceRepositoryImpl } from '../../infrastructure/database/providerService/providerService.repository.impl';
 import { ProviderAddServiceDetailsRequest, ProviderFetchProviderServiceRequest, ProviderFetchProviderServiceResponse, ProviderFindProviderServiceResProps } from '../../infrastructure/dtos/provider.dto';
@@ -19,8 +19,9 @@ export class ProviderAddServiceDetailsUseCase {
         private s3: S3Client
     ){}
 
-    async execute(data: ProviderAddServiceDetailsRequest): Promise<CommonResponse> {
-        const { providerId, serviceCategory, serviceName, serviceDescription, servicePrice, providerAdhaar, providerExperience, file } = data;
+    async execute(payload: ProviderAddServiceDetailsRequest): Promise<ApiResponse> {
+        
+        const { providerId, serviceCategory, serviceName, serviceDescription, servicePrice, providerAdhaar, providerExperience, file } = payload;
         if(!providerId || !serviceCategory || !serviceName || !serviceDescription || !servicePrice || !providerAdhaar || !providerExperience || !file) throw new Error("Invalid Request.");
         
         Validator.validateObjectId(providerId, "providerId");
@@ -74,20 +75,19 @@ export class ProviderFetchServiceDetailsUseCase {
     
     constructor(private provderServiceRepositoryImpl: ProviderServiceRepositoryImpl) { }
 
-    async execute(data: ProviderFetchProviderServiceRequest): Promise<ProviderFetchProviderServiceResponse> {
-        const { providerId } = data;
-        if (!providerId) throw new Error("Invalid request.");
+    async execute({ providerId }: ProviderFetchProviderServiceRequest): Promise<ApiResponse<ProviderFetchProviderServiceResponse>> {
 
+        if (!providerId) throw new Error("Invalid request.");
         Validator.validateObjectId(providerId, "providerId");
 
         const service = await this.provderServiceRepositoryImpl.findProviderServiceByProviderId(new Types.ObjectId(providerId));
-        if(service === null) return { success: true, message: "Provider service details not yet addedd", service: {} };
+        if(service === null) return { success: true, message: "Provider service details not yet addedd", data: {} };
         function isServiceData(obj: any): obj is ProviderFindProviderServiceResProps {
             return obj && typeof obj === 'object' && '_id' in obj;
         }
         
         if (!isServiceData(service)) {
-            return { success: true, message: "Service fetched successfully.", service: {} };
+            return { success: true, message: "Service fetched successfully.", data: {} };
         }
 
         const s3Key = await extractS3Key(service.providerCertificateUrl);
@@ -96,6 +96,6 @@ export class ProviderFetchServiceDetailsUseCase {
         
         const { createdAt, updatedAt, ...rest } = service;
         
-        return { success: true, message: "Provider service details fetched", service: rest };
+        return { success: true, message: "Provider service details fetched", data: rest };
     }
 }

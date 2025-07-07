@@ -1,35 +1,35 @@
 import { S3Client } from "@aws-sdk/client-s3";
 import { Upload } from "@aws-sdk/lib-storage";
 import { aws_s3Config } from "../../config/env";
+import { 
+    ProviderUpdateProviderInfoRequest,
+    ProviderUpdateprofileImageResponse, 
+    ProviderFetchProfileDetailsRequest,
+    ProviderUpdateProviderInfoResponse, 
+    ProviderFetchProfileDetailsResponse, 
+    ProviderUpdateprofileImageRequestPayload, 
+} from "../../infrastructure/dtos/provider.dto";
 import { generateSignedUrl } from "../../config/aws_s3";
+import { ApiResponse } from "../../infrastructure/dtos/common.dto";
 import { extractS3Key } from "../../infrastructure/helpers/helper";
 import { validateOrThrow, Validator } from "../../infrastructure/validator/validator";
 import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/provider.repository.impl";
-import { 
-    ProviderUpdateprofileImageResponse, 
-    ProviderUpdateprofileImageRequestPayload, 
-    ProviderFetchProfileDetailsResponse, 
-    ProviderFetchProfileDetailsRequest,
-    ProviderUpdateProviderInfoRequest,
-    ProviderUpdateProviderInfoResponse, 
-} from "../../infrastructure/dtos/provider.dto";
-import { ApiResponse } from "../../infrastructure/dtos/common.dto";
 
 
 export class ProviderFetchProfileDetailsUseCase {
     constructor(private providerRepositoryImpl: ProviderRepositoryImpl) { }
 
-    async execute(data: ProviderFetchProfileDetailsRequest): Promise<ProviderFetchProfileDetailsResponse> {
-        const { providerId } = data;
+    async execute({ providerId }: ProviderFetchProfileDetailsRequest): Promise<ApiResponse<ProviderFetchProfileDetailsResponse>> {
+        
         if (!providerId) throw new Error("Invalid request.");
 
         Validator.validateObjectId(providerId, "providerId");
 
         const provider = await this.providerRepositoryImpl.findProviderById(providerId);
-        if(provider === null) return { success: true, message: "Provider prfile not addedd.", profileDetails: {} };
+        if(provider === null) return { success: true, message: "Provider prfile not addedd.", data: {} };
         if (!provider) throw new Error("Provider profile fetching error.");
         const { _id, password, addressId, serviceId, subscription, updatedAt, profileImage,  ...rest } = provider;
-        return { success: true, message: "Provider prfile detailed fetched.", profileDetails: rest };
+        return { success: true, message: "Provider prfile detailed fetched.", data: rest };
     }
 }
 
@@ -40,8 +40,8 @@ export class ProviderUpdateProfileImageUseCase {
         private s3: S3Client,
     ) { }
 
-    async execute(data: ProviderUpdateprofileImageRequestPayload): Promise<ApiResponse<ProviderUpdateprofileImageResponse>> {
-        const { providerId, file } = data;
+    async execute({ providerId, file }: ProviderUpdateprofileImageRequestPayload): Promise<ApiResponse<ProviderUpdateprofileImageResponse>> {
+
         if (!providerId || !file) throw new Error("Invalid request.");
 
         Validator.validateObjectId(providerId, "providerId");
@@ -85,13 +85,13 @@ export class ProviderUpdateProviderInfoUseCase {
         private providerRepositoryImpl: ProviderRepositoryImpl
     ) { }
 
-    async execute(data: ProviderUpdateProviderInfoRequest) : Promise<ProviderUpdateProviderInfoResponse> {
-        const { providerId, username, phone } = data;
+    async execute({ providerId, username, phone }: ProviderUpdateProviderInfoRequest) : Promise<ApiResponse<ProviderUpdateProviderInfoResponse>> {
+
         if(!providerId || !username || !phone) throw new Error("Invalid request");
 
         Validator.validateObjectId(providerId,"providerId");
-        validateOrThrow("username",username);
         Validator.validatePhone(phone);
+        validateOrThrow("username",username);
 
         const provider = await this.providerRepositoryImpl.findProviderById(providerId);
         if(!provider) throw new Error("No user found");
@@ -107,6 +107,6 @@ export class ProviderUpdateProviderInfoUseCase {
 
         const updatedData = { username: updatedProvider.username, phone: updatedProvider.phone };
 
-        return { success: true, message: "Info updated successfully", providerInfo: updatedData }
+        return { success: true, message: "Info updated successfully", data: updatedData }
     }
 }

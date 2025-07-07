@@ -11,6 +11,7 @@ export class ProviderFetchAllPaymentsUseCase {
     ) { }
 
     async execute({ providerId, page, limit}: FetchPaymentsRequest): Promise<ApiResponse<FetchPaymentResponse>> {
+        
         if(!providerId) throw new Error("Invalid request.");
 
         Validator.validateObjectId(providerId, "providerId");

@@ -21,7 +21,7 @@ export class UserFetchBookingsUseCase {
 
         Validator.validateObjectId(userId, "userId");
 
-        const result = await this.bookingRepositoryImpl.findAllBooking({page, limit, userId});
+        const result = await this.bookingRepositoryImpl.findAllBookings({page, limit, userId});
         if (!result) throw new Error("Bookings fetching error");
 
         return { data: result.data, totalPages: result.totalPages, currentPage: result.currentPage, totalCount: result.totalCount };

@@ -1,7 +1,7 @@
 import { Validator } from "../../infrastructure/validator/validator";
 import { BookingRepositoryImpl } from "../../infrastructure/database/booking/booking.repository.impl";
 import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/provider.repository.impl";
-import { ProviderFetchBookingAppointmentsRequest, ProviderFetchBookingAppointmentsResponse } from "../../infrastructure/dtos/provider.dto";
+import { ApiResponse, FetchBookingsRequest, FetchBookingsResponse } from "../../infrastructure/dtos/common.dto";
 
 
 export class ProviderFetchBookingAppointmentsUseCase {
@@ -10,18 +10,18 @@ export class ProviderFetchBookingAppointmentsUseCase {
         private bookingRepositoryImpl: BookingRepositoryImpl,
     ) { }
 
-    async execute(data: ProviderFetchBookingAppointmentsRequest): Promise<ProviderFetchBookingAppointmentsResponse> {
-        const { providerId } = data;
-        if(!providerId) throw new Error("Invalid request");
+    async execute({ serviceProviderId, page, limit } : FetchBookingsRequest): Promise<ApiResponse<FetchBookingsResponse>> {
 
-        Validator.validateObjectId(providerId, "providerId");
+        if(!serviceProviderId) throw new Error("Invalid request");
+
+        Validator.validateObjectId(serviceProviderId, "providerId");
         
-        const provider = await this.providerRepositoryImpl.findProviderById(providerId);
+        const provider = await this.providerRepositoryImpl.findProviderById(serviceProviderId);
         if(!provider) throw new Error("No user found");
 
-        const appointments = await this.bookingRepositoryImpl.findAllBookingAppointmentsUsingProviderId(providerId);
-        if(!appointments) throw new Error("Appointments fetching error");
+        const result = await this.bookingRepositoryImpl.findAllBookings({page, limit, serviceProviderId});
+        if(!result) throw new Error("Appointments fetching error");
 
-        return { success: true, message: "Provider booking appointments fetched", bookingAppointments : appointments }
+        return { data: result.data, totalPages: result.totalPages, currentPage: result.currentPage, totalCount: result.totalCount };
     }
 }

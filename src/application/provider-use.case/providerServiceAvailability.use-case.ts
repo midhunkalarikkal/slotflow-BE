@@ -1,15 +1,16 @@
+import dayjs from "dayjs";
 import { Types } from "mongoose";
-import { Validator } from "../../infrastructure/validator/validator";
-import { CommonResponse } from "../../infrastructure/dtos/common.dto";
-import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/provider.repository.impl";
-import { FrontendAvailabilityForRequest, FrontendAvailabilityUpdatedSlots, TimeSlot } from "../../domain/entities/serviceAvailability.entity";
-import { ServiceAvailabilityRepositoryImpl } from "../../infrastructure/database/serviceAvailability/serviceAvailability.repository.impl";
 import { 
-    ProviderFetchServiceAvailabilityResponse, 
     ProviderAddServiceAvailabilityRewuest, 
     ProviderFetchServiceAvailabilityRequest, 
+    ProviderFetchServiceAvailabilityResponse, 
 } from "../../infrastructure/dtos/provider.dto";
-import dayjs from "dayjs";
+import { ApiResponse } from "../../infrastructure/dtos/common.dto";
+import { Validator } from "../../infrastructure/validator/validator";
+import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/provider.repository.impl";
+import { FrontendAvailabilityForRequest, FrontendAvailabilityUpdatedSlots } from "../../domain/entities/serviceAvailability.entity";
+import { ServiceAvailabilityRepositoryImpl } from "../../infrastructure/database/serviceAvailability/serviceAvailability.repository.impl";
+
 
 export class ProviderAddServiceAvailabilitiesUseCase {
     constructor(
@@ -17,8 +18,8 @@ export class ProviderAddServiceAvailabilitiesUseCase {
         private serviceAvailabilityRepositoryImpl: ServiceAvailabilityRepositoryImpl,
     ){}
 
-    async execute(data: ProviderAddServiceAvailabilityRewuest): Promise<CommonResponse> {
-        const { providerId, availabilities } = data;
+    async execute({ providerId, availabilities }: ProviderAddServiceAvailabilityRewuest): Promise<ApiResponse> {
+
         if(!providerId || !availabilities || availabilities.length  === 0) throw new Error("Invalid request.");
 
         Validator.validateObjectId(providerId, "providerId");
@@ -58,8 +59,8 @@ export class ProviderAddServiceAvailabilitiesUseCase {
 export class ProviderFetchServiceAvailabilityUseCase {
     constructor(private serviceAvailabilityRepositoryImpl: ServiceAvailabilityRepositoryImpl) { }
 
-    async execute(data: ProviderFetchServiceAvailabilityRequest): Promise<ProviderFetchServiceAvailabilityResponse> {
-        const { providerId, date } = data;
+    async execute({ providerId, date }: ProviderFetchServiceAvailabilityRequest): Promise<ApiResponse<ProviderFetchServiceAvailabilityResponse>> {
+
         if (!providerId || !date) throw new Error("Invalid request.");
         const currentDateTime = dayjs();
         const selectedDate = dayjs(date).format('YYYY-MM-DD');
@@ -68,7 +69,7 @@ export class ProviderFetchServiceAvailabilityUseCase {
         Validator.validateDate(date);
 
         const availability = await this.serviceAvailabilityRepositoryImpl.findServiceAvailabilityByProviderId(new Types.ObjectId(providerId), new Date(date));
-        if(availability === null) return { success: true, message: "Provider service availability not yet added.", availability: {} };
+        if(availability === null) return { success: true, message: "Provider service availability not yet added.", data: {} };
         if (!availability) throw new Error("Provider service availability fetching error.");
 
         const updatedSlots = availability.slots.map((slot) => {
@@ -80,6 +81,6 @@ export class ProviderFetchServiceAvailabilityUseCase {
               }
             });
             
-        return { success: true, message: "Provider service availability fetched.", availability: { ...availability, slots: updatedSlots } };
+        return { success: true, message: "Provider service availability fetched.", data: { ...availability, slots: updatedSlots } };
     }
 }
