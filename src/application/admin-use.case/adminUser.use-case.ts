@@ -1,6 +1,5 @@
 import { 
     AdminFetchAllUsers, 
-    AdminChangeUserStatusResponse, 
     AdminChangeUserIsBlockedStatusRequest,
 } from "../../infrastructure/dtos/admin.dto";
 import { Validator } from "../../infrastructure/validator/validator";
@@ -12,6 +11,7 @@ export class AdminUserListUseCase {
     constructor(private userRepositoryImpl: UserRepositoryImpl) { }
 
     async execute({ page, limit }: ApiPaginationRequest): Promise<ApiResponse<AdminFetchAllUsers>> {
+        
         const result = await this.userRepositoryImpl.findAllUsers({ page, limit });
         if (!result) throw new Error("Users fetching failed, ");
         return { data: result.data, totalPages: result.totalPages, currentPage: result.currentPage, totalCount: result.totalCount };
@@ -22,8 +22,8 @@ export class AdminUserListUseCase {
 export class AdminChangeUserBlockStatusUseCase {
     constructor(private userRepositoryImpl: UserRepositoryImpl) { }
 
-    async execute(data: AdminChangeUserIsBlockedStatusRequest): Promise<ApiResponse<AdminChangeUserStatusResponse>> {
-        const {userId, isBlocked} = data;
+    async execute({userId, isBlocked}: AdminChangeUserIsBlockedStatusRequest): Promise<ApiResponse> {
+
         if (!userId || isBlocked === null) throw new Error("Invalid request");
 
         console.log("changing user block status");
@@ -36,13 +36,6 @@ export class AdminChangeUserBlockStatusUseCase {
         user.isBlocked = isBlocked;
         const updatedUser = await this.userRepositoryImpl.updateUser(user);
         if (!updatedUser) throw new Error("User not found");
-        const updatedUserData = {
-            _id: updatedUser._id,
-            username: updatedUser.username,
-            email: updatedUser.email,
-            isBlocked: updatedUser.isBlocked,
-            isEmailVerified: updatedUser.isEmailVerified
-        }
-        return { success: true, message: `User ${isBlocked ? "blocked" : "Unblocked"} successfully.`, data: updatedUserData };
+        return { success: true, message: `User ${isBlocked ? "blocked" : "Unblocked"} successfully.` };
     }
 }

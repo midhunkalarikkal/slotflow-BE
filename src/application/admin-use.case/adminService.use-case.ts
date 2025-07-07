@@ -1,13 +1,12 @@
 import { 
-    AdminAddServiceResponse, 
     AdminAddServiceRequest, 
-    AdminChangeServiceStatusResponse, 
-    AdminChnageServiceIsBlockedStatusRequest,
     AdminServiceListResponse, 
+    AdminChnageServiceIsBlockedStatusRequest,
 } from "../../infrastructure/dtos/admin.dto";
 import { Validator } from "../../infrastructure/validator/validator";
-import { ServiceRepositoryImpl } from "../../infrastructure/database/appservice/service.repository.impl";
 import { ApiPaginationRequest, ApiResponse } from "../../infrastructure/dtos/common.dto";
+import { ServiceRepositoryImpl } from "../../infrastructure/database/appservice/service.repository.impl";
+
 
 export class AdminServiceListUseCase {
     constructor(
@@ -15,6 +14,7 @@ export class AdminServiceListUseCase {
     ) { }
 
     async execute({ page, limit }: ApiPaginationRequest): Promise<ApiResponse<AdminServiceListResponse>> {
+        
         const result = await this.seriveRepositoryImpl.findAllServices({ page, limit });
         if (!result) throw new Error("Services fetching failed, ");
         return { data: result.data, totalPages: result.totalPages, currentPage: result.currentPage, totalCount: result.totalCount };
@@ -27,8 +27,8 @@ export class AdminAddServiceUseCase {
         private seriveRepositoryImpl: ServiceRepositoryImpl
     ) { }
 
-    async execute(data: AdminAddServiceRequest): Promise<AdminAddServiceResponse> {
-        const { serviceName } = data;
+    async execute({ serviceName } : AdminAddServiceRequest): Promise<ApiResponse> {
+
         if(!serviceName) throw new Error("Invalid request.");
 
         Validator.validateAppServiceName(serviceName);
@@ -37,8 +37,7 @@ export class AdminAddServiceUseCase {
         if (existService) throw new Error("Service already exist.");
         const service = await this.seriveRepositoryImpl.createService(serviceName);
         if (!service) throw new Error("Service adding error, please try again.");
-        const { createdAt, updatedAt, ...rest} = service
-        return { success: true, message: "Service added successfully.", service: rest };
+        return { success: true, message: "Service added successfully." };
     }
 }
 
@@ -48,9 +47,8 @@ export class AdminChnageServiceBlockStatusUseCase {
         private seriveRepositoryImpl: ServiceRepositoryImpl
     ) { }
 
-    async execute(data: AdminChnageServiceIsBlockedStatusRequest): Promise<AdminChangeServiceStatusResponse> {
-        const {serviceId, isBlocked} = data;
-        console.log("isBlocked : ",isBlocked);
+    async execute({serviceId, isBlocked}: AdminChnageServiceIsBlockedStatusRequest): Promise<ApiResponse> {
+
         if(!serviceId || isBlocked === null) throw new Error("Invalid request.");
         
         Validator.validateObjectId(serviceId, "serviceId");
@@ -61,7 +59,6 @@ export class AdminChnageServiceBlockStatusUseCase {
         existingService.isBlocked = isBlocked;
         const updatedService = await this.seriveRepositoryImpl.updateService(serviceId, existingService);
         if (!updatedService) throw new Error("Service status changing error.");
-        const { createdAt, updatedAt, ...rest } = updatedService;
-        return { success: true, message: `Service ${isBlocked ? "Blocked" : "Unblocked"} successfully.`, updatedService: rest }
+        return { success: true, message: `Service ${isBlocked ? "Blocked" : "Unblocked"} successfully.` }
     }
 }

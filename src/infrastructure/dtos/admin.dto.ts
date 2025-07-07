@@ -118,8 +118,6 @@ export interface AdminChangeUserIsBlockedStatusRequest {
     userId: User["_id"];
     isBlocked: User["isBlocked"];
 }
-// Used as the response type of admin change block status of user 
-export type AdminChangeUserStatusResponse = AdminUserBaseInfo;
 
 
 
@@ -135,20 +133,12 @@ export type AdminServiceListResponse = Array<Pick<Service, "_id" | "serviceName"
 export interface AdminAddServiceRequest {
     serviceName: Service["serviceName"];
 } 
-// admin add new service use case response interface
-export interface AdminAddServiceResponse extends CommonResponse {
-    service: Pick<Service, "_id" | "serviceName" | "isBlocked">;
-}
 
 
 // admin change service isBlocked status use case request payload interface
 export interface AdminChnageServiceIsBlockedStatusRequest {
     serviceId: Service["_id"];
     isBlocked: Service["isBlocked"];
-}
-// admin change service block status use case response interface
-export interface AdminChangeServiceStatusResponse extends CommonResponse {
-    updatedService: Pick<Service, "_id" | "serviceName" | "isBlocked">;
 }
 
 
@@ -193,10 +183,6 @@ export type AdminPlanListResponse = Array<Pick<Plan, "_id" | "planName" | "isBlo
 
 // admin create new plan request payload type 
 export type AdminAddNewPlanRequest = Pick<Plan, "planName" | "description" | "price" | "features" | "maxBookingPerMonth" | "adVisibility">;
-// admin create new plan use case response interface 
-export interface AdminCreatePlanResponse extends CommonResponse {
-    plan: Pick<Plan, "_id" | "planName" | "isBlocked">;
-}
 
 
 // admin change plan block status request payload type
@@ -204,11 +190,6 @@ export type AdminChangePlanIsBlockedStatusRequest = {
     planId: Plan["_id"];
     isBlocked: Plan["isBlocked"]
 }
-// admin change plan block status use case response interface
-export interface AdminChangePlanStatusResponse extends CommonResponse {
-    updatedPlan: Pick<Plan, "_id" | "planName" | "isBlocked">;
-}
-
 
 
 
