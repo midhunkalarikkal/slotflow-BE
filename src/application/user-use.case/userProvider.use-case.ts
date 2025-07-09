@@ -44,7 +44,7 @@ export class UserFetchServiceProvidersUseCase {
 
     const updatedproviders: FindProvidersUsingServiceCategoryIdsResponse[] = await Promise.all(
       providers.map(async (provider) => {
-        let profileImageUrl = provider.provider.profileImage;
+        let profileImageUrl = provider?.provider?.profileImage;
 
         if (profileImageUrl) {
           const s3Key = await extractS3Key(profileImageUrl);

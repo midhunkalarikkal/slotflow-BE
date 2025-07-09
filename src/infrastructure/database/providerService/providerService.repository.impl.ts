@@ -59,7 +59,6 @@ export class ProviderServiceRepositoryImpl implements IProviderServiceRepository
                 {
                     $lookup: {
                         from: "providers",
-
                         let: { providerId: "$providerId" },
                         pipeline: [
                             {
@@ -67,7 +66,7 @@ export class ProviderServiceRepositoryImpl implements IProviderServiceRepository
                                     $expr: {
                                         $and: [
                                             { $eq: ["$_id", "$$providerId"] },
-                                            { $eq: ["$adminVerified", true] }
+                                            { $eq: ["$isAdminVerified", true] }
                                         ]
                                     }
                                 }
