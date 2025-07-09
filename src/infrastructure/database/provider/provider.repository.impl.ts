@@ -79,6 +79,7 @@ export class ProviderRepositoryImpl implements IProviderRepository {
                     email: 1, 
                     isBlocked: 1, 
                     isAdminVerified: 1, 
+                    isEmailVerified: 1,
                     trustedBySlotflow: 1
                 }).skip(skip).limit(limit).lean(),
                 ProviderModel.countDocuments(),

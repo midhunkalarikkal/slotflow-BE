@@ -11,13 +11,11 @@ import { findSubscriptionFullDetailsResProps } from "../../domain/repositories/I
 
 // **************** used in adminProvider.use-case **************** \\
 
-type AdminProviderBaseType = Pick<Provider, "_id" | "username" | "email" | "isBlocked" | "isAdminVerified" | "trustedBySlotflow">;
-
 // **** adminFetchAllProviders
 // Used as the return type of fetch all providers
 // Used in AdminProviderListUseCase, the findAllProviders method in ProviderRepositoryImpl, 
 // and the findAllProviders method in IProviderRepository as the response type with ApiResponse
-export type AdiminFetchAllProviders = Array<AdminProviderBaseType>;
+export type AdiminFetchAllProviders = Array<Pick<Provider, "_id" | "username" | "email" | "isBlocked" | "isAdminVerified" | "isEmailVerified" | "trustedBySlotflow">>;
 
 
 
