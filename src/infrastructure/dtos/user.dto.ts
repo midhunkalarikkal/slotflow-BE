@@ -1,5 +1,4 @@
 import { Types } from "mongoose";
-import { ApiPaginationRequest, CommonResponse } from "./common.dto";
 import { User } from "../../domain/entities/user.entity";
 import { Address } from "../../domain/entities/address.entity";
 import { Booking } from "../../domain/entities/booking.entity";

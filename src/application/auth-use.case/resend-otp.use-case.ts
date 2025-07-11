@@ -1,14 +1,14 @@
 import { User } from '../../domain/entities/user.entity';
 import { Provider } from '../../domain/entities/provider.entity';
-import { CommonResponse } from '../../infrastructure/dtos/common.dto';
+import { ApiResponse } from '../../infrastructure/dtos/common.dto';
+import { ResendOtpRequest } from '../../infrastructure/dtos/auth.dto';
 import { OTPService } from '../../infrastructure/services/otp.service';
 import { validateOrThrow } from '../../infrastructure/validator/validator';
-import { ResendOtpRequest } from '../../infrastructure/dtos/auth.dto';
 import { UserRepositoryImpl } from '../../infrastructure/database/user/user.repository.impl';
 import { ProviderRepositoryImpl } from '../../infrastructure/database/provider/provider.repository.impl';
 
 
-interface ResendOtpResponse extends CommonResponse {
+interface ResendOtpResponse extends ApiResponse {
   authUser: {
     verificationToken: string, 
     role: string 

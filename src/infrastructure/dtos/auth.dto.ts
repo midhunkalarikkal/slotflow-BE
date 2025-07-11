@@ -1,5 +1,4 @@
 import { Types } from "mongoose";
-import { User } from "../../domain/entities/user.entity";
 import { CommonResponse } from "./common.dto";
 
 // **** Register usec case **** \\
