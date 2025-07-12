@@ -25,7 +25,6 @@ export class ProviderServiceRepositoryImpl implements IProviderServiceRepository
             const newProviderService = await ProviderServiceModel.create(providerService);
             return newProviderService ? this.mapToEntity(newProviderService) : null;
         } catch (error) {
-            console.log("providerService.repository.impl.ts createProviderService method error", error);
             throw new Error("Service details adding error.");
         }
     }

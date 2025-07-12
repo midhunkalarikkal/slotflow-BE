@@ -89,7 +89,6 @@ export class BookingRepositoryImpl implements IBookingRepository {
 
             return bookings.modifiedCount > 0 ? true : false;
         } catch {
-            console.log("booking fetching failed");
             return false;
         }
     }

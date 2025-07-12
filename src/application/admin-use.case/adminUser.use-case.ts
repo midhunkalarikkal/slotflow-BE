@@ -26,8 +26,6 @@ export class AdminChangeUserBlockStatusUseCase {
 
         if (!userId || isBlocked === null) throw new Error("Invalid request");
 
-        console.log("changing user block status");
-
         Validator.validateObjectId(userId, "userId");
         Validator.validateBooleanValue(isBlocked, "isBlocked");
 

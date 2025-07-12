@@ -24,14 +24,12 @@ class ProviderServiceAvailabilityController {
 
     async addServiceAvailability(req: Request, res: Response) {
         try{
-            console.log("req.body : ",req.body);
             const providerId = req.user.userOrProviderId;
             const availabilities = ProviderAddServiceAvailabilityZodSchema.parse(req.body);
             if(!providerId || !availabilities || availabilities.length  === 0) throw new Error("Invalid request.");
             const result = await this.providerAddServiceAvailabilitiesUseCase.execute({providerId: new Types.ObjectId(providerId), availabilities});
             res.status(200).json(result);
         }catch(error){
-            console.log("Error : ",error);
             HandleError.handle(error, res);
         }
     }

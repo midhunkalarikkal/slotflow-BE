@@ -18,7 +18,6 @@ export class OTPService {
       const storingOtp = await redis.set(verificationToken,otp, { px : 300000 });
       return otp;
     } catch (error) {
-      console.error("error : ", error);
       throw new Error("Failed to generate OTP.");
     }
   }

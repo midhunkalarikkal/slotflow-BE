@@ -84,7 +84,6 @@ export class PlanRepositoryImpl implements IPlanRepository {
             });
             return existingPlan ? this.mapToEntity(existingPlan) : null;
         } catch (error) {
-            console.log("error : ", error);
             throw new Error("Plan searching error.");
         }
     }

@@ -38,12 +38,8 @@ export class ServiceAvailabilityRepositoryImpl implements IServiceAvailabilityRe
         endOfDay.setHours(23, 59, 59, 999);
 
         const targetDay = daysOfWeek[date.getDay()];
-        console.log("fetching service availabilty of ", targetDay, " on ", date.toDateString());
 
-        console.log("Provider ID:", providerId.toString()); // Log the actual providerId
-        console.log("Target Date:", date.toISOString()); // Log the date in ISO format for precision
-
- try {
+        try {
             const availability = await ServiceAvailabilityModel.aggregate([
                 {
                     $match: {
@@ -114,7 +110,7 @@ export class ServiceAvailabilityRepositoryImpl implements IServiceAvailabilityRe
                                         "$$slot",
                                         {
                                             available: {
-                                                $not: { $in: ["$$slot._id", "$bookedSlots"] } ,           
+                                                $not: { $in: ["$$slot._id", "$bookedSlots"] },
                                             }
                                         }
                                     ]

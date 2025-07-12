@@ -36,7 +36,6 @@ export class PaymentRepositoryImpl implements IPaymentRepository {
             const newPayment = await PaymentModel.create([payment], options);
             return newPayment ? this.mapToEntity(newPayment[0]) : null;
         } catch (error) {
-            console.log("Catch error  in imple provider subscription : ",error);
             throw new Error("Payment creation error.");
         }
     }
@@ -46,7 +45,6 @@ export class PaymentRepositoryImpl implements IPaymentRepository {
             const newPayment = await PaymentModel.create([payment], options);
             return newPayment ? this.mapToEntity(newPayment[0]) : null;
         } catch (error) {
-            console.log("Catch error  in imple : ",error);
             throw new Error("Payment creation error.");
         }
     }

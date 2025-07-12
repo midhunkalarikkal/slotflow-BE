@@ -28,7 +28,6 @@ export class AddressRepositoryImpl implements IAddressRepository {
             const newAddress = await AddressModel.create(address);
             return this.mapToEntity(newAddress);
         }catch(error){
-            console.error("Address adding error : ",error);
             throw new Error("Address adding error.");
         }
     }

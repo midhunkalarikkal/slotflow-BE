@@ -104,9 +104,6 @@ export class UserSaveBookingAfterStripePaymentUseCase {
     async execute({ userId, sessionId }: UserSaveAppoinmentBookingRequest): Promise<ApiResponse> {
         if (!userId || !sessionId) throw new Error("Invalid request");
 
-        console.log("userId : ",userId);
-        console.log("sessionId : ",sessionId);
-
         Validator.validateObjectId(userId, "userId");
         Validator.validateStripeSessionId(sessionId);
 
@@ -154,8 +151,6 @@ export class UserSaveBookingAfterStripePaymentUseCase {
 
             if (!payment) throw new Error("Unexpected error, payment saving error.");
 
-            console.log("payment : ",payment);
-
             const newBooking = await this.bookingRepositoryImpl.createBooking({
                 serviceProviderId: new Types.ObjectId(providerId),
                 userId: new Types.ObjectId(userId),
@@ -169,14 +164,11 @@ export class UserSaveBookingAfterStripePaymentUseCase {
 
             if (!newBooking) throw new Error("Error in slot booking, please try again");
 
-            console.log("newBooking : ",newBooking);
-
             await mongoSession.commitTransaction();
             mongoSession.endSession();
 
             return { success: true, message: "Your booking have been confirmed" }
         } catch (error){
-            console.log("catch error : ",error);
             await mongoSession.abortTransaction();
             mongoSession.endSession();
             throw new Error("Subscribing error.");
