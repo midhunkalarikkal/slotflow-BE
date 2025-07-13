@@ -2,6 +2,9 @@
 
 SlotFlow is a full-featured appointment booking application designed to serve users, service providers, and admins. This repository contains the **monolithic backend server** for SlotFlow.
 
+### Frontend Github Repo
+https://github.com/midhunkalarikkal/Slotflow-FE
+
 ---
 
 ## 🚀 Tech Stack
@@ -49,44 +52,44 @@ SlotFlow is a full-featured appointment booking application designed to serve us
 ## 🧱 Project Structure (Clean Architecture)
 
 src
-    ├───application
-    │   ├───admin-use.case
-    │   │   └───adminProvider
-    │   ├───auth-use.case
-    │   ├───cron-job.use-case
-    │   ├───provider-use.case
-    │   └───user-use.case
-    ├───config
-    │   └───database
-    │       └───mongodb
-    ├───domain
-    │   ├───entities
-    │   └───repositories
-    ├───infrastructure
-    │   ├───cron-jobs
-    │   ├───database
-    │   │   ├───address
-    │   │   ├───appservice
-    │   │   ├───booking
-    │   │   ├───payment
-    │   │   ├───plan
-    │   │   ├───provider
-    │   │   ├───providerService
-    │   │   ├───serviceAvailability
-    │   │   ├───subscription
-    │   │   └───user
-    │   ├───dtos
-    │   ├───error
-    │   ├───helpers
-    │   ├───lib
-    │   ├───security
-    │   ├───services
-    │   ├───validator
-    │   └───zod
-    └───interface
-        ├───admin
-        ├───auth
-        ├───middleware
-        ├───provider
-        └───user
+├── application
+│ ├── admin-use.case
+│ │ └── adminProvider
+│ ├── auth-use.case
+│ ├── cron-job.use-case
+│ ├── provider-use.case
+│ └── user-use.case
+├── config
+│ └── database
+│ └── mongodb
+├── domain
+│ ├── entities
+│ └── repositories
+├── infrastructure
+│ ├── cron-jobs
+│ ├── database
+│ │ ├── address
+│ │ ├── appservice
+│ │ ├── booking
+│ │ ├── payment
+│ │ ├── plan
+│ │ ├── provider
+│ │ ├── providerService
+│ │ ├── serviceAvailability
+│ │ ├── subscription
+│ │ └── user
+│ ├── dtos
+│ ├── error
+│ ├── helpers
+│ ├── lib
+│ ├── security
+│ ├── services
+│ ├── validator
+│ └── zod
+└── interface
+├── admin
+├── auth
+├── middleware
+├── provider
+└── user
 
