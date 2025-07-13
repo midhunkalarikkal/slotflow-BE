@@ -87,6 +87,8 @@ export class BookingRepositoryImpl implements IBookingRepository {
                }
             );
 
+            console.log("bookings : ",bookings);
+
             return bookings.modifiedCount > 0 ? true : false;
         } catch {
             return false;
