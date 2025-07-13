@@ -53,45 +53,204 @@ https://github.com/midhunkalarikkal/Slotflow-FE
 
 ```
 src
-├── application
-│ ├── admin-use.case
-│ │ └── adminProvider
-│ ├── auth-use.case
-│ ├── cron-job.use-case
-│ ├── provider-use.case
-│ └── user-use.case
-├── config
-│ └── database
-│ └── mongodb
-├── domain
-│ ├── entities
-│ └── repositories
-├── infrastructure
-│ ├── cron-jobs
-│ ├── database
-│ │ ├── address
-│ │ ├── appservice
-│ │ ├── booking
-│ │ ├── payment
-│ │ ├── plan
-│ │ ├── provider
-│ │ ├── providerService
-│ │ ├── serviceAvailability
-│ │ ├── subscription
-│ │ └── user
-│ ├── dtos
-│ ├── error
-│ ├── helpers
-│ ├── lib
-│ ├── security
-│ ├── services
-│ ├── validator
-│ └── zod
-└── interface
-├── admin
-├── auth
-├── middleware
-├── provider
-└── user
+    |   app.ts
+    |   express.d.ts
+    |   server.ts
+    |   
+    +---application
+    |   +---admin-use.case
+    |   |   |   adminPayment.use-case.ts
+    |   |   |   adminPlan.use-case.ts
+    |   |   |   adminService.use-case.ts
+    |   |   |   adminSubscription.use-case.ts
+    |   |   |   adminUser.use-case.ts
+    |   |   |   
+    |   |   \---adminProvider
+    |   |           adminProvider.use-case.ts
+    |   |           adminProviderProfile.use-case.ts
+    |   |           
+    |   +---auth-use.case
+    |   |       checkUserStatus.use-case.ts
+    |   |       login.use-case.ts
+    |   |       register.use-case.ts
+    |   |       resend-otp.use-case.ts
+    |   |       updatePassword.use-case.ts
+    |   |       verify-otp.use-case.ts
+    |   |       
+    |   +---cron-job.use-case
+    |   |       updateBookingStatusCron.use-case.ts
+    |   |       
+    |   +---provider-use.case
+    |   |       providerAddress.use-case.ts
+    |   |       providerAppServices.use-case.ts
+    |   |       providerBooking.use-case.ts
+    |   |       providerPayment.use-case.ts
+    |   |       providerPlan.use-case.ts
+    |   |       providerProfile.use-case.ts
+    |   |       providerService.use-case.ts
+    |   |       providerServiceAvailability.use-case.ts
+    |   |       providerStripeSubscription.use-case.ts
+    |   |       providerSubscription.use-case.ts
+    |   |       providerTrailSubscription.use-case.ts
+    |   |       
+    |   \---user-use.case
+    |           usePayment.use-case.ts
+    |           userAddress.use-case.ts
+    |           userAppService.use-case.ts
+    |           userBooking.use-case.ts
+    |           userProfile.use-Case.ts
+    |           userProvider.use-case.ts
+    |           userStripeBooking.use-case.ts
+    |           
+    +---config
+    |   |   aws_s3.ts
+    |   |   env.ts
+    |   |   
+    |   \---database
+    |       \---mongodb
+    |               mongodb.config.ts
+    |               
+    +---domain
+    |   +---entities
+    |   |       address.entity.ts
+    |   |       booking.entity.ts
+    |   |       payment.entity.ts
+    |   |       plan.entity.ts
+    |   |       provider.entity.ts
+    |   |       providerService.entity.ts
+    |   |       service.entity.ts
+    |   |       serviceAvailability.entity.ts
+    |   |       subscription.entity.ts
+    |   |       user.entity.ts
+    |   |       
+    |   \---repositories
+    |           IAddress.repository.ts
+    |           IBooking.repository.ts
+    |           IPayment.repository.ts
+    |           IPlan.repository.ts
+    |           IProvider.repository.ts
+    |           IProviderService.repository.ts
+    |           IService.repository.ts
+    |           IServiceAvailability.repository.ts
+    |           ISubscription.repository.ts
+    |           IUser.repository.ts
+    |           
+    +---infrastructure
+    |   +---cron-jobs
+    |   |       updateBookingsCron.ts
+    |   |       
+    |   +---database
+    |   |   +---address
+    |   |   |       address.model.ts
+    |   |   |       address.repository.impl.ts
+    |   |   |       
+    |   |   +---appservice
+    |   |   |       service.model.ts
+    |   |   |       service.repository.impl.ts
+    |   |   |       
+    |   |   +---booking
+    |   |   |       booking.model.ts
+    |   |   |       booking.repository.impl.ts
+    |   |   |       
+    |   |   +---payment
+    |   |   |       payment.model.ts
+    |   |   |       payment.repository.impl.ts
+    |   |   |       
+    |   |   +---plan
+    |   |   |       plan.model.ts
+    |   |   |       plan.repository.impl.ts
+    |   |   |       
+    |   |   +---provider
+    |   |   |       provider.model.ts
+    |   |   |       provider.repository.impl.ts
+    |   |   |       
+    |   |   +---providerService
+    |   |   |       providerService.model.ts
+    |   |   |       providerService.repository.impl.ts
+    |   |   |       
+    |   |   +---serviceAvailability
+    |   |   |       serviceAvailability.model.ts
+    |   |   |       serviceAvailability.repository.impl.ts
+    |   |   |       
+    |   |   +---subscription
+    |   |   |       subscription.model.ts
+    |   |   |       subscription.repository.impl.ts
+    |   |   |       
+    |   |   \---user
+    |   |           user.model.ts
+    |   |           user.repository.impl.ts
+    |   |           
+    |   +---dtos
+    |   |       admin.dto.ts
+    |   |       auth.dto.ts
+    |   |       common.dto.ts
+    |   |       provider.dto.ts
+    |   |       user.dto.ts
+    |   |       
+    |   +---error
+    |   |       error.ts
+    |   |       
+    |   +---helpers
+    |   |       constants.ts
+    |   |       helper.ts
+    |   |       
+    |   +---lib
+    |   |       redis.ts
+    |   |       
+    |   +---security
+    |   |       jwt.ts
+    |   |       password-hashing.ts
+    |   |       
+    |   +---services
+    |   |       otp.service.ts
+    |   |       
+    |   +---validator
+    |   |       validator.ts
+    |   |       
+    |   \---zod
+    |           admin.zod.ts
+    |           auth.zod.ts
+    |           common.zod.ts
+    |           provider.zod.ts
+    |           user.zod.ts
+    |           
+    \---interface
+        +---admin
+        |       admin.routes.ts
+        |       adminPayment.Controller.ts
+        |       adminPlan.Controller.ts
+        |       adminProvider.controller.ts
+        |       adminService.Controller.ts
+        |       adminSubscription.Controller.ts
+        |       adminUser.Controller.ts
+        |       
+        +---auth
+        |       auth.controller.ts
+        |       auth.routes.ts
+        |       
+        +---middleware
+        |       auth.middleware.ts
+        |       
+        +---provider
+        |       provider.router.ts
+        |       providerAddress.controller.ts
+        |       providerAppService.controller.ts
+        |       providerBooking.controller.ts
+        |       providerPayment.controller.ts
+        |       providerPlan.controller.ts
+        |       providerProfile.controller.ts
+        |       providerService.controller.ts
+        |       providerServiceAvailability.controller.ts
+        |       providerSubscription.controller.ts
+        |       
+        \---user
+                user.routes.ts
+                userAddress.controller.ts
+                userAppService.controller.ts
+                userBooking.controller.ts
+                userPayment.controller.ts
+                userProfile.controller.ts
+                userProvider.controller.ts
+
 ```
 
