@@ -51,6 +51,7 @@ https://github.com/midhunkalarikkal/Slotflow-FE
 
 ## 🧱 Project Structure (Clean Architecture)
 
+```
 src
 ├── application
 │ ├── admin-use.case
@@ -92,4 +93,5 @@ src
 ├── middleware
 ├── provider
 └── user
+```
 
