@@ -14,7 +14,6 @@ export const mailConfig = {
 
 export const jwtConfig = {
     jwtSecret : process.env.JWT_SECRET,
-    refreshJwtSecret : process.env.REFRES_JWT_SECRET
 }
 
 export const appConfig = {
@@ -31,4 +30,9 @@ export const aws_s3Config = {
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
     region: process.env.AWS_REGION,
     bucketName: process.env.AWS_S3_BUCKET_NAME,
+}
+
+export const redisConfig = {
+    redisUrl: process.env.REDIS_URL,
+    redisToken: process.env.REDIS_TOKEN
 }

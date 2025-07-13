@@ -1,6 +1,6 @@
+import { DecodedUser } from "../../express"; 
 import { NextFunction, Request, Response } from "express";
 import { JWTService } from "../../infrastructure/security/jwt";
-import { DecodedUser } from "../../express";
 
 export const authMiddleware = (req: Request, res: Response, next: NextFunction): void => {
   const token = req.cookies.token;
@@ -9,7 +9,7 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction):
   if (!token) {
     res.status(401).json({ success: false, message: "Unauthorized, no token." });
     return;
-  }
+  } 
 
   try {
     const decoded = JWTService.verifyToken(token);
