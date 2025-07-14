@@ -13,16 +13,20 @@ import {
     UserFetchServiceProviderAddressUseCase, 
     UserFetchServiceProviderServiceDetailsUseCase, 
     UserFetchServiceProviderProfileDetailsUseCase, 
-    UserFetchServiceProviderServiceAvailabilityUseCase, 
+    UserFetchServiceProviderServiceAvailabilityUseCase,
+    UserFetchProvidersForChatSidebar, 
 } from "../../application/user-use.case/userProvider.use-case";
+import { BookingRepositoryImpl } from "../../infrastructure/database/booking/booking.repository.impl";
 
 const userRepositoryImpl = new UserRepositoryImpl();
 const addressRepositoryImpl = new AddressRepositoryImpl();
+const bookingRepositoryImpl = new BookingRepositoryImpl();
 const providerRepositoryImpl = new ProviderRepositoryImpl();
 const providerServiceRepository = new ProviderServiceRepositoryImpl();
 const providerServiceRepositoryImpl = new ProviderServiceRepositoryImpl();
 const serviceAvailabilityRepositoryImpl = new ServiceAvailabilityRepositoryImpl();
 
+const userFetchProvidersForChatSidebar = new UserFetchProvidersForChatSidebar(bookingRepositoryImpl);
 const userFetchServiceProvidersUseCase = new UserFetchServiceProvidersUseCase(userRepositoryImpl, providerServiceRepositoryImpl);
 const userFetchServiceProviderAddressUseCase = new UserFetchServiceProviderAddressUseCase(userRepositoryImpl, addressRepositoryImpl);
 const userFetchServiceProviderProfileDetailsUseCase = new UserFetchServiceProviderProfileDetailsUseCase(userRepositoryImpl, providerRepositoryImpl);
@@ -36,12 +40,14 @@ export class UserProviderController {
         private userFetchServiceProviderProfileDetailsUseCase: UserFetchServiceProviderProfileDetailsUseCase,
         private userFetchServiceProviderServiceDetailsUseCase: UserFetchServiceProviderServiceDetailsUseCase,
         private userFetchServiceProviderServiceAvailabilityUseCase: UserFetchServiceProviderServiceAvailabilityUseCase,
+        private userFetchProvidersForChatSidebar: UserFetchProvidersForChatSidebar,
     ) {
         this.fetchServiceProviders = this.fetchServiceProviders.bind(this);
         this.fetchServiceProviderAddress = this.fetchServiceProviderAddress.bind(this);
         this.fetchServiceProviderProfileDetails = this.fetchServiceProviderProfileDetails.bind(this);
         this.fetchServiceProviderServiceDetails = this.fetchServiceProviderServiceDetails.bind(this);
         this.fetchServiceProviderServiceAvailability = this.fetchServiceProviderServiceAvailability.bind(this);
+        this.fetchProvidersForChatSidebar = this.fetchProvidersForChatSidebar.bind(this);
     }
 
     async fetchServiceProviders(req: Request, res: Response) {
@@ -114,6 +120,16 @@ export class UserProviderController {
             HandleError.handle(error, res);
         }
     }
+
+    async fetchProvidersForChatSidebar(req: Request, res: Response) {
+        try {
+            const userId = req.user.userOrProviderId;
+            const result = await this.userFetchProvidersForChatSidebar.execute(new Types.ObjectId(userId));
+            res.status(200).json(result);
+        } catch (error) {
+            HandleError.handle(error,res);
+        }
+    }
 }
 
 const userProviderController = new UserProviderController(
@@ -121,6 +137,8 @@ const userProviderController = new UserProviderController(
     userFetchServiceProviderAddressUseCase, 
     userFetchServiceProviderProfileDetailsUseCase, 
     userFetchServiceProviderServiceDetailsUseCase, 
-    userFetchServiceProviderServiceAvailabilityUseCase);
+    userFetchServiceProviderServiceAvailabilityUseCase,
+    userFetchProvidersForChatSidebar
+);
     
 export { userProviderController };

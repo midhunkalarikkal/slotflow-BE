@@ -35,6 +35,8 @@ router.put('/cancelBooking/:bookingId', authMiddleware, userBookingController.ca
 
 router.get('/getPayments', authMiddleware, userPaymentController.fetchPayments);
 
+router.get('/getProvidersForChatSidebar', authMiddleware, userProviderController.fetchProvidersForChatSidebar);
+
 
 
 export default router;

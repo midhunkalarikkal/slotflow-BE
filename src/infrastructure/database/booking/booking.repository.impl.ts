@@ -6,6 +6,8 @@ import { CreateBookingPayloadProps, IBookingRepository } from "../../../domain/r
 import { Provider } from "../../../domain/entities/provider.entity";
 import { ProviderFetchUsersForChatSideBar } from "../../dtos/provider.dto";
 import dayjs from "dayjs";
+import { User } from "../../../domain/entities/user.entity";
+import { UserFetchProvidersForChatSidebar } from "../../dtos/user.dto";
 
 export class BookingRepositoryImpl implements IBookingRepository {
     private mapToEntity(booking: IBooking): Booking {
@@ -127,17 +129,13 @@ export class BookingRepositoryImpl implements IBookingRepository {
     async findUsersforChatSideBar(providerId: Provider["_id"]): Promise<ProviderFetchUsersForChatSideBar> {
         try {
 
-            console.log("providerId : ",providerId);
-            console.log("gte : ",dayjs().subtract(1, 'day').startOf('day').toDate());
-            console.log("lte : ",dayjs().add(1, 'day').startOf('day').toDate());
-
             const users = await BookingModel.aggregate([
                 {
                     $match: {
                         serviceProviderId: providerId,
                         appointmentDate: {
-                            $gte: dayjs().subtract(1, 'day').startOf('day').toDate(),         // eg: 2025-07-13T18:30:00.000Z
-                            $lte: dayjs().add(1, 'day').startOf('day').toDate(),              // eg: 2025-07-15T00:00:00.000Z
+                            $gte: dayjs().subtract(1, 'day').startOf('day').toDate(),
+                            $lte: dayjs().add(1, 'day').startOf('day').toDate(),
                         },
                     }
                 },
@@ -166,8 +164,53 @@ export class BookingRepositoryImpl implements IBookingRepository {
                 }
             ]);
             return users;
+            
         } catch {
             throw new Error("Users fetching failed");
+        }
+    }
+
+    async findProvidersforChatSideBar(userId: User["_id"]): Promise<UserFetchProvidersForChatSidebar> {
+        try{
+
+            const providers = await BookingModel.aggregate([
+                {
+                    $match: {
+                        userId: userId,
+                        appointmentDate: {
+                            $gte: dayjs().subtract(1, 'day').startOf('day').toDate(),
+                            $lte: dayjs().add(1, 'day').startOf('day').toDate(),
+                        },
+                    }
+                },
+                {
+                    $lookup: {
+                        from: "providers",
+                        localField: "serviceProviderId",
+                        foreignField: "_id",
+                        as: "provider"
+                    }
+                },
+                { $unwind: "$provider" },
+                {
+                    $group: {
+                        _id: "$provider._id",
+                        username: { $first: "$provider.username" },
+                        profileImage: { $first: "$provider.profileImage" }
+                    }
+                },
+                {
+                    $project: {
+                        _id: 1,
+                        username: 1,
+                        profileImage: 1
+                    }
+                }
+            ]);
+            return providers;
+
+        }catch {
+            throw new Error("providers fetching failed");
         }
     }
 }

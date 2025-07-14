@@ -23,6 +23,8 @@ import { AddressRepositoryImpl } from "../../infrastructure/database/address/add
 import { ProviderRepositoryImpl } from "../../infrastructure/database/provider/provider.repository.impl";
 import { ProviderServiceRepositoryImpl } from "../../infrastructure/database/providerService/providerService.repository.impl";
 import { ServiceAvailabilityRepositoryImpl } from "../../infrastructure/database/serviceAvailability/serviceAvailability.repository.impl";
+import { User } from "../../domain/entities/user.entity";
+import { BookingRepositoryImpl } from "../../infrastructure/database/booking/booking.repository.impl";
 
 
 export class UserFetchServiceProvidersUseCase {
@@ -180,5 +182,35 @@ export class UserFetchServiceProviderServiceAvailabilityUseCase {
     });
 
     return { success: true, message: "Service availability fetched successfully.", data: { ...availability, slots: updatedSlots } };
+  }
+}
+
+
+export class UserFetchProvidersForChatSidebar {
+  constructor(
+    private bookingRepositoryImpl: BookingRepositoryImpl
+  ) { }
+
+  async execute(userId: User["_id"]): Promise<ApiResponse<UserFetchProvidersForChatSidebar>> {
+
+    Validator.validateObjectId(userId, "User Id");
+
+    const result = await this.bookingRepositoryImpl.findProvidersforChatSideBar(userId);
+
+    const updatedResult: UserFetchProvidersForChatSidebar = await Promise.all(
+            result.map(async (provider) => {
+                let profileImageUrl = provider?.profileImage;
+
+                if (profileImageUrl) {
+                    const s3Key = await extractS3Key(profileImageUrl);
+                    const signedUrl = await generateSignedUrl(s3Key);
+                    provider.profileImage = signedUrl;
+                }
+
+                return provider;
+            })
+        )
+
+    return { success: true, message:"Providers fetched successfully", data: updatedResult }
   }
 }
