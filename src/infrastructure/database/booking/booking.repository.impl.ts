@@ -3,6 +3,9 @@ import { BookingModel, IBooking } from "./booking.model";
 import { Booking } from "../../../domain/entities/booking.entity";
 import { FetchBookingsRequest, ApiResponse, FetchBookingsResponse, userIdAndServiceProviderId } from "../../dtos/common.dto";
 import { CreateBookingPayloadProps, IBookingRepository } from "../../../domain/repositories/IBooking.repository";
+import { Provider } from "../../../domain/entities/provider.entity";
+import { ProviderFetchUsersForChatSideBar } from "../../dtos/provider.dto";
+import dayjs from "dayjs";
 
 export class BookingRepositoryImpl implements IBookingRepository {
     private mapToEntity(booking: IBooking): Booking {
@@ -76,19 +79,16 @@ export class BookingRepositoryImpl implements IBookingRepository {
 
             const bookings = await BookingModel.updateMany(
                 {
-                        appointmentStatus: "Booked",
-                        appointmentDate: {
-                            $gte: todayStart,
-                            $lt: todayEnd
-                        }
+                    appointmentStatus: "Booked",
+                    appointmentDate: {
+                        $gte: todayStart,
+                        $lt: todayEnd
+                    }
                 },
-               {
-                $set: { appointmentStatus : "Not Attended" }
-               }
+                {
+                    $set: { appointmentStatus: "Not Attended" }
+                }
             );
-
-            console.log("bookings : ",bookings);
-
             return bookings.modifiedCount > 0 ? true : false;
         } catch {
             return false;
@@ -99,8 +99,8 @@ export class BookingRepositoryImpl implements IBookingRepository {
         try {
             const skip = (page - 1) * limit;
             const filter: userIdAndServiceProviderId = {};
-            if (userId) { filter.userId = userId;}
-            if (serviceProviderId) { filter.serviceProviderId = serviceProviderId;}
+            if (userId) { filter.userId = userId; }
+            if (serviceProviderId) { filter.serviceProviderId = serviceProviderId; }
             const [payments, totalCount] = await Promise.all([
                 BookingModel.find(filter, {
                     _id: 1,
@@ -119,8 +119,55 @@ export class BookingRepositoryImpl implements IBookingRepository {
                 currentPage: page,
                 totalCount
             }
-        }catch {
+        } catch {
             throw new Error("Bookings fetching failed")
+        }
+    }
+
+    async findUsersforChatSideBar(providerId: Provider["_id"]): Promise<ProviderFetchUsersForChatSideBar> {
+        try {
+
+            console.log("providerId : ",providerId);
+            console.log("gte : ",dayjs().subtract(1, 'day').startOf('day').toDate());
+            console.log("lte : ",dayjs().add(1, 'day').startOf('day').toDate());
+
+            const users = await BookingModel.aggregate([
+                {
+                    $match: {
+                        serviceProviderId: providerId,
+                        appointmentDate: {
+                            $gte: dayjs().subtract(1, 'day').startOf('day').toDate(),         // eg: 2025-07-13T18:30:00.000Z
+                            $lte: dayjs().add(1, 'day').startOf('day').toDate(),              // eg: 2025-07-15T00:00:00.000Z
+                        },
+                    }
+                },
+                {
+                    $lookup: {
+                        from: "users",
+                        localField: "userId",
+                        foreignField: "_id",
+                        as: "user"
+                    }
+                },
+                { $unwind: "$user" },
+                {
+                    $group: {
+                        _id: "$user._id",
+                        username: { $first: "$user.username" },
+                        profileImage: { $first: "$user.profileImage" }
+                    }
+                },
+                {
+                    $project: {
+                        _id: 1,
+                        username: 1,
+                        profileImage: 1
+                    }
+                }
+            ]);
+            return users;
+        } catch {
+            throw new Error("Users fetching failed");
         }
     }
 }

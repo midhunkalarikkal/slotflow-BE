@@ -4,6 +4,7 @@ import { Service } from "../../domain/entities/service.entity";
 import { Provider } from "../../domain/entities/provider.entity";
 import { ProviderService } from "../../domain/entities/providerService.entity";
 import { FontendAvailabilityForResponse, FrontendAvailabilityForRequest } from "../../domain/entities/serviceAvailability.entity";
+import { User } from "../../domain/entities/user.entity";
 
 
 // **** Used as the request type for creating a provider
@@ -130,6 +131,14 @@ export interface ProviderSaveSubscriptionRequest {
 export interface ProviderTrialSubscriptionRequest {
     providerId: Provider["_id"];
 }
+
+
+
+
+
+// ************ used in providerUser.use-case  ************ \\
+// provider fetch users for the chat sidebar
+export type ProviderFetchUsersForChatSideBar = Array<Pick<User, "_id" | "username" | "profileImage">>
 
 
 

@@ -1,6 +1,8 @@
 import { Types } from "mongoose";
 import { Booking } from "../entities/booking.entity";
 import { ApiResponse, FetchBookingsRequest, FetchBookingsResponse } from "../../infrastructure/dtos/common.dto";
+import { Provider } from "../entities/provider.entity";
+import { ProviderFetchUsersForChatSideBar } from "../../infrastructure/dtos/provider.dto";
 
 export type CreateBookingPayloadProps = Pick<Booking, "serviceProviderId" | "userId" | "appointmentDate" | "appointmentTime" | "appointmentMode" | "appointmentStatus" | "slotId" | "paymentId">;
 
@@ -16,5 +18,7 @@ export interface IBookingRepository {
 
     findTodaysBookingForCronjob() : Promise<boolean> ;
 
-    findAllBookings({ page, limit, userId, serviceProviderId }: FetchBookingsRequest) : Promise<ApiResponse<FetchBookingsResponse>>
+    findAllBookings({ page, limit, userId, serviceProviderId }: FetchBookingsRequest) : Promise<ApiResponse<FetchBookingsResponse>>;
+
+    findUsersforChatSideBar(providerId: Provider["_id"]): Promise<ProviderFetchUsersForChatSideBar>;
 }
