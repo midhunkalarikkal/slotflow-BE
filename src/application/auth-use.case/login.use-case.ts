@@ -72,6 +72,6 @@ export class LoginUseCase {
             updateProfileImage = signedUrl
         }
 
-        return { success: true, message: 'Logged In Successfully.', authUser: { username: userOrProvider.username, profileImage: updateProfileImage ? updateProfileImage : userOrProvider.profileImage, role: role, token, isLoggedIn: true, address, serviceDetails, serviceAvailability, approved } };
+        return { success: true, message: 'Logged In Successfully.', authUser: { uid: userOrProvider._id, username: userOrProvider.username, profileImage: updateProfileImage ? updateProfileImage : userOrProvider.profileImage, role: role, token, isLoggedIn: true, address, serviceDetails, serviceAvailability, approved } };
     }
 }

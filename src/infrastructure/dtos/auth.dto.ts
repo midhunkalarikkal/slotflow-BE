@@ -47,11 +47,12 @@ export interface LoginRequest {
 // user or provider login use case response interface
 export interface LoginResponse extends CommonResponse {
     authUser: { 
+        uid?: Types.ObjectId;
         username: string, 
         profileImage: string | null, 
         role: string, 
         token: string, 
-        isLoggedIn: boolean, 
+        isLoggedIn: boolean,  
         address?: boolean, 
         serviceDetails?: boolean, 
         serviceAvailability?: boolean, 
